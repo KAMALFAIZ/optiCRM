@@ -1,0 +1,492 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Animation point micro voix ── */
+@keyframes voicePulse {
+  0%   { box-shadow: 0 0 0 0   rgba(255, 77, 79, 0.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(255, 77, 79, 0); }
+  100% { box-shadow: 0 0 0 0   rgba(255, 77, 79, 0); }
+}
+
+/* =============================================
+   VELZON THEME - CSS DESIGN TOKENS
+   ============================================= */
+:root {
+  /* Brand Colors */
+  --vz-primary: #405189;
+  --vz-secondary: #3577f1;
+  --vz-success: #0ab39c;
+  --vz-info: #299cdb;
+  --vz-warning: #f7b84b;
+  --vz-danger: #f06548;
+  --vz-light: #f3f6f9;
+  --vz-dark: #212529;
+
+  /* Layout */
+  --vz-sidebar-width: 250px;
+  --vz-sidebar-collapsed-width: 70px;
+  --vz-header-height: 70px;
+
+  /* Sidebar (dark purple) */
+  --vz-sidebar-bg: #405189;
+  --vz-sidebar-text: rgba(255, 255, 255, 0.65);
+  --vz-sidebar-text-active: #ffffff;
+  --vz-sidebar-item-active-bg: rgba(255, 255, 255, 0.15);
+  --vz-sidebar-item-hover-bg: rgba(255, 255, 255, 0.08);
+  --vz-sidebar-sub-bg: rgba(0, 0, 0, 0.2);
+  --vz-sidebar-border: rgba(255, 255, 255, 0.1);
+
+  /* Header */
+  --vz-header-bg: #ffffff;
+  --vz-header-border: #e9ebec;
+  --vz-header-item-color: #495057;
+
+  /* Body / Content */
+  --vz-body-bg: #f3f6f9;
+  --vz-card-bg: #ffffff;
+  --vz-border-color: #e9ebec;
+  --vz-border-radius: 8px;
+
+  /* Text */
+  --vz-text: #495057;
+  --vz-text-muted: #878a99;
+  --vz-heading: #212529;
+
+  /* Shadows */
+  --vz-card-shadow: 0 1px 3px rgba(56, 65, 74, 0.1);
+  --vz-header-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+
+  /* Legacy compat */
+  --primary-color: #405189;
+  --success-color: #0ab39c;
+  --warning-color: #f7b84b;
+  --error-color: #f06548;
+  --font-size-base: 14px;
+  --heading-color: #212529;
+  --text-color: #495057;
+  --text-color-secondary: #878a99;
+  --disabled-color: rgba(0, 0, 0, 0.25);
+  --border-radius-base: 8px;
+  --border-color-base: #e9ebec;
+  --box-shadow-base: 0 1px 3px rgba(56, 65, 74, 0.1);
+}
+
+/* =============================================
+   DARK MODE TOKENS
+   ============================================= */
+[data-theme="dark"] {
+  --vz-sidebar-bg: #1a1d21;
+  --vz-sidebar-text: rgba(255, 255, 255, 0.55);
+  --vz-sidebar-text-active: #ffffff;
+  --vz-sidebar-item-active-bg: rgba(64, 81, 137, 0.6);
+  --vz-sidebar-item-hover-bg: rgba(255, 255, 255, 0.06);
+  --vz-sidebar-sub-bg: rgba(0, 0, 0, 0.3);
+  --vz-sidebar-border: rgba(255, 255, 255, 0.07);
+
+  --vz-header-bg: #262b30;
+  --vz-header-border: #2a2f34;
+  --vz-header-item-color: #b9c0c7;
+
+  --vz-body-bg: #111316;
+  --vz-card-bg: #1d2228;
+  --vz-border-color: #2a2f34;
+
+  --vz-text: #adb5bd;
+  --vz-text-muted: #6d7080;
+  --vz-heading: #e9ecef;
+
+  --vz-card-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  --vz-header-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+
+  --heading-color: rgba(255, 255, 255, 0.85);
+  --text-color: #adb5bd;
+  --text-color-secondary: #6d7080;
+  --border-color-base: #2a2f34;
+}
+
+/* =============================================
+   GLOBAL RESET & BASE
+   ============================================= */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: var(--font-size-base);
+  font-weight: 400;
+  color: var(--vz-text);
+  background-color: var(--vz-body-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* =============================================
+   SCROLLBAR
+   ============================================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #3a3f47;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #555d67;
+}
+
+/* =============================================
+   VELZON SIDEBAR OVERRIDES (Ant Design)
+   ============================================= */
+
+/* Sidebar container */
+.velzon-sider {
+  background: var(--vz-sidebar-bg) !important;
+  transition: background-color 0.3s !important;
+}
+
+/* Menu container inside sidebar */
+.velzon-sider .ant-menu {
+  background: transparent !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 13px !important;
+}
+
+/* Parent menu items */
+.velzon-sider .ant-menu-item,
+.velzon-sider .ant-menu-submenu-title {
+  color: var(--vz-sidebar-text) !important;
+  border-radius: 6px !important;
+  margin: 2px 8px !important;
+  width: calc(100% - 16px) !important;
+}
+
+.velzon-sider .ant-menu-item:hover,
+.velzon-sider .ant-menu-submenu-title:hover {
+  background: var(--vz-sidebar-item-hover-bg) !important;
+  color: var(--vz-sidebar-text-active) !important;
+}
+
+/* Selected/active menu item */
+.velzon-sider .ant-menu-item-selected,
+.velzon-sider .ant-menu-item-active {
+  background: var(--vz-sidebar-item-active-bg) !important;
+  color: var(--vz-sidebar-text-active) !important;
+}
+
+/* Submenu popup */
+.velzon-sider .ant-menu-sub {
+  background: var(--vz-sidebar-sub-bg) !important;
+}
+
+/* Icons */
+.velzon-sider .ant-menu-item .anticon,
+.velzon-sider .ant-menu-submenu-title .anticon {
+  color: inherit !important;
+}
+
+/* Submenu arrow */
+.velzon-sider .ant-menu-submenu-arrow {
+  color: var(--vz-sidebar-text) !important;
+}
+
+.velzon-sider .ant-menu-submenu-open > .ant-menu-submenu-title .ant-menu-submenu-arrow,
+.velzon-sider .ant-menu-submenu-title:hover .ant-menu-submenu-arrow {
+  color: var(--vz-sidebar-text-active) !important;
+}
+
+/* Divider inside sidebar */
+.velzon-sider .ant-menu-item-divider {
+  border-color: var(--vz-sidebar-border) !important;
+}
+
+/* =============================================
+   VELZON HEADER
+   ============================================= */
+.velzon-header {
+  background: var(--vz-header-bg) !important;
+  border-bottom: 1px solid var(--vz-header-border) !important;
+  box-shadow: var(--vz-header-shadow) !important;
+  transition: background-color 0.3s !important;
+  height: var(--vz-header-height) !important;
+  line-height: var(--vz-header-height) !important;
+  padding: 0 24px !important;
+}
+
+/* =============================================
+   VELZON CONTENT AREA
+   ============================================= */
+.velzon-content {
+  background: var(--vz-body-bg) !important;
+  transition: background-color 0.3s;
+}
+
+/* =============================================
+   CARDS
+   ============================================= */
+.ant-card {
+  border-radius: var(--vz-border-radius) !important;
+  box-shadow: var(--vz-card-shadow) !important;
+  border: 1px solid var(--vz-border-color) !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+[data-theme="dark"] .ant-card {
+  background: var(--vz-card-bg) !important;
+}
+
+/* =============================================
+   TABLES
+   ============================================= */
+.ant-table-wrapper {
+  background: var(--vz-card-bg);
+  border-radius: var(--vz-border-radius);
+  box-shadow: var(--vz-card-shadow);
+}
+
+[data-theme="dark"] .ant-table-wrapper {
+  background: var(--vz-card-bg);
+}
+
+/* =============================================
+   TABLE HEADER — réduit la hauteur
+   ============================================= */
+.ant-table-thead > tr > th,
+.ant-table-thead > tr > td {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+/* Boutons dans les cellules — plus petits */
+.ant-table-cell .ant-btn {
+  height: 26px !important;
+  line-height: 26px !important;
+  padding: 0 8px !important;
+}
+
+.ant-table-cell .ant-btn-icon-only {
+  width: 26px !important;
+  padding: 0 !important;
+}
+
+/* Tags dans les cellules — réduits */
+.ant-table-cell .ant-tag {
+  padding: 0 5px !important;
+  line-height: 18px !important;
+  margin: 0 !important;
+}
+
+/* Scrollbar vertical dans les tables */
+.ant-table-body {
+  overflow-y: auto !important;
+  scrollbar-width: thin;
+  scrollbar-color: #ced4da transparent;
+}
+
+.ant-table-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ant-table-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb {
+  background: #ced4da;
+  border-radius: 3px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
+
+[data-theme="dark"] .ant-table-body {
+  scrollbar-color: #3a3f47 transparent;
+}
+
+[data-theme="dark"] .ant-table-body::-webkit-scrollbar-thumb {
+  background: #3a3f47;
+}
+
+[data-theme="dark"] .ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #555d67;
+}
+
+/* =============================================
+   BUTTONS
+   ============================================= */
+.ant-btn {
+  border-radius: 6px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* =============================================
+   FORMS
+   ============================================= */
+.ant-input,
+.ant-select-selector,
+.ant-picker,
+.ant-input-affix-wrapper {
+  border-radius: 6px !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* =============================================
+   TYPOGRAPHY
+   ============================================= */
+.ant-typography,
+h1, h2, h3, h4, h5, h6,
+.ant-card-head-title {
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* =============================================
+   PAGE CONTAINER
+   ============================================= */
+.page-container {
+  padding: 24px;
+  background-color: var(--vz-card-bg);
+  border-radius: var(--vz-border-radius);
+  min-height: calc(100vh - 130px);
+  box-shadow: var(--vz-card-shadow);
+}
+
+/* =============================================
+   LAYOUT
+   ============================================= */
+.site-layout {
+  margin-left: var(--vz-sidebar-width);
+  transition: all 0.2s;
+}
+
+.site-layout.collapsed {
+  margin-left: var(--vz-sidebar-collapsed-width);
+}
+
+.content-wrapper {
+  margin: 20px;
+  padding: 24px;
+  background: var(--vz-card-bg);
+  border-radius: var(--vz-border-radius);
+  box-shadow: var(--vz-card-shadow);
+  min-height: 360px;
+}
+
+[data-theme="dark"] .content-wrapper {
+  background: var(--vz-card-bg);
+}
+
+/* =============================================
+   KANBAN
+   ============================================= */
+.kanban-board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+}
+
+.kanban-column {
+  flex: 0 0 300px;
+  background: var(--vz-body-bg);
+  border-radius: var(--vz-border-radius);
+  padding: 12px;
+  border: 1px solid var(--vz-border-color);
+}
+
+.kanban-column-header {
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.kanban-card {
+  background: var(--vz-card-bg);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+  box-shadow: var(--vz-card-shadow);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  border: 1px solid var(--vz-border-color);
+}
+
+.kanban-card:hover {
+  box-shadow: 0 4px 12px rgba(56, 65, 74, 0.15);
+}
+
+/* =============================================
+   STAT CARDS
+   ============================================= */
+.stat-card {
+  padding: 24px;
+  border-radius: var(--vz-border-radius);
+  background: var(--vz-card-bg);
+  box-shadow: var(--vz-card-shadow);
+  border: 1px solid var(--vz-border-color);
+}
+
+.stat-card .stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--vz-heading);
+  font-family: 'Poppins', sans-serif;
+}
+
+.stat-card .stat-label {
+  color: var(--vz-text-muted);
+  margin-top: 4px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* =============================================
+   TIMELINE
+   ============================================= */
+.activity-timeline {
+  padding: 16px;
+}
+
+.activity-timeline .ant-timeline-item-content {
+  padding-bottom: 16px;
+}
+
+/* =============================================
+   UTILITY
+   ============================================= */
+.card-shadow {
+  box-shadow: var(--vz-card-shadow);
+}
+
+.text-primary { color: var(--vz-primary); }
+.text-success { color: var(--vz-success); }
+.text-warning { color: var(--vz-warning); }
+.text-error   { color: var(--vz-danger); }
+.text-muted   { color: var(--vz-text-muted); }
