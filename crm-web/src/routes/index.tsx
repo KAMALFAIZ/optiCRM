@@ -1,4 +1,11 @@
 import { RouteObject, Navigate } from 'react-router-dom';
+import SavLoginPage from '@/features/sav/portal/SavLoginPage';
+import SavVerifyPage from '@/features/sav/portal/SavVerifyPage';
+import SavNewTicketPage from '@/features/sav/portal/SavNewTicketPage';
+import SavTicketDetailPage from '@/features/sav/portal/SavTicketDetailPage';
+import SavHistoriquePage from '@/features/sav/portal/SavHistoriquePage';
+import SavDashboardPage from '@/features/sav/dashboard/SavDashboardPage';
+import SavKbPage from '@/features/sav/kb/SavKbPage';
 import { useAppSelector } from '@/store';
 
 import MainLayout from '@/layouts/MainLayout';
@@ -75,6 +82,12 @@ function withPermission(module: string, element: React.ReactNode) {
 }
 
 export const routes: RouteObject[] = [
+  // ── Portail SAV public (sans auth OptiCRM) ──────────────────────────────
+  { path: '/sav', element: <SavLoginPage /> },
+  { path: '/sav/verify', element: <SavVerifyPage /> },
+  { path: '/sav/nouveau', element: <SavNewTicketPage /> },
+  { path: '/sav/ticket/:numero', element: <SavTicketDetailPage /> },
+  { path: '/sav/historique', element: <SavHistoriquePage /> },
   {
     path: '/login',
     element: <LoginPage />,
@@ -284,6 +297,15 @@ export const routes: RouteObject[] = [
       {
         path: 'settings',
         element: withPermission('admin', <SettingsPage />),
+      },
+      // ── SAV Module (KASOFT team only) ────────────────────────────────────
+      {
+        path: 'sav',
+        element: withPermission('admin', <SavDashboardPage />),
+      },
+      {
+        path: 'sav/kb',
+        element: withPermission('admin', <SavKbPage />),
       },
       // ── Profile (always accessible) ──
       {
