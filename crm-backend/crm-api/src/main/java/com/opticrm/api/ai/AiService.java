@@ -28,11 +28,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -80,7 +84,11 @@ public class AiService {
     @Autowired
     private LeadRepository leadRepository;
 
+    private static final int MAX_PROMPT_FIELD_LENGTH = 500;
+    private static final int MAX_NOTES_LENGTH = 3000;
+
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // ─── Client cache (rebuilt quand la clé change) ─────────────────────────
 
@@ -105,6 +113,8 @@ public class AiService {
 
     public SseEmitter streamChat(ChatRequest request) {
         SseEmitter emitter = new SseEmitter(120_000L);
+        emitter.onTimeout(emitter::complete);
+        emitter.onError(e -> log.debug("SSE client disconnected"));
 
         AnthropicClient client = getClient();
         if (client == null) {
@@ -130,7 +140,7 @@ public class AiService {
                                 try {
                                     emitter.send(SseEmitter.event().data(text.text()));
                                 } catch (IOException e) {
-                                    emitter.completeWithError(e);
+                                    log.debug("SSE write failed (client likely disconnected)");
                                 }
                             });
                 }
@@ -143,7 +153,7 @@ public class AiService {
                     emitter.send(SseEmitter.event().data("Une erreur est survenue. Veuillez réessayer."));
                     emitter.send(SseEmitter.event().name("done").data(""));
                 } catch (IOException ex) {
-                    log.error("Error sending error SSE", ex);
+                    log.debug("SSE error notification failed");
                 }
                 emitter.completeWithError(e);
             }
@@ -494,6 +504,9 @@ public class AiService {
 
     public SseEmitter streamChatWithSystemPrompt(ChatRequest request, String systemPrompt) {
         SseEmitter emitter = new SseEmitter(120_000L);
+        emitter.onTimeout(emitter::complete);
+        emitter.onError(e -> log.debug("SSE client disconnected"));
+
         AnthropicClient client = getClient();
         if (client == null) {
             try {
@@ -516,19 +529,19 @@ public class AiService {
                                 try {
                                     emitter.send(SseEmitter.event().data(text.text()));
                                 } catch (IOException e) {
-                                    emitter.completeWithError(e);
+                                    log.debug("SSE write failed (client likely disconnected)");
                                 }
                             });
                 }
                 emitter.send(SseEmitter.event().name("done").data(""));
                 emitter.complete();
             } catch (Exception e) {
-                log.error("Error streaming chantier AI chat", e);
+                log.error("Error streaming AI chat", e);
                 try {
                     emitter.send(SseEmitter.event().data("Une erreur est survenue."));
                     emitter.send(SseEmitter.event().name("done").data(""));
                 } catch (IOException ex) {
-                    log.error("SSE send error", ex);
+                    log.debug("SSE error notification failed");
                 }
                 emitter.completeWithError(e);
             }
@@ -725,13 +738,13 @@ public class AiService {
 
         // Account info
         sb.append("═══ COMPTE ═══\n");
-        sb.append("Nom : ").append(account.getName()).append("\n");
-        if (account.getLegalName() != null) sb.append("Raison sociale : ").append(account.getLegalName()).append("\n");
+        sb.append("Nom : ").append(safe(account.getName())).append("\n");
+        if (account.getLegalName() != null) sb.append("Raison sociale : ").append(safe(account.getLegalName())).append("\n");
         if (account.getAccountType() != null) sb.append("Type : ").append(account.getAccountType()).append("\n");
         if (account.getSegment() != null) sb.append("Segment : ").append(account.getSegment()).append("\n");
-        if (account.getIndustry() != null) sb.append("Secteur : ").append(account.getIndustry().getName()).append("\n");
-        if (account.getBillingCity() != null) sb.append("Ville : ").append(account.getBillingCity()).append("\n");
-        if (account.getAssignedTo() != null) sb.append("Commercial : ").append(account.getAssignedTo().getFullName()).append("\n");
+        if (account.getIndustry() != null) sb.append("Secteur : ").append(safe(account.getIndustry().getName())).append("\n");
+        if (account.getBillingCity() != null) sb.append("Ville : ").append(safe(account.getBillingCity())).append("\n");
+        Optional.ofNullable(account.getAssignedTo()).ifPresent(u -> sb.append("Commercial : ").append(safe(u.getFullName())).append("\n"));
         if (account.getCreditLimit() != null) sb.append("Limite crédit : ").append(account.getCreditLimit()).append(" MAD\n");
 
         // Financial summary
@@ -798,9 +811,9 @@ public class AiService {
         sb.append("Analyse ce lead et fournis un score prédictif de conversion.\n\n");
 
         sb.append("═══ PROFIL DU LEAD ═══\n");
-        sb.append("Nom : ").append(lead.getFirstName() != null ? lead.getFirstName() + " " : "").append(lead.getLastName()).append("\n");
-        if (lead.getCompanyName() != null) sb.append("Entreprise : ").append(lead.getCompanyName()).append("\n");
-        if (lead.getJobTitle() != null) sb.append("Poste : ").append(lead.getJobTitle()).append("\n");
+        sb.append("Nom : ").append(safe(lead.getFirstName())).append(" ").append(safe(lead.getLastName())).append("\n");
+        if (lead.getCompanyName() != null) sb.append("Entreprise : ").append(safe(lead.getCompanyName())).append("\n");
+        if (lead.getJobTitle() != null) sb.append("Poste : ").append(safe(lead.getJobTitle())).append("\n");
         if (lead.getIndustry() != null) sb.append("Secteur : ").append(lead.getIndustry()).append("\n");
         if (lead.getSource() != null) sb.append("Source : ").append(lead.getSource()).append("\n");
         if (lead.getStatus() != null) sb.append("Statut actuel : ").append(lead.getStatus()).append("\n");
@@ -853,17 +866,16 @@ public class AiService {
 
     private ClassifyTicketResponse parseClassifyTicketResponse(String json) {
         try {
-            // Clean potential markdown wrapping
             String cleaned = json.trim();
             if (cleaned.startsWith("```")) {
                 cleaned = cleaned.replaceAll("^```(?:json)?\\s*", "").replaceAll("\\s*```$", "");
             }
-            // Simple manual parse to avoid adding Jackson ObjectMapper dependency
-            String category = extractJsonString(cleaned, "category");
-            String priority = extractJsonString(cleaned, "priority");
-            String reasoning = extractJsonString(cleaned, "reasoning");
 
-            // Validate values
+            JsonNode node = objectMapper.readTree(cleaned);
+            String category = node.has("category") ? node.get("category").asText("AUTRE") : "AUTRE";
+            String priority = node.has("priority") ? node.get("priority").asText("NORMALE") : "NORMALE";
+            String reasoning = node.has("reasoning") ? node.get("reasoning").asText("") : "";
+
             if (!List.of("SAV", "TECHNIQUE", "COMMERCIAL", "FACTURATION", "LIVRAISON", "AUTRE").contains(category)) {
                 category = "AUTRE";
             }
@@ -878,18 +890,9 @@ public class AiService {
         }
     }
 
-    private String extractJsonString(String json, String key) {
-        String pattern = "\"" + key + "\"\\s*:\\s*\"";
-        int start = json.indexOf(pattern);
-        if (start < 0) return "";
-        start += pattern.length() - 1; // position at opening quote
-        // Find closing quote (handle escaped quotes)
-        int i = start + 1;
-        while (i < json.length()) {
-            if (json.charAt(i) == '\\') { i += 2; continue; }
-            if (json.charAt(i) == '"') break;
-            i++;
-        }
-        return json.substring(start + 1, Math.min(i, json.length()));
+    private static String safe(String value) {
+        if (value == null) return "";
+        if (value.length() > MAX_PROMPT_FIELD_LENGTH) return value.substring(0, MAX_PROMPT_FIELD_LENGTH) + "…";
+        return value;
     }
 }
