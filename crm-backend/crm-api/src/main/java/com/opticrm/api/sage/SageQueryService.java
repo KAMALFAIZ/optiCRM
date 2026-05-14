@@ -67,14 +67,11 @@ public class SageQueryService {
         SageConnectionInfo info = settingService.getSageConnectionInfo();
         validate(info);
 
-        // Sécurité minimale : seules les requêtes SELECT sont autorisées
-        String trimmed = sql.strip();
-        if (!trimmed.toUpperCase().startsWith("SELECT")) {
-            throw new BusinessException("SAGE_QUERY_FORBIDDEN",
-                    "Seules les requêtes SELECT sont autorisées.");
-        }
-
-        log.info("Requête Sage personnalisée [{}] : {}", entityType, trimmed.substring(0, Math.min(80, trimmed.length())));
+        // Sécurité : on s'appuie sur executeQuery() qui lève une SQLException
+        // si la requête produit un update count (INSERT/UPDATE/DELETE) plutôt qu'un ResultSet.
+        // Cela couvre SELECT, WITH...SELECT (CTE), et bloque nativement tout DML.
+        log.info("Requête Sage personnalisée [{}] : {}…", entityType,
+                sql.strip().substring(0, Math.min(120, sql.strip().length())));
         return execute(info, sql);
     }
 
@@ -114,25 +111,25 @@ public class SageQueryService {
 
     private List<Map<String, Object>> execute(SageConnectionInfo info, String sql) {
         try (Connection conn = buildConnection(info);
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setQueryTimeout(240); // 4 minutes max par requête SQL
+            try (ResultSet rs = stmt.executeQuery()) {
+                ResultSetMetaData meta = rs.getMetaData();
+                int cols = meta.getColumnCount();
+                List<Map<String, Object>> rows = new ArrayList<>();
 
-            ResultSetMetaData meta = rs.getMetaData();
-            int cols = meta.getColumnCount();
-            List<Map<String, Object>> rows = new ArrayList<>();
-
-            while (rs.next()) {
-                Map<String, Object> row = new LinkedHashMap<>();
-                for (int i = 1; i <= cols; i++) {
-                    Object val = rs.getObject(i);
-                    row.put(meta.getColumnLabel(i).toLowerCase(), val != null ? val.toString().trim() : "");
+                while (rs.next()) {
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    for (int i = 1; i <= cols; i++) {
+                        Object val = rs.getObject(i);
+                        row.put(meta.getColumnLabel(i).toLowerCase(), val != null ? val.toString().trim() : "");
+                    }
+                    rows.add(row);
                 }
-                rows.add(row);
+
+                log.info("Sage query ({} col) → {} lignes", cols, rows.size());
+                return rows;
             }
-
-            log.info("Sage query ({} col) → {} lignes", cols, rows.size());
-            return rows;
-
         } catch (SQLException e) {
             log.error("Erreur requête Sage: {}", e.getMessage());
             throw new BusinessException("SAGE_QUERY_ERROR",

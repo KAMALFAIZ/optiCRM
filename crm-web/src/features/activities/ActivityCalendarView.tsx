@@ -9,6 +9,7 @@ import { message } from 'antd';
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { fetchCalendarEvents, rescheduleActivity } from './activitiesSlice';
+import { fetchGoogleCalendarEvents } from '@/features/googleCalendar/googleCalendarSlice';
 
 const typeColors: Record<string, string> = {
   call: '#1890ff',
@@ -27,10 +28,14 @@ interface Props {
 export default function ActivityCalendarView({ onEventClick, onDateClick, onEventReschedule }: Props) {
   const dispatch = useAppDispatch();
   const { calendarEvents } = useAppSelector((state) => state.activities);
+  const { events: googleEvents, status: gcStatus } = useAppSelector((state) => state.googleCalendar);
 
   const loadEvents = useCallback((start: string, end: string) => {
     dispatch(fetchCalendarEvents({ from: start, to: end }));
-  }, [dispatch]);
+    if (gcStatus?.connected) {
+      dispatch(fetchGoogleCalendarEvents({ from: start, to: end }));
+    }
+  }, [dispatch, gcStatus?.connected]);
 
   const handleEventDrop = async (info: any) => {
     const id = info.event.id;
@@ -81,7 +86,7 @@ export default function ActivityCalendarView({ onEventClick, onDateClick, onEven
     loadEvents(start, end);
   }, [loadEvents]);
 
-  const events = calendarEvents.map((event) => ({
+  const crmEvents = calendarEvents.map((event) => ({
     id: event.id,
     title: event.subject,
     start: event.startDate,
@@ -92,8 +97,27 @@ export default function ActivityCalendarView({ onEventClick, onDateClick, onEven
       type: event.activityType,
       status: event.status,
       priority: event.priority,
+      source: 'crm',
     },
   }));
+
+  const gcEvents = googleEvents.map((event) => ({
+    id: 'gc_' + event.id,
+    title: '📅 ' + event.title,
+    start: event.start,
+    end: event.end,
+    backgroundColor: '#34A853',
+    borderColor: '#34A853',
+    textColor: '#fff',
+    editable: false,
+    extendedProps: {
+      type: 'google',
+      source: 'google',
+      htmlLink: event.htmlLink,
+    },
+  }));
+
+  const events = [...crmEvents, ...gcEvents];
 
   return (
     <FullCalendar

@@ -25,8 +25,10 @@ import {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const fmtMAD = (v: number) =>
-  v.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const fmtMAD = (v: unknown) => {
+  const n = typeof v === 'number' && !Number.isNaN(v) ? v : Number(v) || 0;
+  return n.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+};
 
 const cardS = { borderRadius: 8, border: '1px solid #f1f5f9' };
 

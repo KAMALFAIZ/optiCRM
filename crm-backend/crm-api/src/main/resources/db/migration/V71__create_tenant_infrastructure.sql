@@ -40,6 +40,10 @@ CREATE TABLE tenants (
     stripe_subscription_id  NVARCHAR(100),
     trial_ends_at           DATETIME2,
     admin_email             NVARCHAR(255),
+    -- Database provisioning (SaaS database-per-tenant)
+    db_name                 NVARCHAR(200),
+    db_provisioned          BIT              NOT NULL DEFAULT 0,
+    db_provisioned_at       DATETIME2,
     created_at              DATETIME2        NOT NULL DEFAULT GETUTCDATE(),
     updated_at              DATETIME2        DEFAULT GETUTCDATE()
 );

@@ -10,8 +10,14 @@ import { CommercialKpi } from '@/types/dashboard';
 
 // -- Helpers ------------------------------------------------------------------
 
-const formatMAD = (value: number): string =>
-  value.toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const num = (v: unknown): number => {
+  if (typeof v === 'number' && !Number.isNaN(v)) return v;
+  const parsed = Number(v);
+  return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const formatMAD = (v: unknown): string =>
+  num(v).toLocaleString('fr-FR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 const cardS = { borderRadius: 8, border: '1px solid #f1f5f9' };
 
@@ -24,7 +30,7 @@ const medalColors: Record<number, { color: string; label: string }> = {
 // -- Component ----------------------------------------------------------------
 
 export default function CommercialKpisPage() {
-  const [data, setData] = useState<CommercialKpi[]>([]);
+  const [data, setData] = useState<(CommercialKpi & { _uid: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,9 +39,27 @@ export default function CommercialKpisPage() {
       setLoading(true);
       setError(null);
       try {
-        const result = await kpisApi.getCommercialKpis();
-        // Sort by revenue descending for ranking
+        const raw = await kpisApi.getCommercialKpis();
+        const result = (Array.isArray(raw) ? raw : []).map((r, i) => ({
+          _uid: `kpi-${i}`,
+          repName: typeof r.repName === 'string' && r.repName.trim() ? r.repName : 'Inconnu',
+          revenue: num(r.revenue),
+          dealsWon: num(r.dealsWon),
+          dealsLost: num(r.dealsLost),
+          winRate: num(r.winRate),
+          averageDealSize: num(r.averageDealSize),
+          pipeline: num(r.pipeline),
+          openDeals: num(r.openDeals),
+          totalVisits: num(r.totalVisits),
+          completedVisits: num(r.completedVisits),
+          plannedVisits: num(r.plannedVisits),
+          inProgressVisits: num(r.inProgressVisits),
+          visitCompletionRate: num(r.visitCompletionRate),
+          totalMileage: num(r.totalMileage),
+          totalExpenses: num(r.totalExpenses),
+        }));
         result.sort((a, b) => b.revenue - a.revenue);
+        result.forEach((r, i) => { r._uid = `kpi-${i}`; });
         setData(result);
       } catch (err: any) {
         setError(err.response?.data?.error?.message || err.response?.data?.message || 'Erreur lors du chargement des KPIs');
@@ -118,9 +142,10 @@ export default function CommercialKpisPage() {
       align: 'center' as const,
       width: 110,
       sorter: (a: CommercialKpi, b: CommercialKpi) => a.winRate - b.winRate,
-      render: (v: number) => {
-        const color = v >= 50 ? '#16a34a' : v >= 30 ? '#d97706' : '#dc2626';
-        return <span style={{ fontSize: 12, fontWeight: 600, color }}>{v.toFixed(1)}%</span>;
+      render: (v: unknown) => {
+        const n = num(v);
+        const color = n >= 50 ? '#16a34a' : n >= 30 ? '#d97706' : '#dc2626';
+        return <span style={{ fontSize: 12, fontWeight: 600, color }}>{n.toFixed(1)}%</span>;
       },
     },
     {
@@ -155,7 +180,7 @@ export default function CommercialKpisPage() {
   if (loading && data.length === 0) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <Spin size="large" tip="Chargement des KPIs..." />
+        <Spin size="large" tip="Chargement des KPIs..."><div /></Spin>
       </div>
     );
   }
@@ -181,7 +206,7 @@ export default function CommercialKpisPage() {
         <Table
           dataSource={data}
           columns={columns}
-          rowKey="repName"
+          rowKey="_uid"
           pagination={false}
           size="small"
           loading={loading}

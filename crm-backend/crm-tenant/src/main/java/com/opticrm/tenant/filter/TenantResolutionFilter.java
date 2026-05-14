@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -20,16 +21,17 @@ import java.util.UUID;
 /**
  * Resolves the current tenant at the beginning of each HTTP request.
  *
- * Resolution strategy:
+ * Resolution strategy (first match wins):
  *   1. Header X-Tenant-ID (highest priority, used by frontend SPA)
- *   2. Subdomain (SaaS mode only): Host: acme.opticrm.ma → slug=acme
- *   3. Default tenant (on-premise mode)
+ *   2. Query parameter ?client=slug (URL-based, for shareable links / bookmarks)
+ *   3. Subdomain (SaaS mode only): Host: acme.opticrm.ma → slug=acme
+ *   4. Default tenant (on-premise mode)
  *
  * Always clears TenantContext in a finally block to prevent ThreadLocal leaks.
  */
 @Slf4j
 @Component
-@Order(1) // Runs before JwtAuthenticationFilter
+@Order(Ordered.HIGHEST_PRECEDENCE) // Must run before Spring Security FilterChainProxy (order -100)
 @RequiredArgsConstructor
 public class TenantResolutionFilter extends OncePerRequestFilter {
 
@@ -67,13 +69,20 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
             }
         }
 
-        // 2. SaaS mode: extract subdomain from Host header
+        // 2. Query parameter ?client=slug (shareable URLs, bookmarks)
+        String clientSlug = request.getParameter("client");
+        if (clientSlug != null && !clientSlug.isBlank()) {
+            UUID fromSlug = resolveFromSlug(clientSlug);
+            if (fromSlug != null) return fromSlug;
+        }
+
+        // 3. SaaS mode: extract subdomain from Host header
         if (deploymentProps.isSaas()) {
             UUID fromSubdomain = resolveFromSubdomain(request);
             if (fromSubdomain != null) return fromSubdomain;
         }
 
-        // 3. On-premise: always use the default (single) tenant
+        // 4. On-premise: always use the default (single) tenant
         if (deploymentProps.isOnPremise()) {
             try {
                 return UUID.fromString(deploymentProps.getDefaultTenantId());
@@ -83,6 +92,13 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
         }
 
         return null;
+    }
+
+    private UUID resolveFromSlug(String slug) {
+        return tenantRepository.findBySlug(slug.toLowerCase().trim())
+                .filter(t -> t.getStatus() != com.opticrm.tenant.entity.Tenant.TenantStatus.CANCELLED)
+                .map(com.opticrm.tenant.entity.Tenant::getId)
+                .orElse(null);
     }
 
     private UUID resolveFromSubdomain(HttpServletRequest request) {

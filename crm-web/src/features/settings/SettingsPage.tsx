@@ -10,6 +10,7 @@ import {
   CheckSquareOutlined, BorderOutlined,
 } from '@ant-design/icons';
 import { settingsApi, type SmtpSettings, type AiSettings } from '@/api/settings';
+import GoogleCalendarConnect from '@/features/googleCalendar/GoogleCalendarConnect';
 import {
   referenceDataApi,
   CATEGORY_LABELS,
@@ -53,6 +54,20 @@ export default function SettingsPage() {
               </span>
             ),
             children: <AiTab />,
+          },
+          {
+            key: 'integrations',
+            label: (
+              <span>
+                <ApiOutlined style={{ marginRight: 6 }} />
+                Intégrations
+              </span>
+            ),
+            children: (
+              <div style={{ paddingTop: 8 }}>
+                <GoogleCalendarConnect />
+              </div>
+            ),
           },
           {
             key: 'parametrage',

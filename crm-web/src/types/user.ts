@@ -97,6 +97,7 @@ export const ROLE_COLORS: Record<string, string> = {
   SUPER_ADMIN: 'red',
   ADMIN: 'volcano',
   MANAGER: 'blue',
+  SUPERVISEUR: 'cyan',
   COMMERCIAL: 'green',
   READ_ONLY: 'default',
 };
@@ -105,6 +106,7 @@ export const ROLE_LABELS: Record<string, string> = {
   SUPER_ADMIN: 'Super Admin',
   ADMIN: 'Administrateur',
   MANAGER: 'Manager',
+  SUPERVISEUR: 'Superviseur',
   COMMERCIAL: 'Commercial',
   READ_ONLY: 'Lecture seule',
 };

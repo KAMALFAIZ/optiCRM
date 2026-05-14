@@ -19,5 +19,8 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
     @Query("SELECT t FROM Team t WHERE t.manager.id = :managerId")
     List<Team> findByManagerId(@Param("managerId") UUID managerId);
 
+    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.manager")
+    List<Team> findAllWithManager();
+
     boolean existsByName(String name);
 }

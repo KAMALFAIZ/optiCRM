@@ -5,7 +5,7 @@ import {
 } from 'antd';
 import {
   BankOutlined, CloudUploadOutlined, CheckCircleOutlined,
-  ReloadOutlined, InfoCircleOutlined, DatabaseOutlined, CodeOutlined,
+  ReloadOutlined, InfoCircleOutlined, DatabaseOutlined, CodeOutlined, SaveOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import sageIntegrationApi, {
@@ -76,7 +76,7 @@ const DEFAULT_SQL = `SELECT
   ISNULL([Préfecture_], '')                           CT_Prefecture,
   ISNULL([Statut_], '')                               CT_Statut,
   ISNULL([Représentant_], '')                         CT_Representant
-FROM [GROUPE_ALBOUGHAZE].[dbo].[Clients]
+FROM [dbo].[Clients]
 WHERE ISNULL(Catégorie_, '') NOT IN ('', 'NON AFFECTE', 'COMPTANT', 'SHOWROOM', '=', 'PARTICULIER', 'PERSONNEL')
   AND db NOT IN ('SBTATOUINE', 'ALBOUGHAZE', 'GIE')`;
 
@@ -213,7 +213,7 @@ export default function AccountsSyncTab() {
   const { message } = App.useApp();
   const [pastedData, setPastedData] = useState('');
   const [label, setLabel] = useState('');
-  const [sqlQuery, setSqlQuery] = useState(DEFAULT_SQL);
+  const [sqlQuery, setSqlQuery] = useState(() => localStorage.getItem('sage.query.accounts') || DEFAULT_SQL);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -241,7 +241,7 @@ export default function AccountsSyncTab() {
       setStep(1);
       message.success(`Prévisualisation générée : ${req.totalItems} ligne(s) analysée(s).`);
     } catch (e: any) {
-      message.error(e?.response?.data?.message || 'Erreur lors de la prévisualisation.');
+      message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de la prévisualisation.');
     } finally {
       setLoading(false);
     }
@@ -256,10 +256,15 @@ export default function AccountsSyncTab() {
       setStep(2);
       message.success(`Synchronisation appliquée : ${updated.successItems} réussie(s), ${updated.errorItems} erreur(s).`);
     } catch (e: any) {
-      message.error(e?.response?.data?.message || 'Erreur lors de l\'application.');
+      message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de l\'application.');
     } finally {
       setApplying(false);
     }
+  };
+
+  const handleSaveQuery = () => {
+    localStorage.setItem('sage.query.accounts', sqlQuery);
+    message.success('Requête comptes enregistrée');
   };
 
   const handleReset = () => {
@@ -291,7 +296,7 @@ export default function AccountsSyncTab() {
       setStep(1);
       message.success(`${rows.length} compte(s) importés depuis Sage — ${req.totalItems} ligne(s) analysée(s).`);
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || 'Erreur lors de l\'import depuis Sage.';
+      const msg = e?.response?.data?.error?.message || e?.response?.data?.message || e?.message || 'Erreur lors de l\'import depuis Sage.';
       message.error(msg);
     } finally {
       setImporting(false);
@@ -362,17 +367,24 @@ export default function AccountsSyncTab() {
                       onChange={e => setSqlQuery(e.target.value)}
                       style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 12 }}
                     />
-                    <Tooltip title="Exécute la requête SQL sur le serveur Sage configuré et importe les résultats">
-                      <Button
-                        type="primary"
-                        icon={<DatabaseOutlined />}
-                        loading={importing}
-                        onClick={handleImportFromSage}
-                        style={{ background: '#7c3aed', borderColor: '#7c3aed' }}
-                      >
-                        Exécuter et importer depuis Sage
-                      </Button>
-                    </Tooltip>
+                    <Space>
+                      <Tooltip title="Exécute la requête SQL sur le serveur Sage configuré et importe les résultats">
+                        <Button
+                          type="primary"
+                          icon={<DatabaseOutlined />}
+                          loading={importing}
+                          onClick={handleImportFromSage}
+                          style={{ background: '#7c3aed', borderColor: '#7c3aed' }}
+                        >
+                          Exécuter et importer depuis Sage
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title="Enregistrer la requête SQL pour les prochaines sessions">
+                        <Button icon={<SaveOutlined />} onClick={handleSaveQuery}>
+                          Enregistrer la requête
+                        </Button>
+                      </Tooltip>
+                    </Space>
                   </div>
                 ),
               }]}

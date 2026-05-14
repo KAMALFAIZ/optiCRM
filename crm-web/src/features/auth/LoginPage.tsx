@@ -6,6 +6,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { login, clearError, selectAuthError, selectAuthLoading, selectIsAuthenticated } from './authSlice';
 import type { LoginRequest } from '@/types/auth';
+import type { RootState } from '@/store';
 
 const { Title, Text } = Typography;
 
@@ -17,6 +18,11 @@ export default function LoginPage() {
   const isLoading = useAppSelector(selectAuthLoading);
   const error = useAppSelector(selectAuthError);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const publicInfo = useAppSelector((state: RootState) => state.tenant.publicInfo);
+
+  const brandName = publicInfo?.name || 'OptiCRM';
+  const brandColor = publicInfo?.primaryColor || '#405189';
+  const brandLogo = publicInfo?.logoUrl;
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
@@ -41,7 +47,7 @@ export default function LoginPage() {
       style={{
         minHeight: '100vh',
         display: 'flex',
-        background: 'linear-gradient(135deg, #405189 0%, #2e3b6e 50%, #1a2340 100%)',
+        background: `linear-gradient(135deg, ${brandColor} 0%, ${brandColor}cc 50%, ${brandColor}88 100%)`,
         fontFamily: 'Poppins, sans-serif',
       }}
     >
@@ -83,23 +89,31 @@ export default function LoginPage() {
         />
 
         <div style={{ position: 'relative', textAlign: 'center' }}>
-          <div
-            style={{
-              width: 80,
-              height: 80,
-              borderRadius: 20,
-              background: 'rgba(255,255,255,0.15)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 24px',
-              fontSize: 36,
-              fontWeight: 700,
-              color: '#fff',
-            }}
-          >
-            O
-          </div>
+          {brandLogo ? (
+            <img
+              src={brandLogo}
+              alt={brandName}
+              style={{ width: 80, height: 80, borderRadius: 20, objectFit: 'contain', margin: '0 auto 24px' }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 20,
+                background: 'rgba(255,255,255,0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+                fontSize: 36,
+                fontWeight: 700,
+                color: '#fff',
+              }}
+            >
+              {brandName.charAt(0).toUpperCase()}
+            </div>
+          )}
           <h1
             style={{
               color: '#fff',
@@ -110,7 +124,7 @@ export default function LoginPage() {
               letterSpacing: '-0.5px',
             }}
           >
-            OptiCRM
+            {brandName}
           </h1>
           <p
             style={{
@@ -184,22 +198,26 @@ export default function LoginPage() {
         <div style={{ width: '100%', maxWidth: 400 }}>
           {/* Mobile logo */}
           <div className="flex lg:hidden" style={{ justifyContent: 'center', marginBottom: 32 }}>
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 14,
-                background: '#405189',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 24,
-                fontWeight: 700,
-                color: '#fff',
-              }}
-            >
-              O
-            </div>
+            {brandLogo ? (
+              <img src={brandLogo} alt={brandName} style={{ width: 56, height: 56, borderRadius: 14, objectFit: 'contain' }} />
+            ) : (
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 14,
+                  background: brandColor,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 24,
+                  fontWeight: 700,
+                  color: '#fff',
+                }}
+              >
+                {brandName.charAt(0).toUpperCase()}
+              </div>
+            )}
           </div>
 
           <div style={{ marginBottom: 32 }}>
@@ -275,7 +293,7 @@ export default function LoginPage() {
                 </Form.Item>
                 <Link
                   to="/forgot-password"
-                  style={{ color: '#405189', fontFamily: 'Poppins', fontSize: 13 }}
+                  style={{ color: brandColor, fontFamily: 'Poppins', fontSize: 13 }}
                 >
                   Mot de passe oublié ?
                 </Link>
@@ -294,7 +312,7 @@ export default function LoginPage() {
                   fontFamily: 'Poppins',
                   fontWeight: 600,
                   fontSize: 15,
-                  background: '#405189',
+                  background: brandColor,
                   border: 'none',
                 }}
               >

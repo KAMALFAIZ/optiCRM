@@ -25,6 +25,7 @@
     "@fullcalendar/react": "^6.1.20",
     "@fullcalendar/timegrid": "^6.1.20",
     "@reduxjs/toolkit": "^2.0.1",
+    "@xyflow/react": "^12.10.2",
     "antd": "^5.12.8",
     "axios": "^1.6.5",
     "chart.js": "^4.4.1",

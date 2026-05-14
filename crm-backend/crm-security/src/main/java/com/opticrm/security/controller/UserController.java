@@ -7,9 +7,11 @@ import com.opticrm.security.dto.*;
 import com.opticrm.security.entity.Role;
 import com.opticrm.security.entity.Team;
 import com.opticrm.security.entity.Territory;
+import com.opticrm.security.entity.User;
 import com.opticrm.security.repository.RoleRepository;
 import com.opticrm.security.repository.TeamRepository;
 import com.opticrm.security.repository.TerritoryRepository;
+import com.opticrm.security.repository.UserRepository;
 import com.opticrm.security.service.FileStorageService;
 import com.opticrm.security.service.UserActivityService;
 import com.opticrm.security.service.UserExportService;
@@ -24,6 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,6 +48,7 @@ public class UserController {
     private final RoleRepository roleRepository;
     private final TeamRepository teamRepository;
     private final TerritoryRepository territoryRepository;
+    private final UserRepository userRepository;
 
     // ---- Statistics ----
 
@@ -215,13 +220,112 @@ public class UserController {
 
     @GetMapping("/teams")
     public ResponseEntity<ApiResponse<List<TeamDto>>> getTeams() {
-        List<TeamDto> teams = teamRepository.findAll().stream()
+        List<TeamDto> teams = teamRepository.findAllWithManager().stream()
                 .map(team -> TeamDto.builder()
                         .id(team.getId().toString())
                         .name(team.getName())
+                        .description(team.getDescription())
+                        .managerId(team.getManager() != null ? team.getManager().getId().toString() : null)
+                        .managerName(team.getManager() != null ? team.getManager().getFullName() : null)
+                        .memberCount((int) userRepository.countByTeamId(team.getId()))
                         .build())
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success(teams));
+    }
+
+    @Transactional
+    @PostMapping("/teams")
+    public ResponseEntity<ApiResponse<TeamDto>> createTeam(@RequestBody TeamCreateRequest req) {
+        Team team = new Team();
+        team.setName(req.getName());
+        team.setDescription(req.getDescription());
+        if (req.getManagerId() != null) {
+            userRepository.findById(UUID.fromString(req.getManagerId()))
+                    .ifPresent(team::setManager);
+        }
+        Team saved = teamRepository.save(team);
+        return ResponseEntity.ok(ApiResponse.success(TeamDto.builder()
+                .id(saved.getId().toString())
+                .name(saved.getName())
+                .description(saved.getDescription())
+                .managerId(saved.getManager() != null ? saved.getManager().getId().toString() : null)
+                .managerName(saved.getManager() != null ? saved.getManager().getFullName() : null)
+                .memberCount(0)
+                .build()));
+    }
+
+    @Transactional
+    @PutMapping("/teams/{id}")
+    public ResponseEntity<ApiResponse<TeamDto>> updateTeam(@PathVariable UUID id, @RequestBody TeamCreateRequest req) {
+        return teamRepository.findById(id).map(team -> {
+            team.setName(req.getName());
+            team.setDescription(req.getDescription());
+            if (req.getManagerId() != null) {
+                userRepository.findById(UUID.fromString(req.getManagerId())).ifPresent(team::setManager);
+            } else {
+                team.setManager(null);
+            }
+            Team saved = teamRepository.save(team);
+            return ResponseEntity.ok(ApiResponse.success(TeamDto.builder()
+                    .id(saved.getId().toString())
+                    .name(saved.getName())
+                    .description(saved.getDescription())
+                    .managerId(saved.getManager() != null ? saved.getManager().getId().toString() : null)
+                    .managerName(saved.getManager() != null ? saved.getManager().getFullName() : null)
+                    .memberCount((int) userRepository.countByTeamId(saved.getId()))
+                    .build()));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @Transactional
+    @DeleteMapping("/teams/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteTeam(@PathVariable UUID id) {
+        if (!teamRepository.existsById(id)) return ResponseEntity.notFound().build();
+        userRepository.findByTeamId(id).forEach(u -> { u.setTeam(null); userRepository.save(u); });
+        teamRepository.deleteById(id);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    // ---- Team membership ----
+
+    @Transactional
+    @GetMapping("/teams/{teamId}/members")
+    public ResponseEntity<ApiResponse<List<TeamMemberDto>>> getTeamMembers(@PathVariable UUID teamId) {
+        if (!teamRepository.existsById(teamId)) return ResponseEntity.notFound().build();
+        List<TeamMemberDto> members = userRepository.findByTeamId(teamId).stream()
+                .map(u -> TeamMemberDto.builder()
+                        .id(u.getId().toString())
+                        .fullName(u.getFullName())
+                        .email(u.getEmail())
+                        .roleName(u.getRole() != null ? u.getRole().getName() : null)
+                        .avatarUrl(u.getAvatarUrl())
+                        .build())
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.success(members));
+    }
+
+    @Transactional
+    @PostMapping("/teams/{teamId}/members/{userId}")
+    public ResponseEntity<ApiResponse<Void>> addTeamMember(@PathVariable UUID teamId, @PathVariable UUID userId) {
+        Team team = teamRepository.findById(teamId).orElse(null);
+        if (team == null) return ResponseEntity.notFound().build();
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return ResponseEntity.notFound().build();
+        user.setTeam(team);
+        userRepository.save(user);
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    @Transactional
+    @DeleteMapping("/teams/{teamId}/members/{userId}")
+    public ResponseEntity<ApiResponse<Void>> removeTeamMember(@PathVariable UUID teamId, @PathVariable UUID userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return ResponseEntity.notFound().build();
+        if (user.getTeam() != null && user.getTeam().getId().equals(teamId)) {
+            user.setTeam(null);
+            userRepository.save(user);
+        }
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/territories")
@@ -255,6 +359,19 @@ public class UserController {
     public static class TeamDto {
         private String id;
         private String name;
+        private String description;
+        private String managerId;
+        private String managerName;
+        private Integer memberCount;
+    }
+
+    @lombok.Data
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class TeamCreateRequest {
+        private String name;
+        private String description;
+        private String managerId;
     }
 
     @lombok.Data
@@ -265,5 +382,17 @@ public class UserController {
         private String id;
         private String name;
         private String region;
+    }
+
+    @lombok.Data
+    @lombok.Builder
+    @lombok.NoArgsConstructor
+    @lombok.AllArgsConstructor
+    public static class TeamMemberDto {
+        private String id;
+        private String fullName;
+        private String email;
+        private String roleName;
+        private String avatarUrl;
     }
 }

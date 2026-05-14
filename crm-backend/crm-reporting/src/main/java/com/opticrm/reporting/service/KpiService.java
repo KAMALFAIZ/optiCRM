@@ -2,6 +2,8 @@ package com.opticrm.reporting.service;
 
 import com.opticrm.core.opportunity.entity.Opportunity;
 import com.opticrm.core.opportunity.repository.OpportunityRepository;
+import com.opticrm.core.visit.entity.Visit;
+import com.opticrm.core.visit.repository.VisitRepository;
 import com.opticrm.reporting.dto.CommercialKpiDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,35 +22,55 @@ import java.util.stream.Collectors;
 public class KpiService {
 
     private final OpportunityRepository opportunityRepository;
+    private final VisitRepository visitRepository;
+
+    public List<CommercialKpiDto> getCommercialKpis() {
+        return getCommercialKpis(null);
+    }
 
     /**
-     * Commercial KPIs grouped by sales rep.
+     * @param userFilter null = all users; non-null = only these user IDs
      */
-    public List<CommercialKpiDto> getCommercialKpis() {
-        log.debug("Building commercial KPIs");
+    public List<CommercialKpiDto> getCommercialKpis(Set<UUID> userFilter) {
+        log.debug("Building commercial KPIs (filter={})", userFilter == null ? "ALL" : userFilter.size() + " users");
 
         List<Opportunity> allOpportunities = opportunityRepository.findAll();
+        List<Visit> allVisits = visitRepository.findAll();
 
-        // Group by assignedTo user
         Map<UUID, List<Opportunity>> byUser = allOpportunities.stream()
                 .filter(o -> o.getAssignedTo() != null)
+                .filter(o -> userFilter == null || userFilter.contains(o.getAssignedTo().getId()))
                 .collect(Collectors.groupingBy(o -> o.getAssignedTo().getId()));
+
+        Map<UUID, List<Visit>> visitsByUser = allVisits.stream()
+                .filter(v -> v.getAssignedTo() != null)
+                .filter(v -> userFilter == null || userFilter.contains(v.getAssignedTo().getId()))
+                .collect(Collectors.groupingBy(v -> v.getAssignedTo().getId()));
+
+        Set<UUID> allUserIds = new HashSet<>(byUser.keySet());
+        allUserIds.addAll(visitsByUser.keySet());
 
         List<CommercialKpiDto> result = new ArrayList<>();
 
-        for (Map.Entry<UUID, List<Opportunity>> entry : byUser.entrySet()) {
-            UUID userId = entry.getKey();
-            List<Opportunity> userOpps = entry.getValue();
+        for (UUID userId : allUserIds) {
+            List<Opportunity> userOpps = byUser.getOrDefault(userId, Collections.emptyList());
+            List<Visit> userVisits = visitsByUser.getOrDefault(userId, Collections.emptyList());
 
             String userName = userOpps.stream()
                     .findFirst()
                     .map(o -> o.getAssignedTo().getFullName())
-                    .orElse("Unknown");
+                    .orElseGet(() -> userVisits.stream()
+                            .findFirst()
+                            .map(v -> v.getAssignedTo().getFullName())
+                            .orElse("Unknown"));
 
             String email = userOpps.stream()
                     .findFirst()
                     .map(o -> o.getAssignedTo().getEmail())
-                    .orElse(null);
+                    .orElseGet(() -> userVisits.stream()
+                            .findFirst()
+                            .map(v -> v.getAssignedTo().getEmail())
+                            .orElse(null));
 
             long wonCount = 0;
             long lostCount = 0;
@@ -83,6 +105,26 @@ public class KpiService {
                 averageDealSize = totalRevenue.divide(BigDecimal.valueOf(wonCount), 2, RoundingMode.HALF_UP);
             }
 
+            long totalVisits = userVisits.size();
+            long completedVisits = userVisits.stream()
+                    .filter(v -> "completed".equalsIgnoreCase(v.getStatus()))
+                    .count();
+            long plannedVisits = userVisits.stream()
+                    .filter(v -> "planned".equalsIgnoreCase(v.getStatus()))
+                    .count();
+            long inProgressVisits = userVisits.stream()
+                    .filter(v -> "in_progress".equalsIgnoreCase(v.getStatus()))
+                    .count();
+            double visitCompletionRate = totalVisits > 0
+                    ? Math.round((double) completedVisits / totalVisits * 10000.0) / 100.0
+                    : 0.0;
+            BigDecimal totalMileage = userVisits.stream()
+                    .map(v -> v.getMileage() != null ? v.getMileage() : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalExpenses = userVisits.stream()
+                    .map(v -> v.getExpenses() != null ? v.getExpenses() : BigDecimal.ZERO)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
             result.add(CommercialKpiDto.builder()
                     .userId(userId)
                     .userName(userName)
@@ -94,10 +136,16 @@ public class KpiService {
                     .averageDealSize(averageDealSize)
                     .pipelineValue(pipelineValue)
                     .openDeals(openDeals)
+                    .totalVisits(totalVisits)
+                    .completedVisits(completedVisits)
+                    .plannedVisits(plannedVisits)
+                    .inProgressVisits(inProgressVisits)
+                    .visitCompletionRate(visitCompletionRate)
+                    .totalMileage(totalMileage)
+                    .totalExpenses(totalExpenses)
                     .build());
         }
 
-        // Sort by total revenue descending
         result.sort((a, b) -> b.getTotalRevenue().compareTo(a.getTotalRevenue()));
 
         return result;

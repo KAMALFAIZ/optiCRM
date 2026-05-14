@@ -1,12 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   Table, Button, Tag, Space, Input, Select, Card, Row, Col, Statistic,
-  Switch, Modal, Tooltip, Dropdown, message, Typography, Tabs,
+  Switch, Modal, Tooltip, Dropdown, Typography, Tabs,
 } from 'antd';
 import {
   PlusOutlined, SearchOutlined, ThunderboltOutlined, PlayCircleOutlined,
   DeleteOutlined, EditOutlined, EyeOutlined, MoreOutlined,
   CheckCircleOutlined, ExclamationCircleOutlined, AppstoreOutlined,
+  ExperimentOutlined, OrderedListOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
@@ -16,11 +17,36 @@ import 'dayjs/locale/fr';
 import { useAppDispatch, useAppSelector } from '@/store';
 import {
   fetchWorkflows, fetchWorkflowStats, toggleWorkflowActive, deleteWorkflow,
-  setFilters,
+  setFilters, createWorkflow,
 } from './workflowsSlice';
 import { WorkflowListItem, ENTITY_TYPES, TRIGGER_TYPES } from '@/types/workflow';
+import { useMessage } from '@/hooks/useMessage';
 import WorkflowFormModal from './WorkflowFormModal';
 import WorkflowTemplatesGallery from './WorkflowTemplatesGallery';
+import WorkflowRulesDrawer from './WorkflowRulesDrawer';
+
+// ── Workflow de démonstration ─────────────────────────────────────────────────
+const DEMO_WORKFLOW = {
+  name: 'Qualification & Nurturing de Lead',
+  description: 'Évalue le score du lead, envoie un email prioritaire ou crée une tâche de relance, puis notifie le manager après 3 jours.',
+  entityType: 'LEAD',
+  triggerType: 'STATUS_CHANGED',
+  triggerConfig: JSON.stringify({ field: 'status', newValue: 'NEW' }),
+  steps: [
+    { name: 'Vérifier le score du lead',      stepType: 'CONDITION',         stepOrder: 0, isEntryPoint: true,  positionX: 240, positionY: 30,  actionConfig: JSON.stringify({ field: 'score', operator: '>=', value: 60 }) },
+    { name: 'Email haute priorité',            stepType: 'SEND_EMAIL',        stepOrder: 1, isEntryPoint: false, positionX: 30,  positionY: 200, actionConfig: JSON.stringify({ templateId: 'lead-hot', subject: 'Votre demande est prioritaire !' }) },
+    { name: 'Tâche de relance commerciale',    stepType: 'CREATE_TASK',       stepOrder: 2, isEntryPoint: false, positionX: 450, positionY: 200, actionConfig: JSON.stringify({ title: 'Relance lead froid', assignTo: 'commercial', dueInDays: 2 }) },
+    { name: 'Attendre 3 jours',               stepType: 'DELAY',             stepOrder: 3, isEntryPoint: false, positionX: 240, positionY: 370, actionConfig: JSON.stringify({ unit: 'days', value: 3 }) },
+    { name: 'Notifier le responsable',         stepType: 'SEND_NOTIFICATION', stepOrder: 4, isEntryPoint: false, positionX: 240, positionY: 540, actionConfig: JSON.stringify({ channel: 'email', to: 'manager', message: 'Lead qualifié en attente de traitement' }) },
+  ],
+  transitions: [
+    { fromStepIndex: 0, toStepIndex: 1, label: 'Score ≥ 60' },
+    { fromStepIndex: 0, toStepIndex: 2, label: 'Score < 60' },
+    { fromStepIndex: 1, toStepIndex: 3, label: 'Suivant' },
+    { fromStepIndex: 2, toStepIndex: 3, label: 'Suivant' },
+    { fromStepIndex: 3, toStepIndex: 4, label: 'Après délai' },
+  ],
+};
 
 dayjs.extend(relativeTime);
 dayjs.locale('fr');
@@ -34,11 +60,14 @@ const triggerTypeLabels: Record<string, string> = Object.fromEntries(TRIGGER_TYP
 export default function WorkflowsListPage() {
   const dispatch = useAppDispatch();
   const { items, loading, pagination, filters, stats } = useAppSelector(s => s.workflows);
+  const { message } = useMessage();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [search, setSearch] = useState(filters.search || '');
   const [activeTab, setActiveTab] = useState<'workflows' | 'templates'>('workflows');
+  const [creatingDemo, setCreatingDemo] = useState(false);
+  const [rulesDrawerId, setRulesDrawerId] = useState<string | null>(null);
 
   const loadWorkflows = useCallback(() => {
     dispatch(fetchWorkflows({
@@ -54,6 +83,20 @@ export default function WorkflowsListPage() {
     loadWorkflows();
     dispatch(fetchWorkflowStats());
   }, [loadWorkflows, dispatch]);
+
+  const handleCreateDemo = async () => {
+    setCreatingDemo(true);
+    try {
+      await dispatch(createWorkflow(DEMO_WORKFLOW)).unwrap();
+      message.success('Workflow de démonstration créé !');
+      loadWorkflows();
+      dispatch(fetchWorkflowStats());
+    } catch {
+      message.error('Erreur lors de la création du workflow exemple');
+    } finally {
+      setCreatingDemo(false);
+    }
+  };
 
   const handleSearch = (value: string) => {
     dispatch(setFilters({ ...filters, search: value || undefined }));
@@ -87,7 +130,13 @@ export default function WorkflowsListPage() {
       render: (name: string, record) => (
         <Space>
           <ThunderboltOutlined style={{ color: record.isActive ? '#52c41a' : '#d9d9d9' }} />
-          <span className="font-medium">{name}</span>
+          <span
+            className="font-medium"
+            style={{ color: '#1890ff', cursor: 'pointer' }}
+            onClick={() => setRulesDrawerId(record.id)}
+          >
+            {name}
+          </span>
           <Tag>v{record.version}</Tag>
         </Space>
       ),
@@ -158,6 +207,7 @@ export default function WorkflowsListPage() {
         <Dropdown
           menu={{
             items: [
+              { key: 'rules', icon: <OrderedListOutlined />, label: 'Voir les règles', onClick: () => setRulesDrawerId(record.id) },
               { key: 'edit', icon: <EditOutlined />, label: 'Modifier', onClick: () => { setEditingId(record.id); setModalOpen(true); } },
               { key: 'view', icon: <EyeOutlined />, label: 'Voir les exécutions' },
               { type: 'divider' },
@@ -181,13 +231,25 @@ export default function WorkflowsListPage() {
           Workflows
         </Title>
         {activeTab === 'workflows' && (
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => { setEditingId(null); setModalOpen(true); }}
-          >
-            Nouveau workflow
-          </Button>
+          <Space>
+            <Tooltip title="Insère un workflow « Qualification de Lead » avec 5 étapes et des transitions pour tester le builder visuel">
+              <Button
+                icon={<ExperimentOutlined />}
+                loading={creatingDemo}
+                onClick={handleCreateDemo}
+                style={{ borderColor: '#722ed1', color: '#722ed1' }}
+              >
+                Créer un exemple
+              </Button>
+            </Tooltip>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => { setEditingId(null); setModalOpen(true); }}
+            >
+              Nouveau workflow
+            </Button>
+          </Space>
         )}
       </div>
 
@@ -270,6 +332,31 @@ export default function WorkflowsListPage() {
                   dataSource={items}
                   rowKey="id"
                   loading={loading}
+                  locale={{
+                    emptyText: (
+                      <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                        <ThunderboltOutlined style={{ fontSize: 40, color: '#d9d9d9', display: 'block', marginBottom: 12 }} />
+                        <div style={{ color: '#8c8c8c', marginBottom: 16 }}>Aucun workflow configuré</div>
+                        <Space>
+                          <Button
+                            icon={<ExperimentOutlined />}
+                            loading={creatingDemo}
+                            onClick={handleCreateDemo}
+                            style={{ borderColor: '#722ed1', color: '#722ed1' }}
+                          >
+                            Créer un exemple
+                          </Button>
+                          <Button
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => { setEditingId(null); setModalOpen(true); }}
+                          >
+                            Nouveau workflow
+                          </Button>
+                        </Space>
+                      </div>
+                    ),
+                  }}
                   pagination={{
                     current: pagination.page,
                     pageSize: pagination.size,
@@ -314,6 +401,13 @@ export default function WorkflowsListPage() {
           // Basculer automatiquement vers l'onglet workflows après création depuis un template
           setActiveTab('workflows');
         }}
+      />
+
+      {/* Règles de gestion drawer */}
+      <WorkflowRulesDrawer
+        workflowId={rulesDrawerId}
+        open={rulesDrawerId !== null}
+        onClose={() => setRulesDrawerId(null)}
       />
     </div>
   );

@@ -49,6 +49,11 @@ async function reverseGeocode(lat: number, lng: number): Promise<string | undefi
 const DEFAULT_CENTER: [number, number] = [33.5731, -7.5898];
 const DEFAULT_ZOOM = 6;
 
+const OSM_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const OSM_ATTRIBUTION = '&copy; OpenStreetMap contributors';
+const ESRI_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const ESRI_ATTRIBUTION = 'Tiles &copy; Esri';
+
 export default function GpsLocationPicker({
   value,
   onChange,
@@ -65,6 +70,16 @@ export default function GpsLocationPicker({
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const satelliteRef = useRef(false);
+  const [satellite, setSatellite] = useState(false);
+
+  const toggleSatellite = useCallback(() => {
+    const next = !satelliteRef.current;
+    satelliteRef.current = next;
+    setSatellite(next);
+    tileLayerRef.current?.setUrl(next ? ESRI_URL : OSM_URL);
+  }, []);
 
   // ── Capture GPS via navigateur ──
   const captureGps = useCallback(
@@ -196,10 +211,11 @@ export default function GpsLocationPicker({
         zoomControl: true,
       });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
+      const tl = L.tileLayer(satelliteRef.current ? ESRI_URL : OSM_URL, {
+        attribution: satelliteRef.current ? ESRI_ATTRIBUTION : OSM_ATTRIBUTION,
         maxZoom: 19,
       }).addTo(map);
+      tileLayerRef.current = tl;
 
       // Placer le marqueur si on a des coordonnees
       if (tempCoords || value) {
@@ -428,6 +444,13 @@ export default function GpsLocationPicker({
               ghost
             >
               Ma position GPS
+            </Button>
+            <Button
+              size="small"
+              onClick={toggleSatellite}
+              type={satellite ? 'primary' : 'default'}
+            >
+              {satellite ? '🗺 Plan' : '🛰 Satellite'}
             </Button>
             {tempCoords && (
               <Text code style={{ fontSize: 12 }}>

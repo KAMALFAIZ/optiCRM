@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -18,6 +19,7 @@ public class SecurityService {
     /**
      * Get the currently authenticated user from the security context
      */
+    @Transactional(readOnly = true)
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -26,7 +28,7 @@ public class SecurityService {
         }
 
         String email = authentication.getName();
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailFetched(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé: " + email));
     }
 

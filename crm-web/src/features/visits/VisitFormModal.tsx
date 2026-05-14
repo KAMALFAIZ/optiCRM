@@ -750,8 +750,6 @@ export default function VisitFormModal({ open, editingId, onClose, onSuccess }: 
                   <Form.Item name="city" label="Ville" style={{ flex: 1 }}>
                     <Input />
                   </Form.Item>
-                  <Form.Item name="latitude" hidden><InputNumber /></Form.Item>
-                  <Form.Item name="longitude" hidden><InputNumber /></Form.Item>
                   <Form.Item label=" " style={{ flex: 0 }}>
                     <GpsLocationPicker
                       compact
@@ -771,6 +769,45 @@ export default function VisitFormModal({ open, editingId, onClose, onSuccess }: 
                     />
                   </Form.Item>
                 </div>
+                <Form.Item
+                  noStyle
+                  shouldUpdate={(prev, cur) => prev.latitude !== cur.latitude || prev.longitude !== cur.longitude}
+                >
+                  {({ getFieldValue }) => {
+                    const lat = getFieldValue('latitude');
+                    const lng = getFieldValue('longitude');
+                    return (
+                      <>
+                        <Form.Item name="latitude" hidden><InputNumber /></Form.Item>
+                        <Form.Item name="longitude" hidden><InputNumber /></Form.Item>
+                        {(lat || lng) && (
+                          <div style={{
+                            display: 'flex', gap: 12, marginTop: 4,
+                          }}>
+                            <Form.Item label="Latitude" style={{ flex: 1, marginBottom: 0 }}>
+                              <InputNumber
+                                value={lat}
+                                precision={8}
+                                style={{ width: '100%' }}
+                                onChange={(v) => form.setFieldsValue({ latitude: v ?? undefined })}
+                                addonBefore="↕"
+                              />
+                            </Form.Item>
+                            <Form.Item label="Longitude" style={{ flex: 1, marginBottom: 0 }}>
+                              <InputNumber
+                                value={lng}
+                                precision={8}
+                                style={{ width: '100%' }}
+                                onChange={(v) => form.setFieldsValue({ longitude: v ?? undefined })}
+                                addonBefore="↔"
+                              />
+                            </Form.Item>
+                          </div>
+                        )}
+                      </>
+                    );
+                  }}
+                </Form.Item>
               </>
             ),
           },

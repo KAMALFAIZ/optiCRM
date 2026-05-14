@@ -19,7 +19,6 @@ public interface WorkflowRepository extends JpaRepository<Workflow, UUID> {
         WHERE (:search IS NULL OR LOWER(w.name) LIKE LOWER(CONCAT('%', :search, '%')))
         AND (:entityType IS NULL OR w.entityType = :entityType)
         AND (:isActive IS NULL OR w.isActive = :isActive)
-        ORDER BY w.createdAt DESC
     """)
     Page<Workflow> findAllWithFilters(
             @Param("search") String search,

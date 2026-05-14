@@ -15,6 +15,8 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, UUID> {
 
     Optional<Warehouse> findByCode(String code);
 
+    List<Warehouse> findByCodeIn(List<String> codes);
+
     boolean existsByCode(String code);
 
     @Query("SELECT w FROM Warehouse w WHERE w.isDefault = true")

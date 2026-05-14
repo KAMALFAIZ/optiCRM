@@ -60,6 +60,9 @@ public class AppConfig {
                         // Static uploads
                         .requestMatchers("/uploads/**").permitAll()
 
+                        // Google Calendar OAuth2 callback (appelé par Google sans JWT)
+                        .requestMatchers("/api/v1/google-calendar/callback").permitAll()
+
                         // Super admin endpoints require SUPER_ADMIN role
                         .requestMatchers("/api/v1/superadmin/**").hasRole("SUPER_ADMIN")
 

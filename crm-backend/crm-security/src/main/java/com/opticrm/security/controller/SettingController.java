@@ -65,6 +65,31 @@ public class SettingController {
         return ResponseEntity.ok(ApiResponse.success(settingService.getSageServerConfig()));
     }
 
+    // ───── Google Calendar ────────────────────────────────────────────────────
+
+    @GetMapping("/google-calendar")
+    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> getGoogleCalendarConfig() {
+        return ResponseEntity.ok(ApiResponse.success(settingService.getGoogleCalendarConfig()));
+    }
+
+    @PutMapping("/google-calendar")
+    public ResponseEntity<ApiResponse<java.util.Map<String, String>>> saveGoogleCalendarConfig(
+            @RequestBody GoogleCalendarConfigRequest req
+    ) {
+        settingService.saveGoogleCalendarConfig(
+                req.getClientId(), req.getClientSecret(),
+                req.getRedirectUri(), req.getFrontendBaseUrl());
+        return ResponseEntity.ok(ApiResponse.success(settingService.getGoogleCalendarConfig()));
+    }
+
+    @Data
+    static class GoogleCalendarConfigRequest {
+        private String clientId;
+        private String clientSecret;
+        private String redirectUri;
+        private String frontendBaseUrl;
+    }
+
     // ───── AI ─────────────────────────────────────────────────────────────────
 
     @GetMapping("/ai")

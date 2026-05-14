@@ -80,6 +80,19 @@ public class Tenant {
     @Column(name = "admin_email", length = 255)
     private String adminEmail;
 
+    // ── Database provisioning (SaaS database-per-tenant) ──────────────────
+
+    /** Nom de la base SQL Server : opticrm_{slug} */
+    @Column(name = "db_name", length = 200)
+    private String dbName;
+
+    @Column(name = "db_provisioned", nullable = false)
+    @Builder.Default
+    private Boolean dbProvisioned = false;
+
+    @Column(name = "db_provisioned_at")
+    private Instant dbProvisionedAt;
+
     // ── Audit ──────────────────────────────────────────────────────────────
 
     @Column(name = "created_at", nullable = false, updatable = false)

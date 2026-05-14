@@ -2,6 +2,7 @@ package com.opticrm.security.service;
 
 import com.opticrm.common.exception.BusinessException;
 import com.opticrm.security.dto.AiSettingsDto;
+import com.opticrm.security.dto.SageAutoSyncConfigDto;
 import com.opticrm.security.dto.SageServerConfigDto;
 import com.opticrm.security.dto.SmtpSettingsDto;
 import com.opticrm.security.entity.AppSetting;
@@ -222,6 +223,83 @@ public class SettingService {
     public record SageConnectionInfo(
             boolean enabled, String host, int port,
             String database, String username, String password, String dossier) {}
+
+    // ───── Sage Auto-Sync ───────────────────────────────────────────────────
+
+    @Transactional(readOnly = true)
+    public SageAutoSyncConfigDto getSageAutoSyncConfig() {
+        return SageAutoSyncConfigDto.builder()
+                .enabled(Boolean.parseBoolean(get("sage.autosync.enabled", "false")))
+                .interval(get("sage.autosync.interval", "DAILY"))
+                .syncAccounts(Boolean.parseBoolean(get("sage.autosync.accounts", "true")))
+                .syncContacts(Boolean.parseBoolean(get("sage.autosync.contacts", "true")))
+                .lastRunAt(get("sage.autosync.last_run_at", ""))
+                .lastRunStatus(get("sage.autosync.last_run_status", ""))
+                .build();
+    }
+
+    @Transactional
+    public void saveSageAutoSyncConfig(SageAutoSyncConfigDto dto) {
+        set("sage.autosync.enabled",  String.valueOf(dto.isEnabled()),      "sage");
+        set("sage.autosync.interval", nullSafe(dto.getInterval()),          "sage");
+        set("sage.autosync.accounts", String.valueOf(dto.isSyncAccounts()), "sage");
+        set("sage.autosync.contacts", String.valueOf(dto.isSyncContacts()), "sage");
+    }
+
+    @Transactional
+    public void updateAutoSyncRunResult(String status) {
+        set("sage.autosync.last_run_at",     java.time.Instant.now().toString(), "sage");
+        set("sage.autosync.last_run_status", nullSafe(status),                   "sage");
+    }
+
+    public record SageAutoSyncInfo(
+            boolean enabled, String interval,
+            boolean syncAccounts, boolean syncContacts) {}
+
+    public SageAutoSyncInfo getSageAutoSyncInfo() {
+        return new SageAutoSyncInfo(
+                Boolean.parseBoolean(get("sage.autosync.enabled", "false")),
+                get("sage.autosync.interval", "DAILY"),
+                Boolean.parseBoolean(get("sage.autosync.accounts", "true")),
+                Boolean.parseBoolean(get("sage.autosync.contacts", "true"))
+        );
+    }
+
+    // ───── Google Calendar ──────────────────────────────────────────────────
+
+    private static final String GC_SECRET_MASK = "••••••••";
+
+    @Transactional(readOnly = true)
+    public java.util.Map<String, String> getGoogleCalendarConfig() {
+        boolean secretSet = repository.findById("google.calendar.client_secret")
+                .map(s -> s.getValue() != null && !s.getValue().isBlank())
+                .orElse(false);
+
+        return java.util.Map.of(
+                "clientId",       get("google.calendar.client_id",       ""),
+                "clientSecret",   secretSet ? GC_SECRET_MASK : "",
+                "redirectUri",    get("google.calendar.redirect_uri",    ""),
+                "frontendBaseUrl",get("google.calendar.frontend_base_url",""),
+                "secretConfigured", String.valueOf(secretSet),
+                "configured",     String.valueOf(!get("google.calendar.client_id","").isBlank())
+        );
+    }
+
+    @Transactional
+    public void saveGoogleCalendarConfig(String clientId, String clientSecret,
+                                          String redirectUri, String frontendBaseUrl) {
+        if (clientId     != null) set("google.calendar.client_id",        clientId,        "google_calendar");
+        if (redirectUri  != null) set("google.calendar.redirect_uri",     redirectUri,     "google_calendar");
+        if (frontendBaseUrl != null) set("google.calendar.frontend_base_url", frontendBaseUrl, "google_calendar");
+        if (clientSecret != null && !GC_SECRET_MASK.equals(clientSecret) && !clientSecret.isBlank()) {
+            set("google.calendar.client_secret", clientSecret, "google_calendar");
+        }
+    }
+
+    /** Lecture interne (vrai secret, non masqué) pour le service OAuth2. */
+    public String getGoogleCalendarValue(String key, String fallback) {
+        return get(key, fallback);
+    }
 
     // ───── Helpers ──────────────────────────────────────────────────────────
 

@@ -215,29 +215,50 @@ public class WorkflowEngine {
     private void advanceConditional(WorkflowExecution execution, WorkflowStep fromStep, boolean conditionResult) {
         List<WorkflowTransition> transitions = transitionRepository.findByFromStepIdOrderByEvalOrderAsc(fromStep.getId());
 
+        // ── Pass 1 : label-based matching (yes/no/true/false/approved/rejected) ──
         for (WorkflowTransition t : transitions) {
             String label = t.getLabel();
-            boolean match = false;
+            boolean matchTrue  = "Yes".equalsIgnoreCase(label)
+                    || "true".equalsIgnoreCase(label)
+                    || "Approved".equalsIgnoreCase(label)
+                    || "Oui".equalsIgnoreCase(label);
+            boolean matchFalse = "No".equalsIgnoreCase(label)
+                    || "false".equalsIgnoreCase(label)
+                    || "Rejected".equalsIgnoreCase(label)
+                    || "Non".equalsIgnoreCase(label);
 
-            if (conditionResult && ("Yes".equalsIgnoreCase(label) || "true".equalsIgnoreCase(label) || "Approved".equalsIgnoreCase(label) || "Oui".equalsIgnoreCase(label))) {
-                match = true;
-            } else if (!conditionResult && ("No".equalsIgnoreCase(label) || "false".equalsIgnoreCase(label) || "Rejected".equalsIgnoreCase(label) || "Non".equalsIgnoreCase(label))) {
-                match = true;
-            }
-
-            if (match) {
-                execution.setCurrentStep(t.getToStep());
-                executionRepository.save(execution);
-                executeStep(execution, t.getToStep());
+            if ((conditionResult && matchTrue) || (!conditionResult && matchFalse)) {
+                followTransition(execution, t);
                 return;
             }
         }
 
-        // No matching transition, end workflow
+        // ── Pass 2 : positional fallback ─────────────────────────────────────────
+        // When transitions have custom labels (e.g. "Score ≥ 60" / "Score < 60"),
+        // interpret first transition = true branch, second = false branch.
+        if (transitions.size() >= 2) {
+            WorkflowTransition chosen = conditionResult ? transitions.get(0) : transitions.get(1);
+            log.info("Condition positional fallback: result={}, following transition '{}'",
+                    conditionResult, chosen.getLabel());
+            followTransition(execution, chosen);
+            return;
+        }
+        if (transitions.size() == 1 && conditionResult) {
+            followTransition(execution, transitions.get(0));
+            return;
+        }
+
+        // ── No matching transition → end workflow ─────────────────────────────────
         execution.setStatus("COMPLETED");
         execution.setCompletedAt(Instant.now());
         executionRepository.save(execution);
-        log.info("Execution {} completed (no matching transition from condition)", execution.getId());
+        log.info("Execution {} completed (no matching conditional transition)", execution.getId());
+    }
+
+    private void followTransition(WorkflowExecution execution, WorkflowTransition t) {
+        execution.setCurrentStep(t.getToStep());
+        executionRepository.save(execution);
+        executeStep(execution, t.getToStep());
     }
 
     private boolean matchesTriggerConfig(Workflow wf, String changedField, String oldValue, String newValue) {

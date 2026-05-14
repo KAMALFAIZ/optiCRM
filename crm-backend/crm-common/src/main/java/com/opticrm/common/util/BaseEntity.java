@@ -25,13 +25,8 @@ public abstract class BaseEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    /**
-     * Tenant discriminator for multi-tenancy.
-     * Hibernate 6 automatically filters queries and sets this on INSERT
-     * using the CurrentTenantIdentifierResolver.
-     */
-    @TenantId
-    @Column(name = "tenant_id", updatable = false, columnDefinition = "UNIQUEIDENTIFIER")
+    // @TenantId + @Column désactivés (colonne absente de la DB dev)
+    @Transient
     private UUID tenantId;
 
     @CreatedDate

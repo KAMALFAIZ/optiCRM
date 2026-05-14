@@ -83,6 +83,11 @@ function FlyToRadius({ center, radiusKm }: { center: [number, number] | null; ra
 
 const DEFAULT_CENTER: [number, number] = [31.5, -6.5]; // centre Maroc
 
+const OSM_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const ESRI_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const ESRI_ATTRIBUTION = 'Tiles &copy; Esri';
+
 interface Props {
   accounts: AccountListItem[];
   height?: string | number;
@@ -91,6 +96,8 @@ interface Props {
 
 const AccountsMap: React.FC<Props> = ({ accounts, height = 'calc(100vh - 310px)', loading = false }) => {
   const navigate = useNavigate();
+
+  const [satellite, setSatellite] = useState(false);
 
   // Proximity state
   const [myPosition, setMyPosition] = useState<[number, number] | null>(null);
@@ -284,6 +291,7 @@ const AccountsMap: React.FC<Props> = ({ accounts, height = 'calc(100vh - 310px)'
         </AntCard>
       )}
 
+      <div style={{ position: 'relative' }}>
       <MapContainer
         center={DEFAULT_CENTER}
         zoom={6}
@@ -291,8 +299,8 @@ const AccountsMap: React.FC<Props> = ({ accounts, height = 'calc(100vh - 310px)'
         scrollWheelZoom
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution={satellite ? ESRI_ATTRIBUTION : OSM_ATTRIBUTION}
+          url={satellite ? ESRI_URL : OSM_URL}
         />
 
         {/* Auto-fit or fly to proximity */}
@@ -406,6 +414,20 @@ const AccountsMap: React.FC<Props> = ({ accounts, height = 'calc(100vh - 310px)'
           );
         })}
       </MapContainer>
+      <button
+        onClick={() => setSatellite(v => !v)}
+        style={{
+          position: 'absolute', bottom: 16, right: 10, zIndex: 1000,
+          background: satellite ? '#1677ff' : '#fff',
+          color: satellite ? '#fff' : '#333',
+          border: '2px solid rgba(0,0,0,0.2)',
+          borderRadius: 6, padding: '4px 10px', fontSize: 12,
+          cursor: 'pointer', fontWeight: 600, boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+        }}
+      >
+        {satellite ? '🗺 Plan' : '🛰 Satellite'}
+      </button>
+      </div>
     </div>
   );
 };

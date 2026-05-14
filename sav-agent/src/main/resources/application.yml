@@ -1,0 +1,107 @@
+# =============================================================================
+# SAV Agent - Configuration par défaut
+# =============================================================================
+# Ce fichier contient les valeurs par défaut.
+# En production, utiliser application-prod.yml ou variables d'environnement.
+# =============================================================================
+
+spring:
+  application:
+    name: sav-agent
+  main:
+    # Pas de serveur web embarqué (l'agent est un client WS, pas un serveur)
+    web-application-type: none
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Africa/Casablanca
+
+# ─── Configuration de l'agent ─────────────────────────────────────────────────
+
+sav-agent:
+  # URL WebSocket du serveur CRM central
+  central-url: ${AGENT_CENTRAL_URL:wss://crm.example.com/ws/agent}
+
+  # Clé API (fournie lors de l'enregistrement via POST /api/agents)
+  api-key: ${AGENT_API_KEY:}
+
+  # Nom lisible de l'agent (affiché dans le dashboard CRM)
+  agent-name: ${AGENT_NAME:SAV-Agent-01}
+
+  # Reconnexion automatique
+  reconnect-delay-ms: 5000
+  reconnect-max-delay-ms: 60000
+  reconnect-backoff-multiplier: 1.5
+  reconnect-max-attempts: 0  # 0 = tentatives infinies
+
+  # Heartbeat (ping/pong)
+  heartbeat-interval-seconds: 30
+
+  # Base de données locale
+  local-database:
+    enabled: ${LOCAL_DB_ENABLED:false}
+    url: ${LOCAL_DB_URL:jdbc:sqlserver://localhost:1433;databaseName=erp_local;encrypt=false}
+    username: ${LOCAL_DB_USER:readonly_user}
+    password: ${LOCAL_DB_PASSWORD:}
+    query-timeout-seconds: 30
+    max-rows: 10000
+
+  # HTTP client local (pour appeler des APIs sur le réseau du client)
+  local-http:
+    enabled: ${LOCAL_HTTP_ENABLED:true}
+    base-url: ${LOCAL_HTTP_BASE_URL:http://localhost:8090}
+    connect-timeout-ms: 5000
+    read-timeout-ms: 30000
+
+  # Exécution de commandes shell
+  shell:
+    enabled: ${SHELL_ENABLED:false}
+    working-directory: ${SHELL_WORKING_DIR:}
+    timeout-seconds: 60
+
+  # Sécurité - Whitelist (mode strict par défaut)
+  security:
+    strict-mode: true
+    allowed-sql-patterns:
+      - "^SELECT .+ FROM stock .+"
+      - "^SELECT .+ FROM comptes .+"
+      - "^SELECT .+ FROM articles .+"
+      - "^SELECT .+ FROM clients .+"
+    allowed-http-prefixes:
+      - "http://localhost:8090/api/"
+      - "http://localhost:9090/api/"
+    allowed-shell-commands:
+      - "ping"
+      - "ipconfig"
+      - "hostname"
+    allowed-file-paths:
+      - "C:/OptiCRM/exports"
+      - "C:/OptiCRM/imports"
+
+# ─── Actuator (health check local, pas exposé sur le réseau) ─────────────────
+
+management:
+  server:
+    port: ${AGENT_MGMT_PORT:9091}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# ─── Logging ─────────────────────────────────────────────────────────────────
+
+logging:
+  level:
+    root: INFO
+    com.opticrm.agent: DEBUG
+    org.springframework.web.socket: INFO
+  file:
+    name: ${LOG_FILE:logs/sav-agent.log}
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30

@@ -1,0 +1,31 @@
+[1/93] Circuit 1: الرباط - المحيط
+(node:23936) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  → 18 rows
+  waiting 22s...
+[2/93] Circuit 2: الرباط - شالة
+  → 18 rows
+  waiting 22s...
+[3/93] Circuit 3: الصخيرات - تمارة
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 17 rows
+  waiting 22s...
+[4/93] Circuit 4: الخميسات - أولماس
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  → 18 rows
+  waiting 22s...
+[5/93] Circuit 5: تيفلت - الرماني
+  → 11 rows
+  waiting 22s...
+[6/93] Circuit 6: المحمدية
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  → 17 rows
+  waiting 22s...
+[7/93] Circuit 7: أكادير -إدا وتنان
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 19 rows
+  waiting 22s...

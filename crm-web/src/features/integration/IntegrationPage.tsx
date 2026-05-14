@@ -6,7 +6,7 @@ import {
 import {
   PlusOutlined, DeleteOutlined, SaveOutlined, UploadOutlined,
   InfoCircleOutlined, PlayCircleOutlined,
-  ThunderboltOutlined, ClearOutlined,
+  ThunderboltOutlined,
   BankOutlined, AppstoreOutlined,
 } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
@@ -139,8 +139,6 @@ function EntityMappingPanel({ entityType }: { entityType: EntityType }) {
   const [saving, setSaving] = useState(false);
   const [importing, setImporting] = useState(false);
   const [executing, setExecuting] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deletingAll, setDeletingAll] = useState(false);
   const [deletingProducts, setDeletingProducts] = useState(false);
   const [sqlQuery, setSqlQuery] = useState(
     () => localStorage.getItem(`opticrm_integration_sql_query_${entityType}`) ?? ''
@@ -238,67 +236,6 @@ function EntityMappingPanel({ entityType }: { entityType: EntityType }) {
           message.error(handleApiError(e));
         } finally {
           setDeletingProducts(false);
-        }
-      },
-    });
-  };
-
-  const handleDeleteAll = () => {
-    let confirmText = '';
-    Modal.confirm({
-      title: 'Supprimer TOUS les comptes',
-      icon: <ClearOutlined style={{ color: '#ff4d4f' }} />,
-      content: (
-        <div>
-          <Alert
-            type="error"
-            message="Action irréversible"
-            description="Cela supprimera définitivement TOUS les comptes et toutes leurs données liées (contacts, opportunités, devis, visites…)."
-            style={{ marginBottom: 12 }}
-          />
-          <p>Tapez <b>CONFIRMER</b> pour continuer :</p>
-          <Input onChange={e => { confirmText = e.target.value; }} placeholder="CONFIRMER" />
-        </div>
-      ),
-      okText: 'Supprimer tout',
-      okType: 'danger',
-      cancelText: 'Annuler',
-      onOk: async () => {
-        if (confirmText !== 'CONFIRMER') {
-          message.error('Tapez exactement "CONFIRMER" pour valider.');
-          return Promise.reject();
-        }
-        setDeletingAll(true);
-        try {
-          await integrationApi.deleteAllAccounts();
-          message.success('Tous les comptes ont été supprimés.');
-          load();
-        } catch {
-          message.error('Erreur lors de la suppression.');
-        } finally {
-          setDeletingAll(false);
-        }
-      },
-    });
-  };
-
-  const handleDeleteImported = () => {
-    Modal.confirm({
-      title: 'Supprimer les données importées',
-      content: 'Cette action supprimera définitivement tous les comptes dont le nom commence par "Import-". Continuer ?',
-      okText: 'Supprimer',
-      okType: 'danger',
-      cancelText: 'Annuler',
-      onOk: async () => {
-        setDeleting(true);
-        try {
-          const count = await integrationApi.deleteImportedAccounts();
-          message.success(`${count} compte(s) importé(s) supprimé(s).`);
-          load();
-        } catch {
-          message.error('Erreur lors de la suppression.');
-        } finally {
-          setDeleting(false);
         }
       },
     });
@@ -432,16 +369,6 @@ function EntityMappingPanel({ entityType }: { entityType: EntityType }) {
               <Button danger icon={<DeleteOutlined />} loading={deletingProducts} onClick={handleDeleteProducts}>
                 Supprimer les produits
               </Button>
-            )}
-            {entityType === 'ACCOUNTS' && (
-              <>
-                <Button danger icon={<ClearOutlined />} loading={deleting} onClick={handleDeleteImported}>
-                  Supprimer les importés
-                </Button>
-                <Button danger type="primary" icon={<DeleteOutlined />} loading={deletingAll} onClick={handleDeleteAll}>
-                  Vider tous les comptes
-                </Button>
-              </>
             )}
           </Space>
         </div>

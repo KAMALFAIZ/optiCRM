@@ -117,7 +117,7 @@ export default function ObjectivesSyncTab() {
       setStep(1);
       message.success(`Prévisualisation générée : ${req.totalItems} ligne(s) analysée(s).`);
     } catch (e: any) {
-      message.error(e?.response?.data?.message || 'Erreur lors de la prévisualisation.');
+      message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de la prévisualisation.');
     } finally {
       setLoading(false);
     }
@@ -132,7 +132,7 @@ export default function ObjectivesSyncTab() {
       setStep(2);
       message.success(`Objectifs synchronisés : ${updated.successItems} réussi(s), ${updated.errorItems} erreur(s).`);
     } catch (e: any) {
-      message.error(e?.response?.data?.message || 'Erreur lors de l\'application.');
+      message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de l\'application.');
     } finally {
       setApplying(false);
     }
@@ -157,21 +157,6 @@ export default function ObjectivesSyncTab() {
           { title: 'Prévisualiser', icon: <InfoCircleOutlined /> },
           { title: 'Appliquer', icon: <CheckCircleOutlined /> },
         ]}
-      />
-
-      {/* ── Info ── */}
-      <Alert
-        type="info"
-        showIcon
-        className="mb-4"
-        message="Import des objectifs commerciaux"
-        description={
-          <span>
-            Cet onglet crée ou met à jour les objectifs de vente dans OptiCRM depuis un export Sage ou tableur.
-            Chaque commercial est identifié par son <strong>CodeComm</strong> (correspond au login ou code interne).
-            Si l'objectif existe déjà pour la période, il sera mis à jour.
-          </span>
-        }
       />
 
       {/* ── Étape 1 : Saisie ── */}

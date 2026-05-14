@@ -52,6 +52,10 @@
             <groupId>com.opticrm</groupId>
             <artifactId>crm-workflow</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-delivery</artifactId>
+        </dependency>
 
         <!-- Anthropic AI -->
         <dependency>

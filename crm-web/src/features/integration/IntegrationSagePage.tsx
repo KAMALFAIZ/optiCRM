@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Tabs, Typography, Alert, Space, Tag } from 'antd';
+import { Tabs, Typography, Space } from 'antd';
 import {
   BankOutlined,
   UserOutlined,
@@ -11,6 +11,7 @@ import {
   InboxOutlined,
   ShoppingCartOutlined,
   DollarOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import AccountsSyncTab from './tabs/AccountsSyncTab';
 import ContactsSyncTab from './tabs/ContactsSyncTab';
@@ -21,6 +22,7 @@ import ProductsSyncTab from './tabs/ProductsSyncTab';
 import InventaireSyncTab from './tabs/InventaireSyncTab';
 import VentesSyncTab from './tabs/VentesSyncTab';
 import BalanceAgeeSyncTab from './tabs/BalanceAgeeSyncTab';
+import AutoSyncTab from './tabs/AutoSyncTab';
 
 const { Title, Text } = Typography;
 
@@ -109,6 +111,16 @@ export default function IntegrationSagePage() {
       children: <BalanceAgeeSyncTab />,
     },
     {
+      key: 'auto-sync',
+      label: (
+        <span className="flex items-center gap-2">
+          <ThunderboltOutlined />
+          Auto-Sync SQL
+        </span>
+      ),
+      children: <AutoSyncTab />,
+    },
+    {
       key: 'config',
       label: (
         <span className="flex items-center gap-2">
@@ -129,28 +141,8 @@ export default function IntegrationSagePage() {
           <Title level={3} className="!mb-0">
             Intégration Sage 100
           </Title>
-          <Tag color="blue">Synchronisation bidirectionnelle</Tag>
         </Space>
-        <Text type="secondary">
-          Importez et synchronisez les données entre OptiCRM et Sage 100.
-          Collez vos exports Sage directement depuis Excel, prévisualisez les correspondances,
-          puis appliquez la synchronisation.
-        </Text>
       </div>
-
-      <Alert
-        type="info"
-        showIcon
-        className="mb-6"
-        message="Mode de synchronisation par requête"
-        description={
-          <ul className="mt-1 mb-0 pl-4 text-sm">
-            <li><strong>Étape 1</strong> — Collez vos données export Sage (ou saisissez manuellement).</li>
-            <li><strong>Étape 2</strong> — Prévisualisez le matching : Nouveau / Mise à jour / Identique / Conflit.</li>
-            <li><strong>Étape 3</strong> — Appliquez la requête pour écrire les données dans OptiCRM.</li>
-          </ul>
-        }
-      />
 
       <Tabs
         activeKey={activeTab}

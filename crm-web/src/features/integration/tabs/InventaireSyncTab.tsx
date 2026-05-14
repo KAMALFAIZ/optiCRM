@@ -6,7 +6,7 @@ import {
 import {
   CloudUploadOutlined, CheckCircleOutlined,
   ReloadOutlined, InfoCircleOutlined, DatabaseOutlined, CodeOutlined,
-  InboxOutlined,
+  InboxOutlined, SaveOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import sageIntegrationApi, {
@@ -26,7 +26,7 @@ const DEFAULT_SQL = `SELECT
   ISNULL(AS_QteSto, 0)          AS_QteSto,
   ISNULL(AS_QteRes, 0)          AS_QteRes,
   ISNULL(AR_PAMP, 0)            AR_PAMP
-FROM [GROUPE_ALBOUGHAZE].[dbo].[F_ARTSTOCK]
+FROM [dbo].[F_ARTSTOCK]
 WHERE ISNULL(AS_QteSto, 0) != 0 OR ISNULL(AS_QteRes, 0) != 0`;
 
 const extraColumns: ColumnsType<SageSyncItemDto> = [
@@ -83,7 +83,7 @@ export default function InventaireSyncTab() {
   const { message } = App.useApp();
   const [pastedData, setPastedData] = useState('');
   const [label, setLabel] = useState('');
-  const [sqlQuery, setSqlQuery] = useState(DEFAULT_SQL);
+  const [sqlQuery, setSqlQuery] = useState(() => localStorage.getItem('sage.query.inventory') || DEFAULT_SQL);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -99,7 +99,7 @@ export default function InventaireSyncTab() {
       const req = await sageIntegrationApi.createRequest({ entityType: 'INVENTORY', label: label || undefined, rows });
       setRequest(req); setStep(1);
       message.success(`Prévisualisation générée : ${req.totalItems} ligne(s) d'inventaire analysée(s).`);
-    } catch (e: any) { message.error(e?.response?.data?.message || 'Erreur lors de la prévisualisation.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de la prévisualisation.'); }
     finally { setLoading(false); }
   };
 
@@ -117,7 +117,7 @@ export default function InventaireSyncTab() {
       });
       setRequest(req); setStep(1);
       message.success(`${rows.length} ligne(s) de stock importée(s) depuis Sage.`);
-    } catch (e: any) { message.error(e?.response?.data?.message || e?.message || 'Erreur lors de l\'import.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || e?.message || 'Erreur lors de l\'import.'); }
     finally { setImporting(false); }
   };
 
@@ -128,8 +128,13 @@ export default function InventaireSyncTab() {
       const updated = await sageIntegrationApi.applyRequest(request.id);
       setRequest(updated); setStep(2);
       message.success(`${updated.successItems} niveau(x) de stock mis à jour, ${updated.errorItems} erreur(s).`);
-    } catch (e: any) { message.error(e?.response?.data?.message || 'Erreur lors de l\'application.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de l\'application.'); }
     finally { setApplying(false); }
+  };
+
+  const handleSaveQuery = () => {
+    localStorage.setItem('sage.query.inventory', sqlQuery);
+    message.success('Requête inventaire enregistrée');
   };
 
   const handleReset = () => { setPastedData(''); setLabel(''); setRequest(null); setStep(0); };
@@ -149,10 +154,6 @@ export default function InventaireSyncTab() {
               <Input placeholder="Ex : Inventaire Mars 2026" value={label} onChange={e => setLabel(e.target.value)} style={{ maxWidth: 400 }} />
             </Form.Item>
 
-            <Alert type="warning" showIcon className="mb-4"
-              message="Prérequis"
-              description="Les produits doivent être synchronisés en premier (onglet Produits) pour que le matching par AR_Ref fonctionne." />
-
             <Collapse className="mb-4" style={{ background: '#fffbeb', borderColor: '#fde68a' }} items={[{
               key: 'sql',
               label: <Space><DatabaseOutlined style={{ color: '#d97706' }} /><Text strong style={{ color: '#d97706' }}>Import direct depuis Sage SQL Server</Text><Tag color="orange">Recommandé</Tag></Space>,
@@ -162,11 +163,18 @@ export default function InventaireSyncTab() {
                     message="Colonnes mappées"
                     description="AR_Ref → produit (via sageCode), DE_No → dépôt (find or create par code), AS_QteSto → quantité en stock, AS_QteRes → quantité réservée, AR_PAMP → coût moyen pondéré." />
                   <TextArea rows={8} value={sqlQuery} onChange={e => setSqlQuery(e.target.value)} style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 12 }} />
-                  <Tooltip title="Importe les niveaux de stock depuis Sage">
-                    <Button type="primary" icon={<DatabaseOutlined />} loading={importing} onClick={handleImportFromSage} style={{ background: '#d97706', borderColor: '#d97706' }}>
-                      Exécuter et importer depuis Sage
-                    </Button>
-                  </Tooltip>
+                  <Space>
+                    <Tooltip title="Importe les niveaux de stock depuis Sage">
+                      <Button type="primary" icon={<DatabaseOutlined />} loading={importing} onClick={handleImportFromSage} style={{ background: '#d97706', borderColor: '#d97706' }}>
+                        Exécuter et importer depuis Sage
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Enregistrer la requête SQL pour les prochaines sessions">
+                      <Button icon={<SaveOutlined />} onClick={handleSaveQuery}>
+                        Enregistrer la requête
+                      </Button>
+                    </Tooltip>
+                  </Space>
                 </div>
               ),
             }]} />

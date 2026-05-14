@@ -23,13 +23,14 @@ public class TenantHibernateConfig {
     public CurrentTenantIdentifierResolver<UUID> currentTenantIdentifierResolver() {
         return new CurrentTenantIdentifierResolver<>() {
 
+            private static final UUID DEFAULT_TENANT = UUID.fromString("00000000-0000-0000-0000-000000000001");
+
             @Override
             public UUID resolveCurrentTenantIdentifier() {
                 UUID tenantId = TenantContext.get();
                 if (tenantId == null) {
-                    // Return null to disable tenant filtering for system/public operations.
-                    // This is safe only for endpoints that don't return tenant-scoped data.
-                    log.trace("No tenant in context, tenant filter disabled for this query");
+                    log.trace("No tenant in context, using default tenant");
+                    return DEFAULT_TENANT;
                 }
                 return tenantId;
             }

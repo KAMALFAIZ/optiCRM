@@ -27,6 +27,7 @@ import rolesReducer from '@/features/roles/rolesSlice';
 import notificationsReducer from '@/features/notifications/notificationsSlice';
 import workflowsReducer from '@/features/workflows/workflowsSlice';
 import tenantReducer from '@/features/tenant/tenantSlice';
+import googleCalendarReducer from '@/features/googleCalendar/googleCalendarSlice';
 
 export const store = configureStore({
   reducer: {
@@ -56,6 +57,7 @@ export const store = configureStore({
     roles: rolesReducer,
     notifications: notificationsReducer,
     workflows: workflowsReducer,
+    googleCalendar: googleCalendarReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

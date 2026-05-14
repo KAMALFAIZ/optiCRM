@@ -94,16 +94,17 @@ public class SavPipelineService {
                         (int)(System.currentTimeMillis() - t4), null);
             } else {
                 AgentResult.KbSearchResult best = r4.getArticlePrincipal();
+                SavTicket finalTicket = ticket;
                 kbArticleRepository.findById(UUID.fromString(best.getArticleId())).ifPresent(article -> {
                     AgentResult.Agent5ResolverResult r5 = agent5Resolver.run(article, niveau, r1.getLangueDetectee());
-                    ticket.setKbArticle(article);
-                    ticket.setSolutionProposee(r5.getSolutionFormattee());
-                    ticket.setSolutionLangue(r5.getLangue());
-                    ticket.setStatut("EN_COURS");
-                    ticket.setDatePriseEnCharge(Instant.now());
-                    ticketRepository.save(ticket);
-                    saveMessage(ticket, "AGENT_IA", r5.getSolutionFormattee(), r5.getLangue(), canal);
-                    logAgent(ticket, "RESOLVER", "SUCCES", article.getCodeArticle(), r5.getSolutionFormattee(),
+                    finalTicket.setKbArticle(article);
+                    finalTicket.setSolutionProposee(r5.getSolutionFormattee());
+                    finalTicket.setSolutionLangue(r5.getLangue());
+                    finalTicket.setStatut("EN_COURS");
+                    finalTicket.setDatePriseEnCharge(Instant.now());
+                    ticketRepository.save(finalTicket);
+                    saveMessage(finalTicket, "AGENT_IA", r5.getSolutionFormattee(), r5.getLangue(), canal);
+                    logAgent(finalTicket, "RESOLVER", "SUCCES", article.getCodeArticle(), r5.getSolutionFormattee(),
                             0, null);
                 });
             }

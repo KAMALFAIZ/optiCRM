@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Card, Button, Input, Alert, Space, Typography, Collapse, Tag,
-  App, Form, Divider, Steps, Tooltip,
+  App, Form, Divider, Steps, Tooltip, Progress,
 } from 'antd';
 import {
   CloudUploadOutlined, CheckCircleOutlined,
   ReloadOutlined, InfoCircleOutlined, DatabaseOutlined, CodeOutlined,
-  AppstoreOutlined,
+  AppstoreOutlined, SaveOutlined, SyncOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import sageIntegrationApi, {
@@ -18,17 +18,16 @@ import { PreviewTable, PreviewSummary, HistoryPanel } from '../components/SyncPa
 const { TextArea } = Input;
 const { Text } = Typography;
 
-const SAGE_HEADERS = ['AR_Ref', 'AR_Design', 'AR_PrixVen', 'AR_PrixAch', 'AR_Unite', 'AR_Famille', 'AR_Sommeil'];
+const SAGE_HEADERS = ['AR_Ref', 'AR_Design', 'AR_PrixVen', 'AR_PrixAch', 'AR_Famille', 'AR_Sommeil'];
 
 const DEFAULT_SQL = `SELECT
   AR_Ref,
-  ISNULL(AR_Design, '')                AR_Design,
-  ISNULL(AR_PrixVen, 0)               AR_PrixVen,
-  ISNULL(AR_PrixAch, 0)               AR_PrixAch,
-  ISNULL(AR_Unite, 'Unité')           AR_Unite,
-  ISNULL(FA_CodeFamille, '')          AR_Famille,
-  ISNULL(AR_Sommeil, 0)               AR_Sommeil
-FROM [GROUPE_ALBOUGHAZE].[dbo].[F_ARTICLE]
+  ISNULL(AR_Design, '')        AR_Design,
+  ISNULL(AR_PrixVen, 0)       AR_PrixVen,
+  ISNULL(AR_PrixAch, 0)       AR_PrixAch,
+  ISNULL(FA_CodeFamille, '')  AR_Famille,
+  ISNULL(AR_Sommeil, 0)       AR_Sommeil
+FROM [dbo].[F_ARTICLE]
 WHERE ISNULL(AR_Sommeil, 0) = 0`;
 
 const extraColumns: ColumnsType<SageSyncItemDto> = [
@@ -69,19 +68,12 @@ const extraColumns: ColumnsType<SageSyncItemDto> = [
     },
   },
   {
-    title: 'Unité / Famille',
+    title: 'Famille',
     dataIndex: 'rawData',
     width: 130,
     render: (raw: any) => {
-      const unite   = raw?.ar_unite   ?? raw?.AR_Unite   ?? '';
       const famille = raw?.ar_famille ?? raw?.AR_Famille ?? '';
-      return (
-        <div>
-          {unite   && <Tag color="blue" className="text-xs">{unite}</Tag>}
-          {famille && <Tag color="green" className="text-xs">{famille}</Tag>}
-          {!unite && !famille && <Text type="secondary">—</Text>}
-        </div>
-      );
+      return famille ? <Tag color="green" className="text-xs">{famille}</Tag> : <Text type="secondary">—</Text>;
     },
   },
 ];
@@ -90,12 +82,37 @@ export default function ProductsSyncTab() {
   const { message } = App.useApp();
   const [pastedData, setPastedData] = useState('');
   const [label, setLabel] = useState('');
-  const [sqlQuery, setSqlQuery] = useState(DEFAULT_SQL);
+  const [sqlQuery, setSqlQuery] = useState(() => localStorage.getItem('sage.query.products') || DEFAULT_SQL);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
   const [importing, setImporting] = useState(false);
+  const [importStep, setImportStep] = useState('');
   const [request, setRequest] = useState<SageSyncRequestDto | null>(null);
   const [step, setStep] = useState<0 | 1 | 2>(0);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Polling toutes les 3s quand le statut est PROCESSING
+  useEffect(() => {
+    if (request?.status === 'PROCESSING') {
+      pollRef.current = setInterval(async () => {
+        try {
+          const updated = await sageIntegrationApi.getRequest(request.id);
+          setRequest(updated);
+          if (updated.status === 'DONE' || updated.status === 'ERROR') {
+            clearInterval(pollRef.current!);
+            setApplying(false);
+            setStep(2);
+            if (updated.status === 'DONE') {
+              message.success(`Import terminé — ${updated.successItems} produit(s) synchronisé(s), ${updated.skipItems} identique(s), ${updated.errorItems} erreur(s).`);
+            } else {
+              message.error(`Import en erreur — ${updated.errorItems} erreur(s).`);
+            }
+          }
+        } catch { /* ignore polling errors */ }
+      }, 3000);
+    }
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [request?.status, request?.id]);
 
   const handlePreview = async () => {
     if (!pastedData.trim()) { message.warning('Collez des données Sage avant de prévisualiser.'); return; }
@@ -106,7 +123,7 @@ export default function ProductsSyncTab() {
       const req = await sageIntegrationApi.createRequest({ entityType: 'PRODUCTS', label: label || undefined, rows });
       setRequest(req); setStep(1);
       message.success(`Prévisualisation générée : ${req.totalItems} produit(s) analysé(s).`);
-    } catch (e: any) { message.error(e?.response?.data?.message || 'Erreur lors de la prévisualisation.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.message || 'Erreur lors de la prévisualisation.'); }
     finally { setLoading(false); }
   };
 
@@ -114,8 +131,11 @@ export default function ProductsSyncTab() {
     if (!sqlQuery.trim()) { message.warning('La requête SQL est vide.'); return; }
     setImporting(true);
     try {
+      setImportStep('Connexion Sage et récupération des données...');
       const rows = await sageQueryApi.executeQuery(sqlQuery, 'PRODUCTS');
       if (!rows.length) { message.warning('Aucun produit trouvé dans Sage.'); return; }
+
+      setImportStep(`${rows.length} articles récupérés — Analyse du matching en cours...`);
       const req = await sageIntegrationApi.createRequest({
         entityType: 'PRODUCTS',
         label: label || `Import Produits Sage — ${new Date().toLocaleDateString('fr-FR')}`,
@@ -123,23 +143,35 @@ export default function ProductsSyncTab() {
         rows,
       });
       setRequest(req); setStep(1);
-      message.success(`${rows.length} produit(s) importés depuis Sage.`);
-    } catch (e: any) { message.error(e?.response?.data?.message || e?.message || 'Erreur lors de l\'import.'); }
-    finally { setImporting(false); }
+      message.success(`${rows.length} produit(s) importés depuis Sage — prêt à appliquer.`);
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.message || 'Erreur lors de l\'import.'); }
+    finally { setImporting(false); setImportStep(''); }
   };
 
   const handleApply = async () => {
     if (!request) return;
     setApplying(true);
     try {
+      // applyRequest retourne immédiatement (PROCESSING) — le polling prend le relais
       const updated = await sageIntegrationApi.applyRequest(request.id);
-      setRequest(updated); setStep(2);
-      message.success(`${updated.successItems} produit(s) synchronisé(s), ${updated.errorItems} erreur(s).`);
-    } catch (e: any) { message.error(e?.response?.data?.message || 'Erreur lors de l\'application.'); }
-    finally { setApplying(false); }
+      setRequest(updated);
+      message.info(`Import lancé en arrière-plan — ${request.totalItems} produit(s) en cours de traitement...`);
+    } catch (e: any) {
+      setApplying(false);
+      message.error(e?.response?.data?.error?.message || e?.message || 'Erreur lors de l\'application.');
+    }
   };
 
-  const handleReset = () => { setPastedData(''); setLabel(''); setRequest(null); setStep(0); };
+  const handleSaveQuery = () => {
+    localStorage.setItem('sage.query.products', sqlQuery);
+    message.success('Requête produits enregistrée');
+  };
+
+  const handleReset = () => { setPastedData(''); setLabel(''); setRequest(null); setStep(0); setImportStep(''); };
+
+  const progressPct = request && request.totalItems > 0
+    ? Math.round((request.successItems + request.errorItems + request.skipItems) / request.totalItems * 100)
+    : 0;
 
   return (
     <div>
@@ -163,19 +195,27 @@ export default function ProductsSyncTab() {
                 <div>
                   <Alert type="info" showIcon icon={<CodeOutlined />} style={{ marginBottom: 12 }}
                     message="Colonnes mappées"
-                    description="AR_Ref (clé), AR_Design (désignation), AR_PrixVen (prix vente), AR_PrixAch (prix achat), AR_Unite (unité), AR_Famille (famille/catégorie), AR_Sommeil (0=actif, 1=sommeil)." />
-                  <TextArea rows={10} value={sqlQuery} onChange={e => setSqlQuery(e.target.value)} style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 12 }} />
-                  <Tooltip title="Exécute la requête sur le serveur Sage et importe les produits">
-                    <Button type="primary" icon={<DatabaseOutlined />} loading={importing} onClick={handleImportFromSage} style={{ background: '#059669', borderColor: '#059669' }}>
-                      Exécuter et importer depuis Sage
-                    </Button>
-                  </Tooltip>
+                    description="AR_Ref (clé), AR_Design (désignation), AR_PrixVen (prix vente), AR_PrixAch (prix achat), AR_Famille (famille/catégorie), AR_Sommeil (0=actif, 1=sommeil)." />
+                  <TextArea rows={9} value={sqlQuery} onChange={e => setSqlQuery(e.target.value)} style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 12 }} />
+                  {importing && importStep && (
+                    <Alert type="info" showIcon icon={<SyncOutlined spin />} message={importStep} style={{ marginBottom: 12 }} />
+                  )}
+                  <Space>
+                    <Tooltip title="Exécute la requête sur le serveur Sage et prépare l'import">
+                      <Button type="primary" icon={importing ? <SyncOutlined spin /> : <DatabaseOutlined />} loading={importing} onClick={handleImportFromSage} style={{ background: '#059669', borderColor: '#059669' }}>
+                        Exécuter et importer depuis Sage
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Enregistrer la requête SQL pour les prochaines sessions">
+                      <Button icon={<SaveOutlined />} onClick={handleSaveQuery}>Enregistrer la requête</Button>
+                    </Tooltip>
+                  </Space>
                 </div>
               ),
             }]} />
 
             <Form.Item label="Données Sage (copier-coller depuis Excel)">
-              <TextArea rows={6} placeholder={`AR_Ref\tAR_Design\tAR_PrixVen\tAR_PrixAch\tAR_Unite\tAR_Famille\nART001\tRobinet mitigeur\t245.00\t180.00\tPièce\tROBINETTERIE`}
+              <TextArea rows={6} placeholder={`AR_Ref\tAR_Design\tAR_PrixVen\tAR_PrixAch\tAR_Famille\nART001\tRobinet mitigeur\t245.00\t180.00\tROBINETTERIE`}
                 value={pastedData} onChange={e => setPastedData(e.target.value)} style={{ fontFamily: 'monospace', fontSize: 12 }} />
             </Form.Item>
 
@@ -190,7 +230,7 @@ export default function ProductsSyncTab() {
         <Card size="small"
           title={<Space><InfoCircleOutlined style={{ color: '#059669' }} /><span>Prévisualisation — {request.totalItems} produit(s)</span>{request.label && <Tag>{request.label}</Tag>}</Space>}
           extra={<Space>
-            <Button size="small" icon={<ReloadOutlined />} onClick={handleReset}>Nouvelle import</Button>
+            <Button size="small" icon={<ReloadOutlined />} onClick={handleReset} disabled={applying}>Nouvelle import</Button>
             {request.status === 'PENDING' && (
               <Button size="small" type="primary" icon={<CheckCircleOutlined />} loading={applying} onClick={handleApply} style={{ background: '#059669', borderColor: '#059669' }}>
                 Appliquer la synchronisation
@@ -199,11 +239,24 @@ export default function ProductsSyncTab() {
           </Space>}
         >
           <PreviewSummary items={request.items ?? []} />
+
+          {/* Barre de progression pendant le traitement async */}
+          {request.status === 'PROCESSING' && (
+            <div style={{ marginBottom: 12 }}>
+              <Alert type="info" showIcon icon={<SyncOutlined spin />} style={{ marginBottom: 8 }}
+                message={`Traitement en cours — ${request.successItems + request.errorItems + request.skipItems} / ${request.totalItems} produits traités...`} />
+              <Progress percent={progressPct} status="active" strokeColor="#059669" />
+            </div>
+          )}
+
           {step === 2 && request.status === 'DONE' && (
             <Alert type="success" showIcon className="mb-3"
-              message={`Synchronisation terminée — ${request.successItems} produit(s) mis à jour, ${request.skipItems} identique(s), ${request.errorItems} erreur(s).`} />
+              message={`Import terminé — ${request.successItems} synchronisé(s), ${request.skipItems} identique(s), ${request.errorItems} erreur(s).`} />
           )}
-          <PreviewTable items={request.items ?? []} extraColumns={extraColumns} />
+
+          {request.items && request.items.length > 0 && (
+            <PreviewTable items={request.items} extraColumns={extraColumns} />
+          )}
         </Card>
       )}
 

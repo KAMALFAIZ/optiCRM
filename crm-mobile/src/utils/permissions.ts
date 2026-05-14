@@ -11,13 +11,13 @@ export function hasPermission(user: User | null, module: Module, action: Action)
   if (!roleName) return false;
   if (ADMIN_ROLES.includes(roleName)) return true;
   if (roleName === 'READ_ONLY') return action === 'read';
-  // MANAGER and COMMERCIAL have full CRUD on most modules
+  // MANAGER, SUPERVISEUR and COMMERCIAL: check permissions from role object
   const permissions = user.role?.permissions;
   if (permissions && permissions[module]) {
     return permissions[module][action] === true;
   }
-  // Default: MANAGER and COMMERCIAL can do most things
-  if (roleName === 'MANAGER' || roleName === 'COMMERCIAL') {
+  // Default: MANAGER, SUPERVISEUR and COMMERCIAL can do most things
+  if (roleName === 'MANAGER' || roleName === 'SUPERVISEUR' || roleName === 'COMMERCIAL') {
     return true;
   }
   return false;

@@ -83,16 +83,18 @@ interface PageResponse<T> {
   size: number;
 }
 
+const LONG_TIMEOUT = { timeout: 1_800_000 }; // 30 min — imports volumineux
+
 const sageIntegrationApi = {
   /** Créer une requête de sync (génère le preview automatiquement) */
   createRequest: async (req: CreateSyncRequestRequest): Promise<SageSyncRequestDto> => {
-    const res = await apiClient.post<{ data: SageSyncRequestDto }>('/sage/sync/requests', req);
+    const res = await apiClient.post<{ data: SageSyncRequestDto }>('/sage/sync/requests', req, LONG_TIMEOUT);
     return res.data.data;
   },
 
   /** Appliquer la requête (écriture en base CRM) */
   applyRequest: async (id: string): Promise<SageSyncRequestDto> => {
-    const res = await apiClient.post<{ data: SageSyncRequestDto }>(`/sage/sync/requests/${id}/apply`);
+    const res = await apiClient.post<{ data: SageSyncRequestDto }>(`/sage/sync/requests/${id}/apply`, null, LONG_TIMEOUT);
     return res.data.data;
   },
 

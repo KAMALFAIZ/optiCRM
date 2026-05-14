@@ -27,9 +27,10 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo [3/3] Demarrage Spring Boot...
-echo OK - Les migrations Flyway V47+V48 vont s'executer automatiquement
+echo [3/3] Demarrage Spring Boot (opticrm_odyssee)...
+set DATABASE_URL=jdbc:sqlserver://kasoft.selfip.net;databaseName=opticrm_odyssee;encrypt=false;trustServerCertificate=true;sendStringParametersAsUnicode=true
 java -Duser.timezone=UTC ^
+     -Dserver.port=8081 ^
      -Dspring.flyway.locations=filesystem:crm-api/src/main/resources/db/migration ^
      -Dspring.flyway.validate-on-migrate=false ^
      -jar crm-api\target\crm-api-1.0.0-SNAPSHOT.jar

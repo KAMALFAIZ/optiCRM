@@ -1,0 +1,2915 @@
+
+=== PAGE 1 ===
+Sage 100c
+loud
+Premium
+00
+V.7.
+Microsoft SQL Server
+Installation & Mise en œuvre
+=== PAGE 2 ===
+Introduction
+Propriété & Usage
+Conformité & Mise en garde
+Ce logiciel et sa documentation sont protégés par le
+Compte tenu des contraintes inhérentes à la
+Code de la Propriété Intellectuelle, les lois relatives au
+présentation sous forme de manuel électronique, les
+copyright et les traités internationaux applicables.
+spécifications visées dans la présente documentation
+constituent une illustration aussi proche que possible
+Toute utilisation non conforme du logiciel, et
+des spécifications.
+notamment toute reproduction ou distribution partielle
+Il appartient au client, parallèlement à la
+ou totale du logiciel ou toute utilisation au-delà des
+documentation, de mettre en oeuvre le progiciel pour
+droits acquis sur le logiciel est strictement interdite.
+permettre de mesurer exactement l’adéquation de ses
+besoins aux fonctionnalités.
+Toute personne ne respectant pas ces dispositions se
+Il est important, pour une utilisation sûre et
+rendra coupable de délit de contrefaçon et sera
+opérationnelle du progiciel, de lire préalablement la
+passible des peines pénales prévues par la loi.
+documentation.
+La marque Sage est une marque protégée. Toute
+Evolution
+reproduction totale ou partielle de la marque Sage,
+sans l’autorisation préalable et expresse de la société
+La documentation correspond à la version référencée.
+Sage est donc prohibée.
+Entre deux versions, des mises à jour du logiciel
+Tous les noms de produits ou de sociétés, toute
+peuvent être opérées sans modification de la
+image, logo ou représentation visuelle mentionnés documentation. Toutefois, un additif peut être joint à la
+dans ce logiciel ou sa documentation et n’appartenant documentation existante pour présenter les
+pas à Sage peuvent constituer des marques déposées modifications et améliorations apportées à ces mises
+par leurs propriétaires respectifs. à jour.
+=== PAGE 3 ===
+Tab le des matières
+Table des matières
+Généralités ................................................................................................................................................. 7
+Introduction ............................................................................................................................................... 7
+Offre Sage 100cloud Premium .................................................................................................................. 7
+Architecture des versions Sage 100cloud Premium .............................................................................. 8
+Particularités de Microsoft Windows et Microsoft SQL Server 2017 ...................................................... 8
+Particularités des applications Sage 100cloud Premium ....................................................................... 8
+Installation du Poste Serveur .................................................................................................................... 9
+Configuration matérielle recommandée ...................................................................................................... 9
+Configuration logicielle ............................................................................................................................... 9
+Systèmes d'exploitation ........................................................................................................................... 9
+Composants à installer ............................................................................................................................ 9
+Installation de Microsoft SQL Server 2017 .............................................................................................. 10
+Mise à niveau du moteur SQL Server ........................................................................................................ 10
+Création d'une instance nommée ........................................................................................................... 10
+Préconisations ...................................................................................................................................... 10
+Première installation de Microsoft SQL Server 2017 ............................................................................... 11
+Sélection de composant ...................................................................................................................... 13
+Configuration de l'instance .................................................................................................................. 14
+Configuration du serveur ..................................................................................................................... 15
+Configuration du moteur de bases de données ................................................................................... 17
+Protocole de communication ................................................................................................................. 19
+Sage Serveur pour SQL Server - partie Serveur ................................................................................. 20
+Installation par mise à niveau ou création d'une instance nommée ......................................................... 21
+Pré requis d'installation ......................................................................................................................... 21
+Méthode 1 : Installation de SQL Server 2017 par mise à niveau .................................................................. 26
+Méthode 2 : Installation SQL Server 2017 avec création d'une instance nommée ............................... 29
+Opérations à réaliser après la mise à niveau ou la création d'une instance nommée .................................... 30
+Sage Serveur pour SQL Server - partie Serveur ................................................................................. 32
+Installation de Sage Serveur pour SQL - partie Serveur ............................................................................... 34
+Installation des postes clients .................................................................................................................... 37
+Configuration matérielle recommandée .................................................................................................... 37
+Configuration logicielle............................................................................................................................. 37
+Composants à installer .............................................................................................................................. 37
+Installation de Sage 100cloud poste Client ............................................................................................. 38
+Microsoft SQL Native Client ................................................................................................................... 39
+Sage Installation ................................................................................................................................... 39
+© 2020 Sage 3
+=== PAGE 4 ===
+Tab le des matières
+Installation des applications Sage 100cloud Premium ...................................................................................... 41
+Particularités de Sage 100cloud Entreprise .............................................................................................. 42
+Création de compte et droits d'accès aux bases de données Sage 100cloud Premium ..................... 43
+Introduction ............................................................................................................................................. 43
+Ouverture de base .................................................................................................................................... 44
+Rôle du serveur .................................................................................................................................... 44
+Rôle de base de données ....................................................................................................................... 44
+Création/Conversion de base ................................................................................................................. 45
+Rôles du serveur ................................................................................................................................... 45
+Rôle du serveur .................................................................................................................................... 45
+Mappage de l'utilisateur ...................................................................................................................... 46
+Création des bases Sage 100cloud Premium ......................................................................................... 47
+Introduction ............................................................................................................................................. 47
+Création de bases au moyen des applications Sage 100cloud Premium ................................................ 47
+Fichier INI sur le poste client ............................................................................................................... 48
+Base SQL .............................................................................................................................................. 49
+Outil de maintenance et Conversion....................................................................................................... 51
+Introduction ............................................................................................................................................. 51
+Conversion des bases ............................................................................................................................ 51
+Recommandations .................................................................................................................................. 51
+Définition du mode de récupération des données ................................................................................... 52
+Vérification de l'espace disque disponible ............................................................................................... 53
+Opérations à réaliser après conversions ...................................................................................................... 53
+Conversions des bases de données ....................................................................................................... 53
+Conversion des bases Sage100 issues d'une version antérieure ........................................................ 53
+Conversion des bases Sage 100 Windows issues d'une version antérieure ........................................ 55
+Réorganisation de la base relationnelle .................................................................................................. 59
+Recopie des données ................................................................................................................................ 59
+Pré-requis ........................................................................................................................................... 60
+Procédure de recopie des données ......................................................................................................... 61
+Vérification des données .......................................................................................................................... 64
+Fusion des bases relationnelles .............................................................................................................. 65
+Sélection de la base comptable ........................................................................................................... 66
+Lancement du traitement ...................................................................................................................... 66
+Outil de diagnostic pré-migration ............................................................................................................ 67
+Traitements multi-dossiers ...................................................................................................................... 68
+Sauvegarde et restauration des bases de données ...................................................................................... 68
+Sauvegarde d'une base de données ............................................................................................................ 68
+Restauration d'une base de données ...................................................................................................... 69
+Cas de restauration : fichier de sauvegarde issu d'une autre instance/serveur SQL ............................ 73
+© 2020 Sage 4
+=== PAGE 5 ===
+Tab le des matières
+Fonctionnalités spécifiques des applications Sage100cloud Premium ............................................... 75
+Impression des états ................................................................................................................................. 75
+Personnalisation des tris ......................................................................................................................... 77
+Définition d'un nouveau tri......................................................................................................................... 77
+Suppression d'un tri ............................................................................................................................... 79
+Utilisation d'un nouveau tri .................................................................................................................... 79
+Tris par application ................................................................................................................................. 81
+Comptabilité ........................................................................................................................................ 81
+Gestion commerciale ............................................................................................................................ 82
+Saisie de caisse décentralisée ................................................................................................................ 85
+Immobilisations ................................................................................................................................... 87
+Moyens de paiement ............................................................................................................................. 88
+Connexion et erreurs fréquentes .......................................................................................................... 101
+Connexion ............................................................................................................................................ 101
+Connexion au domaine Windows .......................................................................................................... 101
+Postes Clients Windows ....................................................................................................................... 101
+Création d'utilisateurs sous Microsoft SQL Server 2017 ............................................................................. 101
+Erreurs les plus fréquentes et solutions ..................................................................................................... 102
+Echec de connexion à la base de données ............................................................................................. 102
+Erreur -6706 ...................................................................................................................................... 103
+Erreur 5 .............................................................................................................................................. 103
+Annexes .................................................................................................................................................. 104
+Tables et procédures système Sage .......................................................................................................... 104
+Base de données Master ..................................................................................................................... 104
+Bases Sage 100cloud Premium ........................................................................................................... 105
+Procédures stockées, clés et Triggers ....................................................................................................... 112
+Procédures stockées Sage d'accès aux données...................................................................................... 112
+Procédures stockées Système .......................................................................................................... 113
+Les déclencheurs (Triggers) .................................................................................................................. 113
+Contraintes d'intégrité et index ............................................................................................................ 114
+Mécanismes de notification ................................................................................................................. 115
+Utilisation des verrous ............................................................................................................................ 118
+Différents types de verrous .................................................................................................................. 118
+Les verrous des fichiers et des enregistrements................................................................................ 119
+Gestion des verrous dans les applications Sage 100cloud Premium ........................................................ 121
+Supprimer tous les verrous suite à un « plantage » d'application ...................................................... 122
+Lecture et écriture dans les tables Sage ................................................................................................... 122
+Conseils ............................................................................................................................................. 122
+Administration et recommandations ........................................................................................................ 123
+Optimisation et réorganisation de la base ............................................................................................. 123
+© 2020 Sage 5
+=== PAGE 6 ===
+Tab le des matières
+Développements externes et options SQL ............................................................................................. 123
+Plan de maintenance ........................................................................................................................... 126
+Équivalence des types des champs Sage 100cloud / Microsoft SQL Server ......................................... 128
+Informations libres ............................................................................................................................. 128
+Équivalence de types : Information libre Sage 100cloud / Données Microsoft SQL Server ............... 130
+Ajout / Suppression d'informations libres sous Microsoft SQL Server ................................................ 131
+Création d'un nouveau champ sous Microsoft SQL Server................................................................ 132
+© 2020 Sage 6
+=== PAGE 7 ===
+Généralités
+Généralités
+Introduction
+Ce manuel a pour objectif de décrire étape par étape, les procédures à respecter pour installer tous les
+composants nécessaires à l'exploitation des applications Sage 100cloud Premium.
+Les applications Sage 100cloud utilisent des fonctionnalités SQL qui devront être installées
+ou activées avant tout déploiement de votre solution Sage 100cloud. Veuillez-vous référer
+aux fiches techniques de votre Centre d'aide en ligne :
+- Sage Serveur pour SQL Server - Installation des fonctions FullText et FileStream pour
+l'offre Sage 100cloud Premium
+Les étapes à respecter sont les suivantes :
+• Installation du poste serveur :
+- Création d'une instance SQL Server 2017 ou mise à niveau d'une instance Microsoft SQL 2012
+vers une instance SQL Server 2017.
+- Installation de Sage Serveur pour SQL - partie Serveur.
+• Installation des postes clients :
+- Installation de Sage 100cloud poste Client.
+- Installation des applications Sage 100cloud Premium.
+• Création des comptes utilisateurs et attribution des droits d'accès aux bases de données.
+• Création et conversion des bases de données.
+Ces différents thèmes sont détaillés dans les chapitres suivants.
+Offre Sage 100cloud Premium
+L'offre Sage 100cloud Premium propose les applications suivantes :
+• Sage 100cloud Comptabilité Premium,
+• Sage 100cloud Gestion Commerciale Premium,
+• Sage 100cloud Saisie de Caisse Décentralisée Premium,
+• Sage 100cloud Immobilisations Premium,
+• Sage 100cloud Moyens de Paiement Premium,
+• Sage 100cloud Trésorerie Premium,
+• Sage 100cloud Etendue,
+• Sage 100cloud Entreprise Premium, offre intégrée ou ERP incluant les applications Bureau Sage,
+Comptabilité, Gestion commerciale, Immobilisations, Moyens de paiement, Trésorerie et
+Communication bancaire.
+Les applications Sage 100cloud Premium ne peuvent accéder qu'aux bases Sage 100cloud SQL
+Server. La conversion d'une base Sage 100 Windows en base Sage SQL Server peut être réalisée
+via le programme Maintenance installé par défaut par les applications Sage 100cloud
+Premium.
+© 2020 Sage 7
+=== PAGE 8 ===
+Généralités
+Architecture des versions Sage 100cloud Premium
+Particularités de Microsoft Windows et Microsoft SQL Server 2017
+Tout au long de ce manuel, nous nous efforcerons d'utiliser le vocabulaire et la description des
+manipulations propres à Microsoft Windows et Microsoft SQL Server.
+Si ces particularités ne vous sont pas familières, il est vivement souhaitable de vous reporter à la
+documentation fournie par les éditeurs de ces produits.
+Particularités des applications Sage 100cloud Premium
+Les applications Sage 100cloud Premium présentent les particularités suivantes :
+• La conversion d'une base Sage 100 Windows en base Sage 100cloud Premium est effectuée par
+l'outil de maintenance livré en standard avec le programme.
+L'exploitation des applications Sage 100cloud Premium nécessite impérativement que tous les
+types de base d'un dossier (comptabilité, gestion commerciale…) soient contenus dans une base
+de données SQL unique. Se référer aux paragraphes Création des bases Sage 100cloud Premium
+et Fusion des bases relationnelles pour plus de détails sur la procédure de création d'une base
+de données unique.
+© 2020 Sage 8
+=== PAGE 9 ===
+Installation du Poste Serveur
+Installation du Poste Serveur
+Les procédures d’installation des applications Sage 100cloud Premium intègrent l’installation
+de composants Microsoft. Il est impératif de lancer Windows Update avant de procéder à
+l’installation des applications Sage 100cloud Premium.
+Configuration matérielle recommandée
+• Partition NTFS
+• Mémoire vive : 16 Go à augmenter au fur et à mesure de l’augmentation de la taille de la base de
+données
+• Processeur : quadri cœur 2,2Ghz
+• Disque dur : 6 Go disponibles
+Configuration logicielle
+Systèmes d'exploitation
+• Windows Server 2012
+• Windows Server 2012 r2
+• Windows Server 2016
+• Windows Server 2019
+Afin de garantir des performances optimales, il est recommandé de dédier le poste serveur à la
+gestion des bases de données Sage 100cloud Premium.
+Pour des raisons de sécurité, Microsoft ® recommande de ne pas installer SQL Server ™ Standard
+ou Express sur un contrôleur de domaine et fixe les limitations dans l’article suivant :
+https://docs.microsoft.com/fr-fr/sql/sql-server/install/hardware-and-software-
+requirements-for-installing-sql-server?view=sql-server-ver15.
+Les tests de compatibilité sont réalisés sur des licences Windows Server Standard.
+Pour le déploiement des solutions Sage sur d’autres de types de licence (Data Center,
+Essentials …), charge aux Partenaires / Prestataires informatiques d’effectuer les tests de
+validation préalables.
+Composants à installer
+• Microsoft SQL Server 2017
+• Protocole TCP/IP
+• Sage Serveur pour SQL - partie Serveur
+• Bases de données Sage 100cloud Premium (une base SQL unique par société)
+Pour l'installation du protocole TCP/IP, se référer à la documentation Microsoft Windows. Les
+composants Microsoft .Net Framework 4.6 sont nécessaires pour exécuter le programme
+d'installation de Microsoft SQL Server 2017. Ces composants seront installés/activés
+automatiquement s'ils ne sont pas présents.
+© 2020 Sage 9
+=== PAGE 10 ===
+Installation du Poste Serveur
+Installation de Microsoft SQL Server 2017
+Différents types d'installation de Microsoft SQL Server 2017 peuvent se présenter suivant qu'il s'agisse,
+d'une première installation ou d'une mise à jour des applications Sage 100cloud Premium :
+Dans le cas d'une première installation, aucune instance Microsoft SQL Server n'est présente sur le poste
+serveur. Il sera donc nécessaire de préalablement installer une instance Microsoft SQL Server 2017 avant
+d'installer les applications Sage 100cloud Premium. Se reporter au paragraphe Première installation de
+Microsoft SQL Server 2017 pour connaître les modalités et les étapes à respecter pour l'installation d'une
+instance Microsoft SQL Server 2017.
+Dans le cas d'une installation en mise à jour, une instance Microsoft SQL Server 2012 est déjà présente
+sur le serveur. Pour ce cas de figure, deux types d'installations sont possibles pour procéder à la mise à jour
+des bases de données Sage 100 pour SQL Server d'une instance Microsoft SQL Server 2012 vers une instance
+Microsoft SQL Server 2017 :
+• Mise à niveau du moteur SQL Server,
+• Création d'une instance nommée.
+Mise à niveau du moteur SQL Server
+L'installation par mise à niveau consiste à remplacer l'instance Microsoft SQL Server 2012 déjà présente par
+une instance Microsoft SQL Server 2017. Durant cette mise à niveau, les bases de données et comptes de
+connexion de l'instance Microsoft SQL Server présents sont automatiquement inscrits sur l'instance
+Microsoft SQL Server 2017.
+Création d'une instance nommée
+L'installation en choisissant de créer une instance nommée consiste quant à elle, à créer une nouvelle
+instance Microsoft SQL Server 2017 sur un serveur pour lequel une ou plusieurs instances 2012 sont déjà
+présentes. Les instances SQL Server 2012 ne seront pas écrasées et les bases de données SQL Server 2012
+seront toujours gérées par leur moteur Microsoft SQL Server respectif. Ainsi, ce type d'installation
+permettra de faire cohabiter sur le même serveur, une ou plusieurs instances SQL Server avec une instance
+SQL Server 2017. Contrairement à l'installation par mise à niveau, pour ce type d'installation, l'inscription
+des bases de données Sage 100cloud Premium et le report des comptes de connexion sur l'instance Microsoft
+SQL Server 2017 ne seront pas réalisés automatiquement. Ces manipulations devront être réalisées
+manuellement.
+Préconisations
+Dans le cadre de la mise à jour des bases de données Sage 100 de version SQL Server 2012 vers une
+instance SQL Server 2017, le mode d'installation préconisé est l'installation par Mise à niveau. En effet, la
+mise à niveau permet de limiter le nombre d'instances Microsoft SQL Server sur le serveur de bases de
+données et simplifie les méthodes de récupération du paramétrage de l'instance mise à niveau puisque ces
+paramètres sont repris de manière automatique sur l'instance SQL 2017.
+Les étapes à respecter pour procéder à la mise à jour des bases de données Sage 100, vers une instance
+SQL Server 2017, en utilisant, soit la méthode de mise à niveau, soit la méthode de création d'une
+instance nommée sont décrites sous le paragraphe " Installation par mise à niveau ou création d'une
+« instance nommée » de ce manuel.
+© 2020 Sage 10
+=== PAGE 11 ===
+Installation du Poste Serveur
+Première installation de Microsoft SQL Server 2017
+Avant de procéder à l'installation de Microsoft SQL Server 2017, il est conseillé d'exécuter l'outil d'analyse
+de configuration système. Cet outil permet, après analyse du système d'exploitation sur lequel Microsoft
+SQL Server 2017 doit être installé, d'afficher un rapport détaillé sur les conditions qui empêcheraient la
+réussite de l'installation de Microsoft SQL Server 2017. Cet outil s'exécute depuis la page Planification du
+Centre d'installation de Microsoft SQL Server 2017.
+Les contrôles effectués par cet outil sont également réalisés durant le processus d'installation
+de Microsoft SQL Server 2017.
+Dans le cas où certaines règles apparaissent avec le statut Echec, il sera nécessaire de sélectionner le lien
+Etat y correspondant. Le détail de l'erreur rencontrée ainsi que d'éventuelles solutions de résolutions vous
+seront proposés.
+Se reporter à l'aide fournie par Microsoft SQL Server 2017 pour la résolution des problèmes
+détectés durant cette analyse.
+Lorsqu'aucune règle de support du programme d'installation n'apparaît en état Echec, l'installation de
+Microsoft SQL Server 2017 pourra alors être exécutée depuis la fonction Nouvelle installation autonome
+SQL Server ou ajout de fonctionnalités à une instance existante disponible sous la page Installation du
+Centre d'installation SQL Server.
+© 2020 Sage 11
+=== PAGE 12 ===
+Installation du Poste Serveur
+Lors de l'exécution de la fonction Nouvelle installation autonome SQL Server ou ajout de fonctionna-
+lités à une instance existante, différentes étapes se succèdent. Ne sont détaillées ci-après que les
+étapes qui requièrent une attention particulière.
+© 2020 Sage 12
+=== PAGE 13 ===
+Installation du Poste Serveur
+Sélection de composant
+Pour l'exploitation des applications Sage 100cloud Premium, il est nécessaire d'installer au minimum les
+composants :
+• Services Moteur de base de données
+• Extraction en texte intégral et extraction sémantique
+Le service Moteur de base de données est le service en charge des bases de données Sage 100cloud
+Premium.
+La fonction Extraction en texte intégral et extraction sémantique de recherche permet d’afficher la
+fonction de recherche de mots dans les listes concernées.
+Les outils d’administration SQL Server (SQL Server Management Studio) ne sont plus proposés
+dans cette liste. Pour installer SQL Server Management Studio, cliquez sur Installer les
+outils d’administration SQL Server disponible sur la page Installation.
+© 2020 Sage 13
+=== PAGE 14 ===
+Installation du Poste Serveur
+Configuration de l'instance
+Par défaut, le programme d'installation propose de créer l'instance par défaut MSSQLSERVER si aucune
+autre instance SQL n'est déjà installée sur ce serveur.
+Il ne peut y avoir qu'une seule instance par défaut sur un serveur.
+Dans le cas de la création d'une instance nommée, certaines préconisations sont à respecter pour la
+dénomination de l'instance. Par exemple, le nom d'une instance est limité à 16 caractères maximum. Les
+préconisations à respecter sont détaillées dans l'aide disponible sur le centre d'installation SQL Server
+2017.
+© 2020 Sage 14
+=== PAGE 15 ===
+Installation du Poste Serveur
+Configuration du serveur
+Cette étape permet d'attribuer les comptes de connexions aux différents services de Microsoft SQL Server
+2017. Il est également possible de définir le type de démarrage de chacun de ces services.
+Après l'installation de Microsoft SQL Server 2017, l'attribution des comptes ainsi que le type de
+démarrage peuvent être modifiés sous le Gestionnaire de Services de Microsoft Windows.
+La liste des services affichés sur cette page dépend des composants sélectionnés
+précédemment.
+• Le service SQL Server Agent est en charge des travaux et de l'automatisation de certaines tâches
+administratives SQL.
+• SQL Server Browser est le service de résolution des noms qui fournit des informations de
+connexions SQL Server aux postes clients.
+Il est possible d'attribuer le même compte de connexion aux différents services. Cependant, Microsoft
+préconise de configurer les comptes de service individuellement afin de s'assurer que les services SQL
+Server disposent des autorisations minimales pour effectuer leurs tâches.
+Par défaut, le service SQL Server Browser est désactivé. Il sera nécessaire d’activer et démarrer ce
+service si plusieurs instances doivent être gérées sur le même serveur.
+Se reporter à la rubrique Configuration des comptes de service Windows de la documentation Microsoft
+SQL Server pour connaître les types de comptes à attribuer aux différents services.
+Sur l'onglet Classement, il est possible de sélectionner le classement souhaité pour la création de
+l'instance.
+© 2020 Sage 15
+=== PAGE 16 ===
+Installation du Poste Serveur
+Les applications Sage 100cloud Premium supportent tous les classements disponibles. Cependant, pour un
+bon fonctionnement des applications Sage 100cloud Premium, il faudra s'assurer que le classement de la
+base de données est identique au classement de l'instance SQL.
+© 2020 Sage 16
+=== PAGE 17 ===
+Installation du Poste Serveur
+Configuration du moteur de bases de données
+Cette étape est composée de trois onglets.
+1. Attribution de privilèges d'accès aux comptes
+Les applications Sage 100cloud Premium se connectent au serveur de bases de données en utilisant le
+mode d'authentification Windows. Le mode Mixte intègre l'authentification Windows. Ce mode est donc
+également supporté par les applications Sage 100cloud Premium.
+Pour valider cet écran de paramétrage, il sera nécessaire d'ajouter au moins un compte Windows
+Administrateur de l'instance SQL Server.
+© 2020 Sage 17
+=== PAGE 18 ===
+Installation du Poste Serveur
+2. Répertoire de données
+La configuration conseillée pour la répartition des fichiers sur disque est la suivante :
+• 1 disque dédié au système d'exploitation et aux applications
+• 1 disque dédié aux fichiers de données des bases utilisateur (*.mdf et *.ndf)
+• 1 disque dédié aux journaux de transactions des bases utilisateur (*.ldf)
+• 1 disque dédié au fichier de données temporaires (tempdb.mdf)
+• 1 disque dédié au journal de transactions des données temporaires (templog.ldf)
+• 1 disque dédié aux fichiers de sauvegardes
+© 2020 Sage 18
+=== PAGE 19 ===
+Installation du Poste Serveur
+3. FILESTREAM
+Cette fonctionnalité permet d'activer la gestion de certains types de données sur les tables SQL Server.
+Les applications Sage 100cloud Premium gèrent cette fonctionnalité à partir de la version 3.00. Vous devez
+obligatoirement activer toutes les options.
+Veuillez-vous référer aux fiches techniques de votre Centre d'aide en ligne :
+- Sage Serveur pour SQL Server - Installation des fonctions FullText et FileStream pour
+l'offre Sage 100cloud Premium.
+Pour plus de détails sur cette fonctionnalité, consulter la documentation Microsoft SQL Server 2017.
+Les étapes détaillées ci-après ne devront être réalisées que si l'installation de Microsoft SQL Server 2017
+s'est déroulée avec succès.
+Pour tout problème d'installation de Microsoft SQL Server 2017, se référer à la documentation
+d'installation de Microsoft SQL Server 2017.
+Protocole de communication
+Par défaut, les postes clients accèdent au serveur de bases de données par le biais du protocole TCP/IP.
+Ce protocole doit donc être activé pour l'instance SQL Server 2017 en charge des bases de données Sage
+100cloud Premium.
+L'activation de ce protocole s'effectue depuis la console de configuration SQL Server Configuration
+manager installée par Microsoft SQL Server 2017. Sous le nœud Configuration du réseau SQL Server, il
+est possible de définir pour chaque instance les protocoles devant être activés.
+© 2020 Sage 19
+=== PAGE 20 ===
+Installation du Poste Serveur
+L'activation/désactivation d'un protocole sur une instance nécessite le redémarrage de celle-ci.
+De plus, pour que les postes clients puissent accéder au port TCP utilisé par l'instance SQL Server 2017,
+il conviendra de créer une exception sur ce port dans les paramètres du Firewall actif sur le poste serveur.
+Par défaut, le port TCP/IP d'écoute utilisé par Microsoft SQL Server est le 1433. Dans le cas d’un
+serveur devant gérer plusieurs instances Microsoft SQL Server, il sera nécessaire de démarrer le
+service SQL Server Browser.
+Sage Serveur pour SQL Server - partie Serveur
+Après la création de l'instance Microsoft SQL Server 2017, il est nécessaire d'installer Sage Serveur pour
+SQL Server - partie Serveur sur le poste serveur. L'installation de Sage Serveur pour SQL Server - partie
+Serveur permet, de créer des procédures stockées étendues dans la base master de l'instance SQL, et de
+copier les bases de données d'exemples BIJOU et C_MODEL.
+L'installation de Sage Serveur pour SQL Server - partie Serveur doit être exécutée depuis un compte
+utilisateur membre des rôles Administrateur du serveur Windows et Administrateur (sysadmin) de
+l'instance Microsoft SQL Server 2017.
+Se reporter au paragraphe " Installation de Sage Serveur pour SQL Server - partie Serveur " pour connaître
+la procédure d'installation de ce composant.
+© 2020 Sage 20
+=== PAGE 21 ===
+Installation du Poste Serveur
+Installation par mise à niveau ou création d'une instance nommée
+Pré requis d'installation
+Sauvegarde des bases de données
+Avant toute manipulation sur le serveur de bases de données, il est vivement conseillé de sauvegarder
+toutes les bases de données gérées par l'instance Microsoft SQL Server 2012 (y compris les bases de données
+système).
+Analyse de la configuration
+Avant de procéder à l'installation de Microsoft SQL Server 2017, il est conseillé d'exécuter l'outil d'analyse
+de configuration système. Cet outil permet, après analyse du système d'exploitation sur lequel Microsoft
+SQL Server 2017 doit être installé, d'afficher un rapport détaillé sur les conditions qui empêcheraient la
+réussite de l'installation de Microsoft SQL Server 2017. Cet outil s'exécute depuis la page Planification du
+Centre d'installation de Microsoft SQL Server 2017.
+Les contrôles effectués par cet outil sont également réalisés durant le processus d'installation
+de Microsoft SQL Server 2017.
+© 2020 Sage 21
+=== PAGE 22 ===
+Installation du Poste Serveur
+Dans le cas où certaines règles apparaissent avec le statut Echec, il sera nécessaire de sélectionner le
+lien Etat y correspondant. Le détail de l'erreur rencontrée ainsi que d'éventuelles solutions de résolutions
+vous seront proposés.
+Se reporter à l'aide fournie par Microsoft SQL Server 2017 pour la résolution des problèmes détectés
+durant cette analyse.
+Assistant de migration
+Afin que la procédure de mise à niveau se réalise dans les meilleures conditions, il est conseillé de
+préalablement installer et exécuter Data Migration Assistant (DMA) sur la page Planification du Centre
+d'installation de Microsoft SQL Server 2017. Cet outil permet, d'analyser les composants Microsoft SQL
+Server déjà installés sur le serveur, et d'identifier les éventuels problèmes à résoudre avant d'exécuter la
+procédure de mise à niveau vers Microsoft SQL Server 2017.
+Cet outil permet également de vérifier la compatibilité des développements spécifiques qui auraient été
+ajoutés sur les bases Sage 100cloud Premium. Ainsi, dans le cas d'une installation avec création d'une
+instance nommée, il est également conseillé d'exécuter Data Migration Assistant (DMA)sur les bases de
+données devant être portées sur l'instance SQL Server 2017.
+Pour installer Data Migration Assistant (DMA), sélectionner le lien correspondant sur la page Planification
+du Centre d'installation SQL Server.
+© 2020 Sage 22
+=== PAGE 23 ===
+Installation du Poste Serveur
+Installation Data Migration Assistant (DMA)
+Pour installer ce composant, sélectionner le lien correspondant sur la page Planification du Centre
+d'installation SQL Server, puis suivre les étapes proposées par l’assistant. Ce programme sera ensuite
+disponible sous Démarrer\ Microsoft Data Migration Assistant.
+L'assistant de mise à niveau permet d'analyser les différents composants SQL Server pouvant être mis à
+niveau en SQL Server 2017.
+La création d’une nouvelle évaluation (Assessment) permet d’indiquer le composant à évaluer (Database
+Engine).
+© 2020 Sage 23
+=== PAGE 24 ===
+Installation du Poste Serveur
+Indiquer la version cible : SQL Server 2017 pour Windows
+Saisir le nom du serveur SQL et cliquer sur le bouton Connect.
+l'analyse peut être exécutée sur les bases de données de l'instance à mettre à niveau ou porter sur une
+instance nommée, mais également sur des fichiers de trace générés par SQL Profiler ainsi que sur des
+scripts Transact SQL.
+© 2020 Sage 24
+=== PAGE 25 ===
+Installation du Poste Serveur
+Un rapport d'analyse est affiché à la fin du traitement.
+Se reporter à la documentation fournie par Microsoft SQL Server 2017 pour obtenir les méthodes de
+résolution des problèmes pouvant empêcher la mise à niveau vers SQL 2017.
+© 2020 Sage 25
+=== PAGE 26 ===
+Installation du Poste Serveur
+Méthode 1 : Installation de SQL Server 2017 par mise à niveau
+Outils d’analyse de configuration système
+Avant de procéder à la mise à niveau d’une instance Microsoft SQL Server 2012, il convient de vérifier
+que l’instance à mettre à niveau dispose du service pack minimum pour être mise à niveau en SQL
+Server 2017. Les configurations minimales requises sont détaillées sous l’article :
+https://docs.microsoft.com/fr-fr/sql/sql-server/sql-server-2017-release-
+notes?toc=..%2Ftoc.json&view=sqlallproducts-allversions.
+Mise à niveau de l'édition
+Il convient de vérifier que l'édition de Microsoft SQL Server 2017 utilisée pour la mise à niveau permet de
+mettre à niveau l'édition Microsoft SQL Server déjà présente. Par exemple, la mise à niveau de Microsoft
+SQL Server 2012 Edition Entreprise n'est pas possible avec l'édition Standard de Microsoft SQL Server
+2017. Les scénarios de mise à niveau pris en charge par Microsoft SQL Server 2017 sont détaillés sous la
+page :
+https://docs.microsoft.com/fr-fr/sql/database-engine/install-windows/supported-version-and-edition-
+upgrades-2017?view=sql-server-ver15.
+Mise à niveau de l'instance
+Pour installer Microsoft SQL Server 2017 par la méthode de mise à niveau, il faut exécuter la fonction
+Mise à niveau à partir d’une version précédente de SQL Server de la page Installation du Centre
+d'installation SQL Server.
+Ne sont détaillées ci-après que les étapes qui requièrent une attention particulière.
+© 2020 Sage 26
+=== PAGE 27 ===
+Installation du Poste Serveur
+Sélectionner une instance
+Le programme d'installation permet de sélectionner l'instance Microsoft SQL Server devant être mise
+à niveau.
+Sélectionner les composants
+Durant la procédure de mise à niveau, il n'est pas possible d'installer de nouveaux composants Microsoft
+SQL Server 2017. Seuls les composants déjà présents sont mis à niveau.
+L'ajout de nouveaux composants ne pourra être réalisé qu'après la mise à niveau de l'instance SQL Server
+2012 en sélectionnant la fonction Nouvelle installation autonome SQL Server ou ajout de
+fonctionnalités à une installation existante du Centre d'installation SQL Server.
+Vous devrez alors sélectionner l’installation de la fonctionnalité Extraction en texte intégral et
+extraction sémantique de recherche.
+Veuillez-vous référer aux fiches techniques de votre Centre d'aide en ligne :
+- Sage Serveur pour SQL Server - Installation des fonctions FullText et FileStream pour
+l'offre Sage 100cloud Premium.
+© 2020 Sage 27
+=== PAGE 28 ===
+Installation du Poste Serveur
+Configuration de l'instance
+Un récapitulatif sur l'instance devant être mise à niveau est affiché. Cet écran permet notamment de
+connaître le répertoire utilisé pour la mise à niveau de l'instance.
+Lorsque l'installation s'est déroulée avec succès, se reporter directement au paragraphe Opérations à
+réaliser après la mise à niveau ou la création d'une instance nommée.
+Pour tout problème d'installation de Microsoft SQL Server 2017, se référer à la documentation
+disponible sur le lien Aide d’installation en ligne disponible sur la page Planification du Centre
+d'installation SQL Server.
+.
+© 2020 Sage 28
+=== PAGE 29 ===
+Installation du Poste Serveur
+Méthode 2 : Installation SQL Server 2017 avec création d'une instance nommée
+Pour installer Microsoft SQL Server 2017 par la méthode de création d'une instance nommée, il faut
+exécuter la fonction Nouvelle installation autonome SQL Server ou ajout de fonctionnalités à une
+instance existante disponible sous la page Installation du Centre d'installation SQL Server.
+Pour la création d’une instance nommée, les étapes d’installation sont les mêmes que pour la création
+d’une instance par défaut (cf. paragraphe Première installation de SQL Server 2017). La seule
+différence se trouve sur l’écran de définition de l’instance, sur lequel il sera nécessaire de
+renseigner le nom de l’instance.
+Pour rappel, certaines préconisations sont à respecter pour la dénomination de l'instance. Par exemple, le
+nom d'une instance est limité à 16 caractères maximum. Les préconisations à respecter sont détaillées
+dans l'aide disponible sur le centre d'installation SQL Server 2017.
+© 2020 Sage 29
+=== PAGE 30 ===
+Installation du Poste Serveur
+Inscription des bases de données
+Contrairement à l'installation par mise à niveau, pour l'installation avec création d'une instance nommée,
+l'inscription des bases de données Sage 100cloud Premium sur l'instance Microsoft SQL Server 2017 ne sera
+pas automatique. Cette manipulation devra être réalisée manuellement en utilisant une des méthodes
+suivantes :
+• En détachant les bases de données inscrites sur l'instance Microsoft SQL Server 2012 puis en les
+attachant sur l'instance Microsoft SQL Server 2017,
+• En sauvegardant les bases de données inscrites sur l'instance Microsoft SQL Server 2012 puis en les
+restaurants sur l'instance Microsoft SQL Server 2017.
+Avant d'attacher les bases de données sur l'instance SQL 2017, il est vivement conseillé de
+réaliser une copie des fichiers de données et journaux de transactions de chacune des bases de
+données.
+Opérations à réaliser après la mise à niveau ou la création d'une instance nommée
+Protocole de communication
+Par défaut, les postes clients accèdent au serveur de bases de données par le biais du protocole TCP/IP.
+Ce protocole doit donc être activé pour l'instance SQL Server 2017 en charge des bases de données Sage
+100cloud Premium.
+L'activation de ce protocole s'effectue depuis la console de configuration SQL Server Configuration ma-
+nager installée par Microsoft SQL Server 2017. Sous le nœud Configuration du réseau SQL Server, il est
+possible de définir pour chaque instance les protocoles devant être activés.
+L'activation/désactivation d'un protocole sur une instance nécessite le redémarrage de celle-ci.
+De plus, pour que les postes clients puissent accéder au port TCP utilisé par l'instance SQL 2017, il
+conviendra de créer une exception sur ce port dans les paramètres du Firewall actif sur le poste serveur.
+Par défaut, le port TCP/IP d'écoute utilisé par Microsoft SQL Server est le 1433.Dans le cas où
+plusieurs instances sont présentes sur le poste, il sera nécessaire d’activer et démarrer le
+service SQL Server Browser.
+© 2020 Sage 30
+=== PAGE 31 ===
+Installation du Poste Serveur
+Activation de FILESTREAM
+L'activation de ce protocole s'effectue depuis la console de configuration SQL Server Configuration ma-
+nager installée par Microsoft SQL Server 2017. Après sélection de l’instance, puis Propriétés, il faudra
+cocher toutes les options proposées dans l’onglet FILESTREAM.
+Veuillez-vous référer aux fiches techniques de votre Centre d'aide en ligne :
+- Sage Serveur pour SQL Server - Installation des fonctions FullText et FileStream pour
+l'offre Sage 100cloud Premium.
+© 2020 Sage 31
+=== PAGE 32 ===
+Installation du Poste Serveur
+Sage Serveur pour SQL Server - partie Serveur
+Après la mise à niveau de l'instance SQL ou la création d'une instance nommée, il est nécessaire d'installer
+Sage Serveur pour SQL Server - partie Serveur sur le poste serveur. L'installation de Sage Serveur pour SQL
+Server - partie Serveur permet, de créer des procédures stockées étendues dans la base master de
+l'instance SQL, et de copier les bases de données d'exemples BIJOU et C_MODEL.
+L'installation de Sage Serveur pour SQL Server - partie Serveur doit être exécutée depuis un compte
+utilisateur membre des rôles Administrateur du serveur Windows et Administrateur (sysadmin) de
+l'instance Microsoft SQL Server 2017.
+Se reporter au paragraphe Installation de Sage Serveur pour SQL Server - partie Serveur pour connaître
+la procédure d'installation de ce composant.
+Changement du propriétaire d'une base de données
+Que ce soit après le processus de mise à niveau d'une instance SQL Server 2012 vers SQL Server 2017, ou
+après la restauration/attachement d'une base de données SQL Server 2012 sur une instance SQL Server
+2017 (cas de création d'une instance nommée), une réaffectation du propriétaire de la base de données
+est nécessaire avant que la base de données ne soit ouverte à partir des applications Sage 100cloud
+Premium.
+Le propriétaire de la base de données est une information visible dans les propriétés de la base de don-
+nées sous la page Général.
+© 2020 Sage 32
+=== PAGE 33 ===
+Installation du Poste Serveur
+Dans le cas où le propriétaire de la base de données n'a pas été réaffecté, la conversion de la base de
+données depuis le programme Maintenance échoue avec l'erreur suivante :
+Le SID du propriétaire de la base de données enregistré dans la base de données master diffère de celui
+qui est enregistré dans la base de données ‘BIJOU’. Pour résoudre le problème, redéfinissez le
+propriétaire de la base de données ‘BIJOU’ à l’aide de l’instruction ALTER AUTHORIZATION.
+Ceci s'explique par le fait qu'un même nom de compte de connexion défini sur SQL Server 2012
+(DOM1\USER1 par exemple), ne porte pas le même numéro interne (SID) sur les différentes instances.
+Ainsi, pour résoudre cette erreur, il convient de réaffecter un propriétaire à la base de données gérée par
+l'instance Microsoft SQL Server 2017. Cette manipulation s'effectue en exécutant le script suivant :
+USE master;
+ALTER AUTHORIZATION ON DATABASE ::[NomBase] TO [LogUser];
+Exemple :
+Exemple d'affectation du propriétaire USER1 appartenant au domaine DOM1 sur la base BIJOU. A partir
+d'une nouvelle requête depuis Microsoft SQL Server Management Studio, il sera nécessaire d'exécuter le
+script suivant :
+USE master;
+ALTER AUTHORIZATION ON DATABASE ::[BIJOU] TO [DOM1\USER1];
+Affectation du login APPL_CBASE à l'utilisateur USER_CBASE
+Dans le cas de la création d'une instance nommée, ou en cas de changement de serveur, après la restau-
+ration/attachement d'une base de données SQL Server 2012 sur une instance SQL Server 2017, une
+réaffectation du rôle APPL_CBASE à l'utilisateur USER_CBASE est nécessaire. L'utilisateur USER_CBASE est
+le compte utilisé par les applications Sage 100cloud Premium. Si cette réaffectation n'est pas effectuée,
+une erreur de connexion s'affichera lors de l'ouverture de la base de données dans les applications Sage
+100cloud Premium.
+Cette manipulation s'effectue en exécutant le script suivant sur la base de données :
+ALTER USER [USER_CBASE] WITH LOGIN= [APPL_CBASE];
+© 2020 Sage 33
+=== PAGE 34 ===
+Installation du Poste Serveur
+Niveau de compatibilité des bases de données
+Lorsqu'une base de données Microsoft SQL Server est inscrite sur une instance Microsoft SQL Server
+2017, soit automatiquement (installation par Mise à niveau), soit manuellement (Détache/Attache ou
+Sauvegarde/restauration), le niveau de compatibilité de la base de données est par défaut positionné sur le
+niveau de compatibilité de la version de l’instance SQL Server d’origine.
+Ce niveau permet de définir certains comportements des bases de données afin qu'ils soient compatibles
+avec la version de SQL Server spécifiée. Ainsi, cela permet de faire fonctionner des développements
+spécifiques sur l'instance SQL Server 2017, alors qu'ils utilisent des instructions n'étant plus gérées par le
+moteur de base de données SQL Server 2017.
+Les applications Sage 100cloud Premium supportent le niveau sur SQL Server 2017 (140)
+La modification de ce paramètre peut donc s’avérer nécessaire pour l'exploitation des applications Sage
+100cloud Prémium si la base de données est issue d’une conversion d’une ancienne base hébergée sur
+une instance SQL Server 2012.
+Il conviendra de vérifier que les développements spécifiques déjà présents sur une base de données issue
+d'une instance SQL Server 2012 soient compatibles avec le niveau de compatibilité SQL Server 2017 (140).
+En effet, certaines fonctions SQL Server 2102 peuvent être dépréciées ou non supportées par une instance
+SQL Server 2017. La liste complète des fonctions dépréciées par le moteur Microsoft SQL Server 2017 est
+publiée sur la base msdn sous la fiche :
+https://docs.microsoft.com/fr-fr/sql/database-engine/deprecated-database-engine-features-in-sql-
+server-2016?redirectedfrom=MSDN&view=sql-server-ver15.
+Pour vérifier la compatibilité des développements spécifiques, utiliser également Data Migration Assistant
+(MDA) sur la base de données à migrer sur SQL Server 2017.
+Installation de Sage Serveur pour SQL - partie Serveur
+L'installation de Sage Serveur pour SQL - partie Serveur, doit être réalisée après la création d'une instance
+Microsoft SQL Server 2017.
+Les applications Sage 100cloud utilisent des fonctionnalités SQL qui devront être installées
+ou activées avant tout déploiement de votre solution Sage 100cloud. Veuillez-vous référer
+aux fiches techniques de votre Centre d'aide en ligne :
+Sage Serveur pour SQL Server - Installation des fonctions FullText et FileStream
+pour l'offre Sage 100cloud Premium
+© 2020 Sage 34
+=== PAGE 35 ===
+Installation du Poste Serveur
+L'installation de Sage Serveur pour SQL - partie Serveur, se déroule en plusieurs étapes :
+• Sélection de l'instance Microsoft SQL Server 2017 et copie de fichiers,
+• Création de la base d'exemples BIJOU (base comptable, base commerciale, base immobilisations,
+base moyens de paiement, base trésorerie),
+• Création de la base Modèle de la comptabilité (C_MODEL).
+L'installation de Sage Serveur pour SQL Server - partie Serveur doit être exécutée depuis un
+compte utilisateur membre des rôles Administrateur du serveur Windows et Administrateur
+(sysadmin) de l'instance Microsoft SQL Server 2017.
+Le programme d'installation de Sage Serveur pour SQL Server - partie Serveur s'exécute depuis la liste
+d'installation des applications Sage 100cloud Premium, en sélectionnant le composant Sage Serveur pour
+SQL Server - partie Serveur disponible dans la liste des applications à installer sur un poste serveur.
+Après sélection du composant, cliquer sur Suivant pour démarrer la procédure d'installation.
+L'assistant d'installation de Sage Serveur pour SQL Server - partie Serveur apparaît :
+Cliquer sur Suivant pour poursuivre.
+L'assistant d'installation affiche la liste des instances locales disponibles sur le serveur.
+© 2020 Sage 35
+=== PAGE 36 ===
+Installation du Poste Serveur
+Sélectionner l'instance sur laquelle Sage Serveur pour SQL Server - Partie Serveur doit être installé, soit en
+sélectionnant l'instance directement dans la liste déroulante, soit en cliquant sur la commande
+Parcourir.
+Le compte de connexion utilisé pour l'installation de Sage Serveur pour SQL Server - partie Serveur, peut
+être un compte Windows, ou un compte SQL Server (nécessite que le serveur autorise
+l'authentification mixte).
+Ce compte doit également être membre du rôle sysadmin sur l'instance SQL Server sans quoi les bases
+d'exemples et les procédures stockées étendues ne pourront pas être installées.
+Cliquer sur Suivant pour poursuivre l'installation.
+Lors de l'installation en mise à jour, les bases BIJOU et C_MODEL sont déjà présentes sur l'instance. Ainsi,
+un message demandant leur remplacement apparaîtra.
+Dans le cas où vous ne souhaitez pas que Sage Serveur pour SQL Server - partie Serveur remplace les bases
+de données existantes, il sera alors nécessaire de les convertir manuellement à partir du programme
+Maintenance, afin de pouvoir les exploiter avec les dernières versions des applications Sage 100cloud
+Premium.
+© 2020 Sage 36
+=== PAGE 37 ===
+Installation des postes clients
+Installation des postes clients
+Les procédures d’installation des applications Sage 100cloud Premium intègrent l’installation
+de composants Microsoft. Il est impératif de lancer Windows Update avant de procéder à
+l’installation des applications Sage 100cloud Premium.
+Configuration matérielle recommandée
+• Mémoire vive : 8 Go
+• Processeur : Processeur double cœur 3.0 Ghz
+Configuration logicielle
+Systèmes d'exploitation
+• Windows 10
+Composants à installer
+• Sage 100cloud poste Client
+• Applications Sage 100cloud Premium
+• Outil client de gestion des bases de données SQL Server 2017 (SQL Server Management Studio)
+Les applications requièrent Internet Explorer V10 minimum pour Intuisage, et V11 pour le
+Stockage et partage.
+Les composants de connexions installés par Sage 100cloud poste Client (MDAC et SQL Server
+Native Client), nécessitent un redémarrage du poste client. SQL Server Management Studio peut
+être installé sur un poste client dédié à l'administration de l'instance SQL Server 2017.
+La procédure d'installation décrite ci-après concerne une installation standard des applications
+Sage 100cloud Premium. L’installation doit être effectuée sur chaque poste client.
+© 2020 Sage 37
+=== PAGE 38 ===
+Installation des postes clients
+Installation de Sage 100cloud poste Client
+Le programme d'installation de Sage 100cloud poste Client s'exécute en sélectionnant le composant Sage
+100cloud poste Client disponible dans la liste des applications à installer sur les postes clients
+L'assistant d'installation de Sage 100cloud poste Client apparaît :
+Cliquer sur Suivant pour poursuivre.
+© 2020 Sage 38
+=== PAGE 39 ===
+Installation des postes clients
+Cette étape permet de préciser le nom de l'instance SQL qui sera utilisée pour stocker les bases de don-
+nées Sage 100cloud Premium. Cette instance est celle sur laquelle le composant Sage Serveur pour SQL
+Server - partie Serveur a été installé.
+Si vous avez créé une instance Microsoft SQL Server 2017 nommée, le nom du serveur à
+renseigner dans la zone ci-dessus devra être sous la forme : Nom_Serveur_SQL\Nom_instance.
+Dans le cas d'une instance Microsoft SQL Server 2017 par défaut, indiquez uniquement le nom
+du serveur SQL dans la zone Serveur.
+Le nom du serveur n'est pas obligatoire. Ce dernier peut être renseigné ultérieurement à partir de l'icône
+Sage Installation du panneau de configuration de Windows du poste de travail.
+Cliquez sur le bouton Suivant pour continuer. A la fin de l'installation, la boîte de dialogue suivante sera
+affichée :
+Microsoft SQL Native Client
+Les applications Sage 100cloud Premium se connectent aux bases de données par le biais du composant
+Microsoft SQL Native Client.
+Ce composant est installé de manière automatique et silencieuse durant l'installation de Sage 100cloud
+poste Client.
+Sage Installation
+L'installation de Sage 100cloud poste Client créé également une icône Sage
+Installation dans le panneau de configuration de Microsoft Windows.
+Ce programme permet de modifier le paramétrage défini pour l'accès à l'instance Microsoft SQL Server.
+© 2020 Sage 39
+=== PAGE 40 ===
+Installation des postes clients
+La zone Serveur correspond au nom du Serveur SQL utilisé pour le stockage des bases de données des
+applications Sage 100cloud Premium.
+Pour modifier le nom du Serveur/instance SQL devant être utilisé par les applications Sage 100cloud
+Premium, cliquer sur le bouton Configurer.
+Indiquez alors dans la zone Serveur, le nom du Serveur/instance SQL vers lequel les applications Sage
+100cloud Premium devront pointer.
+Si vous avez créé une instance Microsoft SQL Server 2017 nommée, le nom du serveur à
+renseigner dans la zone ci-dessus est : Nom_Serveur_SQL\Nom_instance.
+Dans le cas d'une instance Microsoft SQL Server 2017 par défaut, indiquez uniquement le nom
+du serveur SQL dans la zone ci-dessus.
+Le nom du serveur renseigné à cet endroit sera utilisé lors de la création d'une base ou lors de la conversion
+des bases Sage 100cloud Premium.
+Si vous souhaitez modifier le nom du serveur sur lequel sont stockées les bases de données existantes, il
+est nécessaire d'ouvrir les fichiers INI des différentes bases de données Sage 100cloud Premium
+(BIJOU.MAE, BIJOU.GCM,…) et d'apporter les modifications nécessaires via un éditeur de texte tel que
+le Bloc-notes de Windows.
+© 2020 Sage 40
+=== PAGE 41 ===
+Installation des postes clients
+Installation des applications Sage 100cloud Premium
+Les procédures d’installation des applications Sage 100cloud Premium intègrent l’installation
+de composants Microsoft. Il est impératif de lancer Windows Update avant de procéder à
+l’installation des applications Sage 100cloud Premium.
+Avant d'installer les applications Sage 100cloud Premium, il est nécessaire de s'assurer que Sage
+Serveur pour SQL Server – partie Serveur et Sage 100cloud poste Client, ont été préalablement
+installées.
+Ces composants sont obligatoires pour le fonctionnement des applications Sage 100cloud
+Premium.
+Les programmes d'installation des applications Sage 100cloud Premium s'exécutent depuis la liste des
+applications. Après sélection des applications à installer, l'assistant d'installation vous guidera durant la
+procédure d'installation. Veuillez compléter ou valider les fenêtres d'assistant successivement affichées :
+Etape Assistant Commentaires
+1 Sélection de la langue Sélectionner la langue qui correspond à la version
+acquise.
+2 Sélection du dossier Nous vous recommandons de conserver le répertoire
+d’installation proposé, sauf si cela va à l’encontre de votre organisation
+interne.
+3 Identification Saisir la clé d’authenticité mentionnée sur le certificat
+d’authenticité fourni avec votre programme.
+4 Conditions générales Valider les conditions générales d’utilisation avant de
+d’utilisation poursuivre l’installation.
+5 Type d’installation Nous vous recommandons de conserver Complète.
+6 Informations sur l’installation Merci de prendre connaissance du texte affiché.
+7 Informations sur votre société La page suivante permet de référencer votre société. Il
+est recommandé de la compléter le plus exactement
+possible.
+Une fenêtre de progression de l'installation est ensuite affichée.
+© 2020 Sage 41
+=== PAGE 42 ===
+Installation des postes clients
+Particularités de Sage 100cloud Entreprise
+Sage 100cloud Entreprise est une offre intégrée proposant les applications Comptabilité, Gestion
+commerciale, Immobilisations, Moyens de paiement et Trésorerie.
+Lors de l'installation de Sage 100cloud Entreprise, il est possible de sélectionner les applications à
+installer :
+Sélectionnez la (ou les) applications(s) à installer puis cliquez sur Suivant pour procéder à l'installation
+des applications.
+Remarque : le choix Gestion commerciale n’est pas proposée pour une Suite comptable et financière.
+© 2020 Sage 42
+=== PAGE 43 ===
+Création de compte et d roits d'accès aux bases de données Sage 100c Premium
+Création de compte et droits d'accès aux bases de données Sage
+100cloud Premium
+Introduction
+Pour que les postes clients Sage 100cloud Premium puissent convertir, créer ou ouvrir une base de données
+Sage 100cloud Premium de l'instance SQL Server, il est nécessaire que le compte utilisateur Windows du
+poste client dispose de droits d'accès au serveur de bases de données.
+La création des comptes et l'affectation de droits s'effectuent depuis l'outil d'administration de bases de
+données : SQL Server Management Studio.
+Cet outil peut être installé sur un poste client en sélectionnant le composant Outils de gestion
+dans les paramètres du programme d'installation de Microsoft SQL Server 2017.
+Depuis cet outil, pour créer des comptes de connexion, il faut se placer sous la branche
+Sécurité\Connexions de l'explorateur d'objets.
+Et à l'aide du menu contextuel, sélectionner la fonction Nouvelle connexion.
+© 2020 Sage 43
+=== PAGE 44 ===
+Création de compte et d roits d'accès aux bases de données Sage 100c Premium
+Pour l'exploitation des applications Sage 100cloud Premium, il est nécessaire que les comptes de
+connexion soient créés avec le type Authentification Windows.
+Les modules Sage CRM Force de Vente, Sage CRM Service Client, Sage BI Reporting, et Sage
+Gestion de production accèdent aux bases de données par le biais d’une authentification SQL
+Server mixte.
+Après installation, si le serveur SQL ou SQL Express est en mode d'authentification Windows,
+vous devez donc :
+• autoriser et activer le compte ‘sa’ sur votre instance,
+• lui affecter un mot de passe respectant les stratégies de sécurité de votre entreprise,
+• modifier le mode d’authentification et redémarrer votre instance..
+De plus, en fonction des traitements devant être réalisés par les comptes de connexion (création,
+conversion ou ouverture de bases), différents rôles devront être attribués.
+Ouverture de base
+Rôle du serveur
+• Public
+Rôle de base de données
+• Public
+• SAGE_USER
+© 2020 Sage 44
+=== PAGE 45 ===
+Création de compte et d roits d'accès aux bases de données Sage 100c Premium
+Création/Conversion de base
+Rôles du serveur
+• Sysadmin
+• Public
+Par exemple, l'attribution des rôles suivants à un compte de connexion :
+Rôle du serveur
+© 2020 Sage 45
+=== PAGE 46 ===
+Création de compte et d roits d'accès aux bases de données Sage 100c Premium
+Mappage de l'utilisateur
+Cela lui permet, à partir des applications Sage 100cloud Premium, d'accéder à la base BIJOU et de créer
+et convertir des bases de données sur l'instance SQL Server 2017.
+Le rôle SAGE_USER permet d’utiliser les fonctions de stockage des fichiers dans la base de données Sage
+100cloud. Par exemple : génération et consultation des PDF Facture de la Gestion commerciale.
+Remarque : Les applications disposent d’une fonction de Sauvegarde / Restauration de la base de
+données. L’utilisateur doit disposer au minimum des rôles :
+- db_backupoperator pour la sauvegarde,
+- db_creator pour la restauration.
+© 2020 Sage 46
+=== PAGE 47 ===
+Création des bases Sage 100 pour SQL Server
+Création des bases Sage 100cloud Premium
+Introduction
+La création de bases de données s'effectue :
+• soit depuis les applications Sage 100cloud Premium (Comptabilité, Gestion commerciale, Saisie de
+caisse décentralisée, Immobilisations, Moyens de paiement ou Trésorerie), afin de créer une
+nouvelle base de données.
+• soit par le logiciel de Maintenance livré avec les produits Sage 100cloud Premium, afin de
+convertir une base de données Sage 100 Windows en base de données relationnelle SQL Server.
+Ce chapitre présente la méthode de création d'une base Sage 100cloud Premium au moyen des
+applications Sage 100cloud Premium.
+Le chapitre suivant traite plus en détail la méthode de conversion des bases de données Windows et SQL
+Server en version SQL Server par l'utilisation du programme Maintenance.
+Pour de plus amples informations sur le programme Sage Maintenance, veuillez-vous référer au Manuel
+Ergonomie et Fonctions communes fourni avec les applications Sage 100cloud Premium.
+Création de bases au moyen des applications Sage 100cloud Premium
+Avant toute conversion ou création de fichier, veuillez vérifier que l'accès au serveur Microsoft SQL est
+correctement configuré dans Sage Installation du Panneau de configuration Windows.
+Toutes les manipulations à réaliser sur le poste serveur et les postes clients sont décrites dans les
+chapitres précédents. Nous vous recommandons de respecter toutes les consignes données tout au long
+de ce manuel avant de poursuivre la procédure de conversion ou de création de fichier.
+Pour créer de nouvelles bases de comptabilité, gestion commerciale, saisie de caisse décentralisée,
+immobilisations, moyens de paiement ou trésorerie par le biais des applications Sage100cloud Premium
+correspondantes, il convient de procéder comme suit :
+1 . Lancez le programme Sage100cloud Premium avec lequel vous voulez créer la base.
+Sous le menu Démarrer de Microsoft Windows sélectionnez l'application voulue dans Programmes
+/ Sage.
+2 . Lancez la commande Fichier / Nouveau de cette application.
+3 . Suivez les instructions de l'assistant de création.
+© 2020 Sage 47
+=== PAGE 48 ===
+Création des bases Sage 100 pour SQL Server
+Exemple :
+Ci-dessous un exemple avec le programme Sage 100cloud Comptabilité Premium
+Cette création génère :
+- Un fichier INI (.MAE, .GCM, .IMO ou .MDP),
+- La base sur le serveur SQL avec comme nom le nom du fichier INI sans l'extension et en majuscules.
+Exemple :
+Si vous souhaitez créer le fichier comptable « SOCIETE.MAE », cette procédure crée :
+- Un fichier INI : SOCIETE.MAE (sur votre poste client),
+- Une base SQL : SOCIETE (sur votre serveur SQL).
+Fichier INI sur le poste client
+Lors de la procédure de création, soit par l'application par l'intermédiaire de la commande Fichier /
+Nouveau, soit à l'aide du logiciel de Maintenance, il vous est demandé de renseigner le nom du fichier
+(comptable, commercial, immobilisation, moyen de paiement ou de trésorerie).
+Les différents fichiers (.MAE, .GCM, .IMO, ou .MDP) sont en fait des fichiers INI structurés de la manière
+suivante :
+[CBASE]
+ServeurSQL=Nom_Serveur_SQL2017
+Createur=Code interne
+Type=Type_de_BD
+© 2020 Sage 48
+=== PAGE 49 ===
+Création des bases Sage 100 pour SQL Server
+Ce fichier permet d'accéder directement aux données de la base SQL.
+Type= CPTA (base comptable)
+CIAL (base commerciale)
+IMMO (base immobilisations)
+TRES (base moyens de paiement/trésorerie)
+Base SQL
+Paramètres de base de données
+Pour optimiser la reconstruction des index de recherche de texte intégral, positionnez le paramètre de base de
+données Fermeture automatique à FALSE pour toutes les bases Sage 100cloud sur le Serveur SQL (via SQL
+Management Studio / Instance / Base de données / clic droit Propriétés / Options).
+En effet, la valeur TRUE entraîne des interruptions temporaires de disponibilité de la base Sage 100cloud lors de la
+reconstruction des index FullText, ce qui peut provoquer des problématiques de saturation de mémoire.
+IMPORTANT ! Cette valeur est positionnée à TRUE par défaut en création de base dans une instance
+EXPRESS. A vérifier et modifier si nécessaire après création, restauration ou attachement
+d’une base de données Sage 100cloud.
+Fichiers MDF et LDF
+Emplacement
+Physiquement la base de données SQL se compose de deux fichiers (.MDF et .LDF), correspondant
+respectivement aux fichiers de données et au journal des transactions.
+Le nom de chaque fichier est :
+• Fichier MDF (fichier de données) : NOM_BASE_DE_DONNEES + .MDF
+• Fichier LDF (Journal des transactions) : NOM_BASE_DE_DONNEES + _log.LDF
+Ces fichiers sont installés dans le répertoire utilisé par défaut par Microsoft SQL Server pour stocker les
+bases de données.
+Ce répertoire par défaut est PROGRAM FILES\MICROSOFT SQL SERVER\MSSQL\DATA.
+Taille de la base de données
+La taille d'une base Sage100cloud Premium (issue d'une conversion d'une base Windows en version SQL) est
+au maximum :
+• Taille de la base propriétaire + 60 Mo + taille du fichier log
+Si vous faites une conversion, vérifiez donc bien que vous ayez l'espace nécessaire sur votre disque.
+Les 60 Mo correspondent à la structure de la base (Tables + procédures stockées + triggers) dans
+le cas où vous avez toutes les tables de votre société (Comptabilité, Gestion Commerciale,
+Immobilisations, Moyens de paiement, Trésorerie).
+Propriétés
+En création, les fichiers MDF et LDF reprennent les paramètres de la base de données système MODEL,
+qui par défaut a les propriétés suivantes :
+• fichier à croissance automatique (10 %),
+• fichier à croissance illimitée.
+© 2020 Sage 49
+=== PAGE 50 ===
+Création des bases Sage 100 pour SQL Server
+Base de données SQL unique
+L'exploitation des données d'une société requiert impérativement que les différents types
+de fichiers représentant les données d'une société (Comptabilité, Gestion commerciale,
+Immobilisation et Moyens de paiement/Trésorerie) soient stockés dans une base de données
+SQL unique.
+Dans le cas où ce prérequis n'est pas respecté, l'ouverture de la base de données ne sera
+alors pas possible depuis les applications.
+Par exemple, depuis Sage 100cloud Gestion commerciale Premium, lorsque la structure du fichier
+comptable sélectionné ne fait pas partie de la base SQL de gestion commerciale ouverte, le message
+suivant est affiché :
+Le fichier xxxx.mae ne peut être ouvert ! Il concerne un fichier comptable qui n’est pas intégré dans le
+fichier ouvert.
+Pour procéder à la création d'une base de données SQL unique pour les différents types de fichiers gérés
+par la société, il convient lors de la création des fichiers depuis les applications Sage 100cloud Premium,
+de renseigner pour chacun des types de fichier, le même nom de base de données de destination.
+Exemple :
+Depuis Sage 100cloud Comptabilité Premium, création d'un fichier comptable nommé MASOCIETE.mae.
+Cette création se matérialise par la création d'une base de données SQL Server nommée MASOCIETE.
+Pour que les autres types de fichiers (Gestion commerciale, Immobilisation, Moyens de
+paiement/Trésorerie) soient créés dans la base de données SQL Server MASOCIETE, il conviendra de créer
+ces fichiers en renseignant le même nom de fichier que pour le fichier comptable. Pour notre exemple :
+MASOCIETE.gcm, MASOCIETE.imo et MASOCIETE.mdp.
+Il n'est pas possible de mettre deux bases de même type dans la même base SQL, par exemple
+deux bases comptables.
+© 2020 Sage 50
+=== PAGE 51 ===
+Outil de maintenance et Conversion
+Outil de maintenance et Conversion
+Introduction
+Outre les possibilités décrites dans le manuel Ergonomie et Fonctions communes de Sage 100cloud,
+l'outil de maintenance installé avec les applications Sage100cloud Premium permet de :
+• Réaliser les conversions de vos bases de données Sage 100 Windows en base Sage100cloud
+Premium
+• Recopier les données dans une autre base
+• Vérifier la structure des données de la base
+• Réorganiser la base relationnelle
+• Fusionner les bases de données
+• Diagnostic pré-migration
+• Traitements multi-dossiers
+Pour pouvoir exploiter toutes les fonctionnalités du programme Maintenance (Conversion,
+recopie…), celui-ci doit être installé par le programme d'installation de l'application
+Sage100cloud Premium correspondant.
+L'installation copie notamment les fichiers de description des bases dans le répertoire Program
+Files\Fichiers communs\Sage\Bases de votre disque dur.
+Le programme Maintenance installé par les applications Sage100cloud Premium ne permet
+pas de convertir des bases de versions antérieures à la version 16.
+Conversion des bases
+Ce chapitre vous explique comment convertir des bases Sage 100 Windows et des bases Sage 100 pour
+SQL Server en dernière version de base Sage100cloud Premium.
+Pour convertir vos fichiers, utilisez le logiciel Sage Maintenance livré avec les produits Sage 100cloud
+Premium.
+Les données comptables (fichier .mae) doivent être converties avant la conversion des autres
+types de données :
+- Données commerciales (Fichier .gcm)
+- Données immobilisations (Fichier .imo)
+- Données moyens de paiement - trésorerie (Fichier .mdp)
+Recommandations
+Avant de procéder à toute conversion de bases Sage 100 en nouvelle version de base Sage100cloud
+Premium, veuillez respecter les recommandations suivantes. Celles-ci vont vous aider à réaliser
+l'opération de conversion dans les meilleures conditions. Elles vont également vous permettre de gagner
+du temps et de l'espace disque sur le poste serveur :
+• Réaliser obligatoirement une sauvegarde de vos données pour pouvoir repartir des données
+initiales en cas d'erreur de manipulation.
+• Définition du mode de récupération des données.
+• Vérification de l'espace disque disponible.
+• Opérations à réaliser après conversion, avant l'exploitation à partir des applications Sage 100cloud
+Premium.
+© 2020 Sage 51
+=== PAGE 52 ===
+Outil de maintenance et Conversion
+Définition du mode de récupération des données
+Nous vous recommandons d'opter pour un mode simple de récupération des données SQL, au lieu du mode
+complet. Le mode simple permet de purger l'historique du fichier des logs après chaque point de contrôle.
+Vous pouvez accéder à cette option via les propriétés de la base à convertir dans l'outil SQL Server
+Management Studio de Microsoft SQL Server.
+Les commandes SQL permettant de modifier les deux modes de récupération des données dans le module
+Analyseur de requêtes SQL sont :
+• Mode complet : ALTER DATABASE [Nom_BD] SET RECOVERY FULL
+• Mode simple : ALTER DATABASE [Nom_BD] SET RECOVERY SIMPLE
+Voici deux exemples de la taille approximative du fichier des logs selon les deux modes de récupération
+des données.
+Taille de base V8 à Taille du fichier des logs après conversion
+convertir en ver-
+sion Sage 100cloud Mode simple Mode complet
+350 Mo 200 Mo 500 Mo
+1,4 Go 500 Mo 3 Go
+© 2020 Sage 52
+=== PAGE 53 ===
+Outil de maintenance et Conversion
+Vérification de l'espace disque disponible
+Pour réussir la conversion de vos bases de données, veuillez vérifier préalablement que l'espace disque
+disponible sur le poste serveur permet non seulement d'accueillir les données de vos bases mais
+également des fichiers des logs.
+Opérations à réaliser après conversions
+Les opérations à réaliser après la conversion des bases sont les suivantes :
+• Si vous le souhaitez, vous pouvez remettre l'option Mode de récupération de données d'origine
+(Complet si vous avez basculé en mode simple avant la conversion)
+• Réorganiser la base relationnelle par l'outil de Maintenance (pour plus de détails, veuillez-vous
+référer au paragraphe Réorganisation de la base relationnelle)
+• Réaliser une sauvegarde de la base convertie en respectant les recommandations de Microsoft
+afin de limiter le volume des données à sauvegarder (supprimer les entrées inactives, réduire
+physiquement la taille de la base, etc.)
+Conversions des bases de données
+Conversion des bases Sage100 issues d'une version antérieure
+Principe
+Les bases issues d'une version antérieure des applications Sage100 doivent être converties à l'aide du
+logiciel Maintenance installé par le dernier programme Sage100cloud Premium. Cette conversion
+s'effectue en 2 étapes :
+1 . Conversion de la structure interne Cbase
+Ajout de nouveaux champs correspondants aux nouvelles fonctionnalités.
+2 . Conversion de données
+Suppression puis recréation de tous les déclencheurs, index, clés (primaires et étrangères)
+spécifiques aux bases de données Sage100cloud Premium et alimentation des tables avec les données
+converties.
+Les tables, vues, procédures stockées, fonctions ou déclencheurs créés via des
+développements externes ne sont pas modifiées. De même les champs ajoutés dans les tables
+des bases de données Sage 100cloud sont conservés.
+Conseils pour les développements externes
+Comme évoqué précédemment, la conversion conserve les tables, vues, procédures stockées, fonctions
+ou déclencheurs créés via des développements externes. Cependant, il convient de respecter certaines
+règles :
+• Faites une sauvegarde de votre base SQL avant la conversion.
+• Générez un script SQL de tous vos objets (Déclencheurs, index...).
+• Ne pas modifier les objets spécifiques aux bases de données Sage 100cloud car ils seront supprimés
+lors de la conversion.
+• Afin de ne pas perturber le processus de conversion, désactivez vos propres déclencheurs avant la
+conversion et réactivez-les après conversion.
+Conversion
+© 2020 Sage 53
+=== PAGE 54 ===
+Outil de maintenance et Conversion
+Avant toute conversion ou création de fichier, veuillez vérifier que l'accès au serveur SQL est correcte-
+ment configuré dans Sage Installation du Panneau de configuration Windows.
+• Accès Sage : Accès SQL Server,
+• Nom du serveur : si une instance SQL a été créée, renseignez dans cette zone Nom du serveur
+SQL\Instance SQL.
+Toutes les manipulations à réaliser sur le poste serveur et les postes clients sont décrites dans les
+chapitres précédents. Nous vous recommandons de respecter toutes les consignes données tout au long
+de ce manuel avant de poursuivre la procédure de conversion ou de création de fichier.
+Pour convertir votre ancienne base Sage100 procédez comme suit :
+1 . Lancez le logiciel Maintenance.
+2 . Ouvrez votre fichier à convertir (.Mae, .Gcm, .Imo ou .Mdp) à l'aide de la commande Menu Fichier
+/ Ouvrir.
+Si l’état des données système des bases Sage 100cloud le requiert, une conversion des
+informations système peut vous être proposée.
+Répondez Oui uniquement si vous lancez la conversion jusqu’au bout. Si vous souhaitez
+interrompre le traitement, votre base de données devient inutilisable. Il faudra
+obligatoirement repartir d’une sauvegarde.
+Il vous est d’ailleurs rappelé d’effectuer une sauvegarde préalable de votre base de
+données !
+3 . La fenêtre suivante vous propose de convertir votre fichier en nouvelle version ou de l'ouvrir en
+version actuelle.
+Conversion du fichier en nouvelle version : cliquez sur le bouton Suivant pour poursuivre la
+conversion.
+Ouverture du fichier en version actuelle : le bouton Suivant se transforme en bouton Fin.
+Cliquez dessus pour ouvrir le fichier en version actuelle.
+Si vous ne convertissez pas la base en nouvelle version, il ne sera alors pas possible d'ouvrir la
+base de données avec les dernières versions des applications.
+© 2020 Sage 54
+=== PAGE 55 ===
+Outil de maintenance et Conversion
+Suivant la version de la base Sage 100 à convertir, un assistant permettant de définir le champ
+devant être utilisé pour stocker le champ N° facture des pièces commerciales pourra apparaître. Se
+reporter au manuel du logiciel Maintenance pour de plus amples informations sur cette fonction.
+4 . La fenêtre suivante vous propose de convertir tous les types de base ou uniquement le fichier
+ouvert.
+Tout convertir : tous les types de base seront convertis.
+Convertir uniquement le fichier ouvert : seul le type de base correspondant au fichier ouvert
+sera converti. Dans ce cas, il faudra répéter l’opération de conversion pour chaque type de base.
+5 . Cliquez sur le bouton Suivant.
+7 . Cliquez sur le bouton Fin pour lancer la procédure.
+Pour rappel, la conversion d'une base de données est une opération irréversible. Il est
+impératif de procéder à une sauvegarde de la base de données avant de la convertir.
+Conversion des bases Sage 100 Windows issues d'une version antérieure
+A l'ouverture du fichier par la maintenance, le programme vous propose de convertir le fichier en nouvelle
+version.
+© 2020 Sage 55
+=== PAGE 56 ===
+Outil de maintenance et Conversion
+La conversion du fichier Sage 100 Windows en dernière version Sage100cloud Premium ne s'effectue que
+si vous avez sélectionné le mode d'accès Accès SQL Server dans Sage Installation du Panneau de
+Configuration.
+Cliquez sur le bouton Suivant.
+© 2020 Sage 56
+=== PAGE 57 ===
+Outil de maintenance et Conversion
+• Conversion du fichier en nouvelle version : cliquez sur le bouton Suivant pour poursuivre la
+conversion.
+• Ouverture du fichier en version actuelle : le bouton Suivant se transforme en bouton Fin.
+Cliquez dessus pour ouvrir le fichier en version actuelle.
+• Suivant la version de la base à convertir, un assistant permettant de définir le champ devant être
+utilisé pour stocker le champ N° facture des pièces commerciales pourra apparaître. Se reporter
+au manuel du logiciel Maintenance pour de plus amples informations sur cette fonction.
+Cliquez sur le bouton Suivant.
+Cliquez sur le bouton Parcourir pour indiquer le nouveau nom du fichier.
+Exemple :
+Si le nouveau fichier se nomme BIJOUSQL.MAE, l'opération de conversion créera :
+- un fichier INI, BIJOUSQL.MAE sur votre poste client,
+- une base de données Microsoft SQL Server 2017 se nommant : BIJOUSQL (en majuscules) sur votre
+poste Serveur.
+La taille 2439 Ko indiquée dans cet exemple, correspond à la taille de la base propriétaire.
+La taille de la base Microsoft SQL Server correspondante sera au maximum :
+Taille de la base propriétaire (ici 2439 Ko) + 60 Mo maximum (Fichier MDF) + taille du fichier
+LOG. La taille de 60 Mo correspond à la taille d'une base vierge avec toutes les tables de tous
+les produits Comptabilité, Gestion commerciale, Immobilisations, Moyens de Paiement,
+Trésorerie)
+Cliquez sur le bouton Suivant après enregistrement du nom du fichier.
+© 2020 Sage 57
+=== PAGE 58 ===
+Outil de maintenance et Conversion
+Cliquez alors sur le bouton Fin pour lancer la conversion.
+Pour rappel, la conversion d'une base de données est une opération irréversible. Il est
+impératif de procéder à une sauvegarde de la base de données avant de la convertir.
+© 2020 Sage 58
+=== PAGE 59 ===
+Outil de maintenance et Conversion
+Réorganisation de la base relationnelle
+Cette fonction devient active dans le menu Maintenance du programme Maintenance lorsqu'une base
+Sage100cloud Premium est ouverte.
+Cette fonction permet de réindexer les tables de votre base Sage 100cloud Premium et de mettre à jour
+les statistiques.
+Il est fortement conseillé de lancer régulièrement ce traitement après avoir effectué un certain nombre
+de saisies de données ou après une conversion des données.
+En effet, Microsoft SQL Server utilise des statistiques collectées pour choisir le meilleur plan d'exécution
+d'une requête. De ce fait, avoir des statistiques régulièrement à jour vous permet de conserver des per-
+formances optimales pour les traitements exécutés à partir des applications Sage100cloud Premium.
+La fréquence de réorganisation de la base est à définir en fonction du volume de données saisies et de la
+dégradation de performances constatée. Nous vous recommandons de lancer ce traitement au moins 1 à
+2 fois par semaine.
+Recopie des données
+Cette fonction de l'outil Maintenance installé par les programmes Sage100cloud Premium, vous permet
+de recopier l'ensemble des données de votre base de données Sage100cloud Premium dans une autre
+base de données. Cette fonction permet ainsi de reconstituer les données système d'origine de la base
+Sage100cloud Premium. Cette opération permet de récupérer les données suivantes d'une base SQL vers
+une autre :
+• Utilisateurs (s'ils existent en tant que connexion sur le serveur SQL)
+• Règles
+© 2020 Sage 59
+=== PAGE 60 ===
+Outil de maintenance et Conversion
+• Valeurs par défaut
+• Types de données utilisateurs
+• Tables
+• Triggers
+• Vues
+• Contraintes (Primary key, foreign key, checks, etc.)
+• Index
+• Fonctions utilisateurs
+• Procédures stockées
+La procédure de recopie génère une base de données dont la taille est automatiquement
+réduite en laissant un espace libre de 10% (DBCC SHRINKDATABASE(NomBase,10)).
+L'opération de recopie des données s'effectue sur l'intégralité des données de la base
+Sage100cloud Premium. Si votre base de données regroupe plusieurs types de données
+(comptables, commerciales, immobilisations, moyens de paiement/trésorerie), il suffira
+d'ouvrir un des fichiers raccourcis correspondants et de lancer la recopie. Toutes les données
+de la base d'origine seront transférées dans la nouvelle base de données issue de cette
+opération.
+Afin d'optimiser le temps de traitement de la recopie d'une base contenant plusieurs types de
+données, il conviendra d'exécuter ce traitement depuis un poste sur lequel toutes les
+applications correspondantes aux types des données contenues dans la base auront été
+installées.
+Pré-requis
+La recopie des données d'une base Sage100cloud Premium vers une autre base de données peut être
+réalisée dans les conditions suivantes :
+• L'installation préalable des outils clients SQL (SQL Server Management Studio) sur le poste de travail
+qui lance l'opération de recopie.
+• La recopie s'effectue vers une nouvelle base ou vers une base existante ne comportant aucune
+donnée Sage100cloud Premium du type de la base devant être recopiée.
+• En cas de recopie avec la création d'une nouvelle base, l'utilisateur doit disposer des droits pour
+réaliser cette opération (Public et Sysadmin).
+• La recopie des données d'une base Sage100cloud Premium doit être réalisée sur un même serveur,
+c'est-à-dire la base source et la base de destination doivent être placées sur un même serveur SQL.
+• Avant de lancer l'opération de recopie des données, veuillez également vérifier le nom et l'instance
+du serveur SQL définis dans l'icône Sage installation du poste de travail qui réalise cette opération.
+© 2020 Sage 60
+=== PAGE 61 ===
+Outil de maintenance et Conversion
+Procédure de recopie des données
+La recopie des données s'effectue de la manière suivante :
+• Ouvrir le raccourci (fichier .MAE, .GCM, .IMO ou .MDP).
+• Lancer la fonction Recopier les données du menu Maintenance.
+Un assistant va vous guider pour réaliser cette opération.
+Démarrage de la recopie
+Cette première étape vous informe du démarrage de l'opération de recopie. Cliquez sur le bouton
+Annuler pour arrêter l'opération et sur le bouton Suivant pour continuer.
+© 2020 Sage 61
+=== PAGE 62 ===
+Outil de maintenance et Conversion
+Choix du type de recopie
+La fonction de recopie propose une option pour la recopie des objets Sage :
+La maintenance peut effectuer :
+• Une recopie de l'intégralité des données et objets
+Tous les développements spécifiques ajoutés sur la base de données seront également recopiés
+dans la base de destination.
+• Une recopie des données et des objets Sage seuls
+Les développements spécifiques ajoutés sur la base de données ne sont pas recopiés.
+Propriété de la nouvelle base de données
+Cette étape vous permet de préciser le nom de la base et la taille de la nouvelle base de destination.
+Cliquez sur le bouton Parcourir pour spécifier le nom de la base et l'emplacement du raccourci
+correspondant (fichier .MAE, .GCM, .IMO ou .MDP).
+© 2020 Sage 62
+=== PAGE 63 ===
+Outil de maintenance et Conversion
+La fenêtre qui s'ouvre vous permet de spécifier le nom de la base Sage100cloud Premium et
+l'emplacement du fichier raccourci correspondant.
+Démarrage de l'opération
+Dans cette dernière étape, vous pouvez demander ou non l'affichage du journal de maintenance.
+Cochez l'option de votre choix et cliquez sur le bouton Fin pour démarrer la recopie.
+Fin de la recopie
+La nouvelle base Sage100cloud Premium contient toutes les données de la base d'origine (données
+comptables, commerciales, immobilisations, moyens de paiement/trésorerie). Pour pouvoir l'exploiter à
+partir des applications, veuillez recréer les fichiers raccourcis correspondant à chaque application Sage
+100cloud Premium dont vous disposez.
+© 2020 Sage 63
+=== PAGE 64 ===
+Outil de maintenance et Conversion
+Voir plus haut pour plus de détails sur les propriétés des fichiers raccourcis à créer.
+Vérification des données
+Cette fonction de l'outil de maintenance vous permet de vérifier la structure et la cohérence des bases
+de données Sage100cloud Premium.
+Type de fichier Données vérifiées
+.MAE Données de Sage 100cloud Comptabilité Premium
+.GCM Données de Sage 100cloud Gestion commerciale Premium et Sage 100
+Saisie de caisse décentralisée Premium
+.IMO Données de Sage 100cloud immobilisations Premium
+.MDP Données de Sage 100cloud Moyens de paiement Premium et Sage 100
+Trésorerie Premium
+La vérification du contenu des objets SQL Server (exemple : celui d'un déclencheur
+Sage100cloud Premium) n'est pas réalisée par la fonction de Vérification des données.
+Dans le cas où cette fonction détecte des incohérences dans la base de données, il conviendra alors
+d'exécuter une recopie de base.
+Pour plus de détails, voir le paragraphe Recopie des données.
+© 2020 Sage 64
+=== PAGE 65 ===
+Outil de maintenance et Conversion
+Fusion des bases relationnelles
+La fonction de fusion des bases relationnelles est accessible lorsqu'une base de type Gestion
+commerciale, Immobilisations ou Moyens de paiement/Trésorerie est ouverte dans la Maintenance.
+Cette fonction permet via un assistant, de sélectionner la base comptable dans laquelle seront recopiées
+les données de la base ouverte.
+L'exploitation des applications Sage100cloud Premium nécessite impérativement que tous les
+types de base d'un dossier (comptabilité, gestion commerciale…) soient contenus dans une base
+de données SQL unique. Ainsi, dans le cas de bases de données distinctes, il sera nécessaire
+d'employer la procédure de fusion pour regrouper l'ensemble des différentes bases dans une
+base de données SQL unique. Se référer au manuel Maintenance - Outils d'accompagnement à la
+migration des bases relationnelles pour la description exacte de cette fonction.
+© 2020 Sage 65
+=== PAGE 66 ===
+Outil de maintenance et Conversion
+Sélection de la base comptable
+A l'exécution de cette fonction, il sera nécessaire de renseigner la base comptable dans laquelle les
+données de la base ouverte devront être transférées.
+Après sélection de la base comptable, cliquer sur Suivant pour poursuivre la procédure.
+Lancement du traitement
+Cette étape permet d'exécuter le traitement de Fusion des bases relationnelles. Cliquer sur Fin pour
+démarrer le traitement.
+Ce traitement devra être réalisé pour chaque type de base (gcm, imo et mdp) à fusionner dans
+la base comptable.
+© 2020 Sage 66
+=== PAGE 67 ===
+Outil de maintenance et Conversion
+Outil de diagnostic pré-migration
+La fonction de diagnostic pré-migration permet de simuler la conversion des bases de données
+propriétaires vers des bases de données SQL Server. Après vérification et recopie des données, le journal
+de maintenance affiche un rapport sur les étapes de la conversion, une estimation du temps nécessaire
+et éventuellement une liste d'actions préalables à réaliser afin que la conversion arrive à son terme. Cette
+fonction permet ainsi de planifier en toute sérénité les traitements de conversions.
+Se référer au manuel Maintenance - Outils d'accompagnement à la migration des bases
+relationnelles pour la description exacte de cette fonction.
+© 2020 Sage 67
+=== PAGE 68 ===
+Outil de maintenance et Conversion
+Traitements multi-dossiers
+La fonction de traitement multi-dossiers permet d'enchaîner les traitements suivants :
+• Vérification en rafale des bases de données
+• Recopie en rafale
+• Conversion en base relationnelle en rafale
+Ces traitements sont réalisés sans intervention de l'utilisateur. L'ensemble des erreurs et alertes
+éventuelles est journalisé dans le journal de traitement de la maintenance.
+Se référer au manuel Maintenance - Outils d'accompagnement à la migration des bases relationnelles
+pour la description exacte de cette fonction.
+Sauvegarde et restauration des bases de données
+La sauvegarde et restauration des bases de données s'effectuent depuis l'outil d'administration installé
+lors de l’installation de Microsoft SQL Server : Microsoft SQL Server Management Studio.
+La sauvegarde/restauration de la base de données s’effectue également depuis l’application. Pour plus
+d’informations se référer au manuel Fonctions communes.
+Microsoft SQL Server Management Studio peut être exécuté depuis le menu démarrer de Microsoft
+Windows sous Démarrer\Programmes\Microsoft SQL Server 2017\SQL Server Management Studio.
+Les opérations de Sauvegarde et Restauration des bases de données doivent être réalisées avec
+le compte utilisateur à partir duquel l'installation de Sage Serveur pour SQL Server - partie
+Serveur a été exécutée. En effet, ce compte dispose par défaut des droits nécessaires pour
+réaliser ces opérations. L'utilisation d'un autre compte est également possible. Cependant, il
+faudra préalablement s'assurer que ce compte soit membre du rôle serveur sysadmin de
+l'instance SLQ Server (page Rôles du serveur dans les propriétés de la connexion).
+Sauvegarde d'une base de données
+Depuis Microsoft SQL Server Management Studio, sélectionner la base de données à sauvegarder et depuis
+le menu contextuel, sélectionner la fonction Tâches\Sauvegarder :
+© 2020 Sage 68
+=== PAGE 69 ===
+Outil de maintenance et Conversion
+Dans la fenêtre qui apparaît, positionner le type de sauvegarde sur Complète et définir le chemin de
+destination de la sauvegarde.
+Par défaut, le chemin de destination est automatiquement positionné sous le répertoire
+Sauvegarde du répertoire d'installation de l'instance SQL Server 2017. De plus, le nom du
+fichier de sauvegarde est également automatiquement renseigné en reprenant le nom de la
+base de données suivi de l'extension bak (bijou.bak par exemple).
+Cliquer sur la commande OK pour démarrer le processus de sauvegarde de la base de données et patienter
+jusqu'à obtenir le message :
+Se référer à la documentation Microsoft SQL Server pour plus de détails sur les différentes options
+proposées par la fonction de sauvegarde.
+Restauration d'une base de données
+Depuis Microsoft SQL Server Management Studio, sélectionner la base de données à sauvegarder et depuis
+le menu contextuel, sélectionner la fonction Tâches\Restaurer\Base de données :
+© 2020 Sage 69
+=== PAGE 70 ===
+Outil de maintenance et Conversion
+La restauration d'une base de données nécessite un accès exclusif à la base de données. Ainsi,
+avant d'exécuter cette fonction, vérifier qu'aucun utilisateur n'est en cours de travail sur la
+base de données.
+Dans la fenêtre qui apparaît, sélectionner l'emplacement et le fichier source de la sauvegarde à restaurer.
+Pour restaurer une base de données issue d'un fichier non référencé dans la liste Sélectionnez les jeux
+de sauvegarde à restaurer, sélectionner l'option A partir de l'unité et rechercher le fichier de
+sauvegarde dans la fenêtre de localisation de sauvegarde.
+Après sélection de la sauvegarde à restaurer, se placer sur la page Fichier :
+© 2020 Sage 70
+=== PAGE 71 ===
+Outil de maintenance et Conversion
+Puis sur la page Options, cocher l'option Remplacer la base de données existante (WITH REPLACE) :
+© 2020 Sage 71
+=== PAGE 72 ===
+Outil de maintenance et Conversion
+Dans le cas d'une restauration d'un fichier de sauvegarde issu d'une autre instance/serveur SQL,
+il sera peut être nécessaire de modifier les chemins d'accès définis sous Restaurer sous, pour
+les adapter à l'arborescence du serveur sur lequel la sauvegarde doit être restaurée.
+Cliquer sur la commande OK pour démarrer le processus de restauration et patienter jusqu'à obtenir le
+message :
+Se référer à la documentation Microsoft SQL Server 2017 pour plus de détails sur les différentes options
+proposées par la fonction de restauration.
+© 2020 Sage 72
+=== PAGE 73 ===
+Sauvegarde et restauration des bases de données
+Cas de restauration : fichier de sauvegarde issu d'une autre instance/serveur SQL
+Dans le cas d'une restauration d'un fichier de sauvegarde issu d'une autre instance/serveur SQL, il sera
+nécessaire, après avoir restauré la base, de réaliser les opérations suivantes :
+Sous Microsoft SQL Server Management Studio, sélectionner la fonction Requête avec la connexion
+actuelle disponible sous le menu Fichier\Nouveau.
+Dans la page de la requête qui apparaît, copier les instructions suivantes :
+USE MASTER;
+ALTER AUTHORIZATION ON DATABASE ::[BASE_RESTAUREE] TO [UTILISATEUR];
+USE [BASE_RESTAUREE];
+ALTER USER [USER_CBASE] WITH LOGIN=[APPL_CBASE]
+Les paramètres [BASE_RESTAUREE] et [UTILISATEUR] doivent être modifiés pour les adapter à la
+configuration mise en place. Ainsi :
+• [BASE_RESTAUREE] correspond au nom de la base de données qui vient d'être restaurée.
+• [UTILISATEUR] correspond à un compte utilisateur existant sur l'instance SQL Server 2017
+Par exemple, après avoir restauré la base BIJOU depuis un fichier de sauvegarde issu d'un autre serveur/
+instance Sage 100cloud, et pour attribuer le compte USER1 appartenant au domaine Windows DOM1 à la
+base BIJOU, le script à exécuter devra être le suivant :
+USE MASTER;
+ALTER AUTHORIZATION ON DATABASE ::[BIJOU] TO [DOM1\USER1];
+USE [BIJOU];
+ALTER USER [USER_CBASE] WITH LOGIN=[APPL_CBASE]
+Après modification des paramètres, exécuter la requête en sélectionnant la fonction Exécuter disponible
+sous le menu Requête :
+© 2020 Sage 73
+=== PAGE 74 ===
+Sauvegarde et restauration des bases de données
+© 2020 Sage 74
+=== PAGE 75 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Fonctionnalités spécifiques des applications Sage100cloud
+Premium
+Impression des états
+Une grande partie des états imprimés des applications de Sage100cloud Premium bénéficie d'une option
+supplémentaire permettant d'améliorer significativement les performances d'impression.
+La fenêtre de sélection dispose dans ce cas d'une nouvelle option Traitement :
+• Avec des critères étendus : les impressions s'effectuent de façon classique : la totalité des
+critères de sélection existants dans les versions antérieures sont disponibles ;
+• Rapide simplifié : seuls les critères de sélection principaux sont disponibles, ce qui permet une
+augmentation significative des performances d'impression.
+Exemple : Statistiques clients
+Lorsque le traitement sélectionné est Rapide simplifié, seuls les principaux critères de sélection sont
+disponibles :
+Lorsque le traitement sélectionné est Avec des critères étendus, la totalité des critères de sélection
+sont utilisables :
+© 2020 Sage 75
+=== PAGE 76 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Ce critère est également disponible dans la fenêtre du format de sélection obtenue à l'aide du bouton
+Plus de critères.
+Lorsque la zone à liste déroulante Traitement est positionnée sur Rapide simplifié, seuls les critères
+de sélection concernés par le traitement SQL sont actifs. Bien qu'il soit possible d'ajouter d'autres
+critères dans cette fenêtre, seuls les critères proposés par défaut seront appliqués. Tous les autres
+critères éventuellement ajoutés seront ignorés.
+Exemple : Statistiques clients
+Lorsque le traitement sélectionné est Rapide simplifié, seuls les principaux critères de sélection sont
+disponibles.
+L'ajout d'autres critères de sélection n'aura aucune incidence sur le traitement.
+Lorsque le traitement sélectionné est Avec des critères étendus, la totalité des critères de sélection
+sont utilisables. Il est alors possible d'ajouter d'autres critères de sélection.
+© 2020 Sage 76
+=== PAGE 77 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Personnalisation des tris
+A partir des applications Sage100cloud Premium, il est possible d'exploiter des tris (index) définis sur les
+bases de données. Ces tris seront visibles dans les applications au niveau de la barre de navigation et du
+menu contextuel. Cette fonctionnalité est disponible pour les applications :
+• Sage 100cloud Comptabilité Premium
+• Sage 100cloud Gestion commerciale Premium
+• Sage 100cloud Saisie de caisse décentralisée Premium
+• Sage 100cloud Immobilisations Premium
+• Sage 100cloud Moyens de Paiement Premium
+• Sage 100cloud Trésorerie Premium
+L'index doit contenir au maximum 16 champs.
+Pour ajouter un nouvel index dans les bases de données Sage100cloud Premium, nous vous renvoyons vers
+la documentation de Microsoft SQL Server 2017. Dès lors qu'un nouvel index est ajouté dans une table Sage
+100cloud, il sera utilisable dans les applications Sage100cloud Premium.
+Dans le cas d'une mise à jour de version, les tris personnalisés créés sur une version antérieure
+à la version Sage 100 i7 version 7.70 ne sont pas conservés. Ainsi, ils existent toujours dans la
+base de données, mais ne sont plus associés dans les applications Sage 100cloud Premium. Il
+conviendra donc, après mise à jour, de réaffecter chacun de ces tris afin de les exploiter dans
+les applications Sage 100cloud Premium (cf. paragraphe Définition d'un nouveau tri).
+Ci-dessous quelques exemples pour Sage 100cloud Gestion commerciale Premium :
+Fonction Liste Table
+Articles Articles actifs ou mis en sommeil F_ARTICLE
+Clients Tous les clients F_COMPTET
+Clients Clients actifs ou mis en sommeil F_COMPTET
+Documents des ventes Tous les documents F_DOCENTETE
+Documents des ventes Un type de document F_DOCENTETE
+Définition d'un nouveau tri
+A partir des applications Sage100cloud Premium, la définition d'un nouveau tri s'effectue en sélectionnant
+la fonction intitulée Listes de l'onglet Interface utilisateur, disponible sous le menu
+Fenêtre\Personnaliser.
+© 2020 Sage 77
+=== PAGE 78 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Toutes les listes permettant d'utiliser de nouveaux tris sont proposées dans cette fonction. Le nombre de
+tris possible pour une liste est limité à 100.
+Pour chaque liste, les différents tris existants sont affichés.
+Si un index concernant cette liste a été ajouté dans la base de données, le bouton [Ajouter un tri...] est
+disponible. Ce bouton donne accès à la fenêtre ci-dessous :
+© 2020 Sage 78
+=== PAGE 79 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Tous les index créés dans la base et qui concernent la liste sélectionnée sont proposés.
+Il est possible de sélectionner un ou plusieurs index dans la liste. Les éléments sélectionnés
+sont identifiés par la présence d'une coche devant leur intitulé.
+Après avoir validé les index souhaités, ils sont proposés avec les tris déjà existants.
+Les tris ajoutés sont identifiés par une icône particulière dans la liste.
+Chaque tri peut être renommé. Pour ce faire, il suffit de le sélectionner, puis de cliquer sur son nom pour
+accéder en modification à cette zone. Pour valider les modifications, il convient de cliquer sur le bouton
+OK.
+Suppression d'un tri
+Pour supprimer un tri d'une liste, il convient de le sélectionner puis de cliquer sur le bouton Supprimer.
+Le bouton Réinitialiser permet de revenir au paramétrage standard. Toutes les modifications, ajouts et
+suppressions de tris sont alors perdus.
+Utilisation d'un nouveau tri
+Chaque nouveau tri défini dans la fonction Personnaliser l'interface est visible sur la liste concernée :
+• Dans le menu déroulant de la barre d'outils Navigation sous le bouton de commande Tri
+© 2020 Sage 79
+=== PAGE 80 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+• Dans le menu contextuel
+© 2020 Sage 80
+=== PAGE 81 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Tris par application
+Vous retrouverez ci-dessous, détaillés par application, la table à utiliser pour créer des index
+personnalisées dans les différentes listes.
+Comptabilité
+Menu Structure
+Fonction Table Liste
+Plan comptable F_COMPTEG Tous les comptes généraux
+Plan analytique F_COMPTEA Toutes les sections analytiques
+Sections analytiques actives ou mis en sommeil
+Plan reporting F_COMPTER Tous les comptes reporting
+Plan tiers F_COMPTET Tous les tiers
+Tiers actifs ou mis en sommeil
+Tiers par type
+Tiers actifs ou mis en sommeil par type
+Taux de taxes F_TAXE Tous les taux de taxes
+Codes journaux F_JOURNAUX Tiers par type
+Codes journaux analy- F_JOURNAUXA Tous les journaux analytiques
+tiques
+Tous les journaux analytiques actifs ou mis en sommeil
+Banques F_BANQUE Toutes les banques
+Modèles/Modèles de sai- F_PIECE Tous les modèles de saisie
+sie
+Modèles/Modèles de F_MODELEG Tous les modèles de grille
+grille
+Modèles/Modèles de F_MODELER Tous les modèles de règlement
+règlement
+Modèles/Modèles d'abon- F_MODELEA Tous les modèles d'abonnement
+nement
+Libellés F_LIBELLE Tous les libellés
+Postes budgétaires F_BUDGET Tous les postes budgétaires
+Cycles de révision F_CYCLE Tous les cycles de révision
+© 2020 Sage 81
+=== PAGE 82 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Menu Traitement
+Fonction Table Liste
+Saisie des écritures F_ECRITUREC Toutes les écritures
+Saisie des écritures par F_ECRITUREC Toutes les écritures
+lot
+Gestion des extraits ban- F_EXTRAIT Tous les extraits bancaires
+caires
+Gestion des lignes F_EEXTRAIT Toutes les lignes d'extrait
+d'extraits bancaires
+Gestion commerciale
+Menu Structure
+Fonction Table Liste
+Familles d'articles F_FAMILLE Toutes les familles
+Articles F_ARTICLE Tous les articles
+Articles actifs ou mis en sommeil
+Articles F_ARTFOURNISS Toutes les références fournisseurs
+Nomenclatures F_ARTICLE Toutes les nomenclatures
+Comptabilité / Plan F_COMPTEG Tous les comptes généraux
+comptable
+Comptabilité / Plan F_COMPTEA Toutes les sections analytiques
+analytique
+Sections actives ou mises en sommeil
+Comptabilité / Taux F_TAXE Tous les taux de taxes
+de taxes
+Codes journaux F_JOURNAUX Tous les codes journaux
+Codes journaux actifs ou mis en sommeil
+Comptabilité / F_BANQUE Toutes les banques
+Banques
+Comptabilité / F_MODELER Tous les modèles de règlements
+Modèles de règle-
+ment
+Comptabilité / F_MODELEG Tous les modèles de grilles
+Modèles de grille
+Codes affaires F_COMPTEA Tous les codes affaires
+Codes affaires actifs ou mis en sommeil
+© 2020 Sage 82
+=== PAGE 83 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Fonction Table Liste
+Clients F_COMPTET Tous les clients
+Clients actifs ou mis en sommeil
+Fournisseurs F_COMPTET Tous les fournisseurs
+Fournisseurs actifs ou mis en sommeil
+Barèmes / Commis- F_TARIF Tous les barèmes de commissions
+sions
+Barèmes / Rabais, F_TARIF Tous les barèmes de rabais, remises et ristournes
+remises et ristournes
+Barèmes / Soldes et F_TARIF Tous les barèmes de soldes et promotions
+promotions
+Glossaires F_GLOSSAIRE Tous les glossaires
+Modèles d'enregistre- F_MODELE Tous les modèles d'enregistrements
+ment
+Ressources F_RESSOURCE- Toutes les ressources
+PROD
+Ressources actives ou mises en sommeil
+Centres de charges F_RESSOURCE- Tous les centres de charges
+PROD
+Centres de charges actifs ou mis en sommeil
+Représentants F_REPRESENT Tous les représentants
+Dépôts de stockage F_DEPOT Tous les dépôts de stockages
+© 2020 Sage 83
+=== PAGE 84 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Menu Traitement
+Fonction Table Liste
+Documents des F_DOCENTETE Tous les documents
+ventes
+Tous les documents / sélection par client
+Tous les documents / sélection par période
+Un type de document
+Un type de document / sélection par client
+Un type de document / sélection par période
+Documents en cours
+Documents des F_DOCENTETE Tous les documents
+achats
+Tous les documents / sélection par fournisseur
+Tous les documents / sélection par période
+Un type de document
+Un type de document / sélection par fournisseur
+Un type de document / sélection par période
+Documents en cours
+Documents des stocks F_DOCENTETE Tous les documents
+Tous les documents / sélection par dépôt
+Tous les documents / sélection par période
+Un type de document
+Un type de document / sélection par dépôt
+Un type de document / sélection par période
+Documents internes F_DOCENTETE Tous les documents
+Tous les documents / sélection par client
+Tous les documents / sélection par période
+Un type de document
+Un type de document / sélection par client
+Un type de document / sélection par période
+Documents en cours
+Gestion des fabrica- F_DOCENTETE Tous les documents
+tions / Documents de
+Un type de document
+fabrication
+Un type de document / sélection par dépôt
+Un type de document / sélection par période
+Modèles et presta- F_ABONNEMENT Tous les modèles et prestations types
+tions types
+Abonnements / Abon- F_ABONNEMENT Tous les abonnements clients
+nement clients
+Abonnements / Abon- F_ABONNEMENT Tous les abonnements
+nement fournisseurs
+© 2020 Sage 84
+=== PAGE 85 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Fonction Table Liste
+Mise à jour de F_AGENDA Tous les intéressés
+l'agenda
+Un type d'intéressés
+Tous les événements échus
+Saisie de caisse décentralisée
+Menu Structure
+Fonction Table Liste
+Familles d'articles F_FAMILLE Toutes les familles
+Articles F_ARTICLE Tous les articles
+Articles actifs ou mis en sommeil
+Articles F_ARTFOURNISS Toutes les références fournisseurs
+Nomenclatures F_ARTICLE Toutes les nomenclatures
+Comptabilité / Plan F_COMPTEG Tous les comptes généraux
+comptable
+Comptabilité / Plan F_COMPTEA Toutes les sections analytiques
+analytique
+Sections actives ou mises en sommeil
+Comptabilité / Taux F_TAXE Tous les taux de taxes
+de taxes
+Codes journaux F_JOURNAUX Tous les codes journaux
+Codes journaux actifs ou mis en sommeil
+Comptabilité / F_BANQUE Toutes les banques
+Banques
+Comptabilité / F_MODELER Tous les modèles de règlements
+Modèles de règle-
+ment
+Comptabilité / F_MODELEG Tous les modèles de grilles
+Modèles de grille
+Clients F_COMPTET Tous les clients
+Clients actifs ou mis en sommeil
+Barèmes / Commis- F_TARIF Tous les barèmes de commissions
+sions
+Barèmes / Rabais, F_TARIF Tous les barèmes de rabais, remises et ristournes
+remises et ristournes
+Barèmes / Soldes et promotions
+© 2020 Sage 85
+=== PAGE 86 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+F_TARIF Tous les barèmes de soldes et promotions
+Glossaires F_GLOSSAIRE Tous les glossaires
+© 2020 Sage 86
+=== PAGE 87 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Fonction Table Liste
+Modèles d'enregistre- F_MODELE Tous les modèles d'enregistrements
+ment
+Vendeur et caissier F_REPRESENT Tous les vendeurs et caissiers
+Caisse F_CAISSE Toutes les caisses
+Dépôts de stockage F_DEPOT Tous les dépôts de stockages
+Menu Traitement
+Fonction Table Liste
+Documents des F_DOCENTETE Tous les documents
+ventes
+Tous les documents / sélection par client
+Tous les documents / sélection par période
+Un type de document
+Un type de document / sélection par client
+Un type de document / sélection par période
+Documents en cours
+Documents des stocks F_DOCENTETE Tous les documents
+Tous les documents / sélection par dépôt
+Tous les documents / sélection par période
+Un type de document
+Un type de document / sélection par dépôt
+Un type de document / sélection par période
+Immobilisations
+Menu Structure
+Fonction Table Liste
+Familles d'immobili- F_FAMILLEIMMO Toutes les familles d'immobilisations
+sations
+Immobilisations F_IMMOBILISA- Toutes les immobilisations
+TION
+Immobilisations par lieu
+Comptabilité/Plan F_COMPTEG Tous les comptes généraux
+comptable
+© 2020 Sage 87
+=== PAGE 88 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Fonction Table Liste
+Comptabilité/Plan F_COMPTET Tous les tiers
+tiers
+Tiers actifs ou mis en sommeil
+Tiers par type
+Tiers actifs ou mis en sommeil par type
+Comptabilité/Plan F_COMPTEA Toutes les sections analytiques
+analytique
+Sections analytiques actives ou mis en sommeil
+Comptabilité/Codes F_JOURNAUX Tous les journaux
+journaux
+Tous les journaux actifs ou mis en sommeil
+Comptabilité/ F_MODELEG Tous les modèles de grille
+Modèles/Modèles de
+grille -
+Lieu de biens F_LIEU Tous les lieux de biens
+Menu Traitement
+Fonction Table Liste
+Gestion des d'immo- F_IMMOBILISA- Toutes les immobilisations
+bilisations TION
+Immobilisations par type
+Immobilisations en service ou sorties
+Virements de poste à F_VIREMENT- Tous les virements de poste
+poste POSTE
+Virements par exercice
+Moyens de paiement
+Menu Structure
+Fonction Table Liste
+Plan tiers F_COMPTET Tous les tiers
+Tiers actifs ou mis en sommeil
+Tiers par type
+Tiers actifs ou mis en sommeil par type
+Banques F_BANQUE Toutes les banques
+Comptabilité/Plan F_COMPTEG Tous les comptes généraux
+comptable
+Comptabilité/Plan F_COMPTEA Toutes les sections analytiques
+analytique
+Sections analytiques actives ou mises en sommeil
+© 2020 Sage 88
+=== PAGE 89 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Fonction Table Liste
+Comptabilité/Taux de F_TAXE Tous les taux de taxe
+taxes
+Comptabilité/Codes F_JOURNAUX Tous les journaux
+journaux
+Tous les journaux actifs ou mis en sommeil
+Comptabilité/ F_MODELEG Tous les modèles de grille
+Modèles/Modèles de
+grille
+Comptabilité/ F_MODELER Tous les modèles de règlement
+Modèles/Modèles de
+règlement
+Type de remise F_TREMISES Tous les types de remise
+Montants F_MONTANT Tous les montants
+Libellé F_LIBELLE Tous les libellés
+Menu Traitement
+Fonction Table Liste
+Encaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des remises
+Etape et toutes les échéances
+chèques
+Encaissement/Ges- F_ECHEANCES Toutes les échéances
+tion des versements
+Etape et toutes les échéances
+espèces
+Encaissement/Ges- F_ECHEANCES Toutes les échéances
+tion des remises des
+Etape et toutes les échéances
+cartes bancaires
+Encaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des prélève-
+Etape et toutes les échéances
+ments émis
+Encaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des LCR-BOR
+Etape et toutes les échéances
+Encaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des autres
+Etape et toutes les échéances
+encaissements
+Encaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des remises de
+Etape et toutes les échéances
+chèques pré-datés
+(Portugal)
+Décaissement/ F_ECHEANCES Toutes les étapes et toutes les échéances
+Chèques payés
+Etape et toutes les échéances
+© 2020 Sage 89
+=== PAGE 90 ===
+Fonctionnalités spécifiques des applications Sage 100c Premium
+Fonction Table Liste
+Décaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des virements
+Etape et toutes les échéances
+émis
+Décaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des virements
+Etape et toutes les échéances
+internationaux
+Décaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des LCR-BOR
+Etape et toutes les échéances
+Décaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des autres
+Etape et toutes les échéances
+décaissements
+Décaissement/Ges- F_ECHEANCES Toutes les étapes et toutes les échéances
+tion des chèques pré-
+Etape et toutes les échéances
+datés payés (Portu-
+gal)
+Relevé de LCR à F_RELEVELCR Tous les relevés de LCR à payer
+payer
+Relevés non transmis ou Réponses effectuées
+Gestion des lignes de F_LRELEVELCR Tous les mouvements de relevé
+relevé des LCR
+Lots préétablis/Pré- F_LOTS Tous les lots de Prélèvements émis
+lèvements émis
+Lots préétablis/Vire- F_LOTS Tous les lots de Virements émis
+ments émis
+Gestion des extraits F_EXTRAIT Tous les extraits bancaires
+bancaires
+Gestion des lignes F_EEXTRAIT Toutes les lignes d'extraits
+d'extraits bancaires
+© 2020 Sage 100
+=== PAGE 91 ===
+Connexion et erreurs fréquentes
+Connexion et erreurs fréquentes
+La lecture de ce chapitre est essentielle avant d'ouvrir ou de créer des bases Sage100cloud Premium.
+Aussi nous vous invitons à le lire attentivement.
+Connexion
+Les applications Sage100cloud Premium utilisent une connexion Microsoft SQL Server avec authentification
+Windows.
+C'est un mode de connexion sécurisé qui nécessite que le poste client soit connecté à un réseau Windows,
+et que l'utilisateur possède des droits d'accès sur la base de données Microsoft SQL Server.
+Il faut de plus, comme indiqué dans le chapitre Installation, que Microsoft SQL Server 2017 soit installé sur
+un Serveur Windows appartenant au même domaine Windows que les postes clients devant se connecter
+à l'instance SQL Server.
+Vous trouverez ci-dessous les prérequis nécessaires pour se connecter aux bases de données de
+Sage100cloud Premium.
+1 . Connexion au domaine Windows où se trouve le Serveur SQL 2017.
+2 . Droits sur les bases de données de Sage 100cloud Premium.
+Ces deux points sont détaillés ci-dessous.
+Connexion au domaine Windows
+Les postes clients souhaitant accéder aux bases Sage100cloud Premium doivent se connecter sur le
+même domaine Windows que celui sur lequel se trouve le Serveur SQL 20012.
+Postes Clients Windows
+Sur les postes clients Windows, sélectionnez le domaine Windows lors de l'entrée du login.
+Si vous ne pouvez accéder au domaine Windows, contactez votre administrateur réseau pour connaître
+le paramétrage à mettre en place pour démarrer une session sur le domaine.
+Création d'utilisateurs sous Microsoft SQL Server 2017
+Pour l'ouverture et l'exploitation des bases de données Sage 100cloud Premium depuis les applications
+Sage100cloud Premium, il est nécessaire que les utilisateurs Windows des postes clients soient au
+minimum membres du rôle Public et SAGE_USER sur les bases de données SQL sur lesquelles ils doivent
+accéder.
+De plus, concernant les opérations de création et de conversion de bases de données, il est nécessaire
+que les utilisateurs soient membre des rôles serveur suivants :
+• Public,
+• Sysadmin.
+© 2020 Sage 101
+=== PAGE 92 ===
+Connexion et erreurs fréquentes
+Cette procédure d'attribution de rôles doit être réalisée par votre administrateur Réseau (ou SQL) à partir
+des outils fournis avec Microsoft SQL Server 2017 (SQL Server Management Studio par exemple).
+La procédure de création et d'attribution de droits aux utilisateurs est détaillée sous le para-
+graphe Création de compte et droits d'accès aux bases de données Sage 100cloud Premium.
+Erreurs les plus fréquentes et solutions
+Vous trouverez ci-dessous les erreurs les plus fréquentes lors de l'ouverture des bases Sage100cloud
+Premium.
+Echec de connexion à la base de données
+Cette erreur peut se produire pour différentes raisons.
+Vous trouverez ci-dessous différents cas possibles avec leurs solutions. Les 4 premiers problèmes sont les
+plus fréquents.
+Problème Solution
+Vous ne vous êtes pas logué sur le Domaine Vérifiez bien que vous avez ouvert une session sur le
+Windows où se trouve le Serveur SQL. domaine Windows.
+Vous n'avez pas les droits sur la base Demandez à votre administrateur Réseau de vous donner
+Microsoft SQL Server. les droits sur la base de données Sage 100cloud Premium.
+Microsoft SQL Native Client n'est pas Ré-exécutez l'installation de Sage 100cloud poste Client.
+installé ou mal installé sur votre poste.
+Vous effectuez un glisser déplacer de Ouvrez le fichier via l'application. Il faut en effet, lors de la
+votre fichier Sage100cloud Premium création, que la base soit créée avec un nom DOS (8 carac-
+vers l'application correspondante, avec tères maximum selon les règles correspondantes).
+un nom ayant plus de 8 caractères.
+La base de données Microsoft SQL Ser- 1 . Vérifiez avec votre administrateur que la base SQL
+ver n'a pas été trouvée. n'a pas été supprimée. Si c'est le cas demandez-lui de
+restaurer une ancienne version de votre base SQL.
+2 . Vérifiez le nom de votre fichier comptable, commer-
+cial, immobilisation, moyen de paiement/trésorerie.
+Le nom du fichier sans l'extension doit correspondre à
+un nom de base de données existant.
+Il se peut que vous ayez renommé votre fichier par erreur,
+auquel cas redonnez lui le nom d'origine.
+La section 'ServeurSQL' de votre fichier Editez votre fichier via un éditeur de texte tel que
+comptable, commercial, immobilisa- WORDPAD et renseignez le bon Serveur SQL.
+tion, moyen de paiement/trésorerie
+ne correspond pas à un serveur SQL
+existant ou n’est pas le bon Serveur
+SQL.
+© 2020 Sage 102
+=== PAGE 93 ===
+Connexion et erreurs fréquentes
+Erreur -6706
+Problème Solution
+Vous avez les messages suivants : Microsoft SQL Native Client n'est pas installé sur le poste.
+• Erreur inconnue [800A0E7A] ! Exécutez l'installation de Sage 100cloud poste
+Client.
+• Erreur inconnue [-6706] !
+Erreur 5
+Problème Solution
+Une erreur 5 (Accès refusé) est surve- Quittez les applications Sage 100cloud Premium et attendez
+nue lors de l'exécution de cette opéra- que le service soit redémarré par votre administrateur
+tion de service sur le service MSSQL réseau.
+Server.
+Une personne essaie d'arrêter le ser-
+vice SQL sur la machine Serveur alors
+que des utilisateurs sont encore
+connectés à une base SQL.
+© 2020 Sage 103
+=== PAGE 94 ===
+Annexes
+Annexes
+Vous trouverez ci-après des éléments techniques relatifs à la structure des bases Sage100cloud Premium
+ainsi que sur le fonctionnement des applications.
+Tables et procédures système Sage
+Base de données Master
+Procédures stockées étendues
+A l'installation de Sage100cloud Premium, des procédures stockées étendues sont créées dans la base
+Master du serveur Microsoft SQL.
+La liste des procédures stockées étendues est la suivante :
+• xp_CBLockFile
+• xp_CBUnlockFile
+• xp_CBLockRecord
+• xp_CBUnLockRecord
+• xp_CBLockVrac
+• xp_CBUnLockVrac
+• xp_CBIsFileLock
+• xp_CBIsRecordLock
+• xp_CBIsVracLock
+• xp_CBPurgeLock
+Ces procédures stockées étendues utilisent la librairie Cbsqlxp.dll installée dans le répertoire Win-
+dows\System32 de votre poste serveur.
+Messages d'erreurs
+Certains messages utilisés dans les applications Sage100cloud Premium sont ajoutés dans la liste des
+messages Microsoft SQL Server.
+© 2020 Sage 104
+=== PAGE 95 ===
+Annexes
+Les messages d'erreurs Sage sont écrits du numéro 80000 jusqu'au numéro 80011. Bien que cela soit peu
+probable, l'écriture de ces messages pourrait effacer des messages déjà existants autres que ceux de
+Microsoft SQL Server.
+EVITEZ donc dans vos développements de créer des messages Microsoft SQL Server dans
+cette plage d'adresse 80000 à 80011.
+Bases Sage 100cloud Premium
+Les bases de données Sage100cloud Premium utilisent des tables systèmes internes. Elles servent entre
+autre, pour la notification entre les applications (ajout, modification, suppression d'enregistrements),
+envoi de messages, etc.
+Ces tables, ne sont pas visibles depuis les applications Supporia, Sage Objets métiers et Sage Driver
+ODBC,.
+Ces tables commencent toutes par 'cb' et sont les suivantes :
+Problème Solution
+cbMessage Table contenant les messages à destination des applications Sage 100cloud
+Premium.
+cbNotification Table contenant les notifications à destination des applications (pour mise à
+jour des listes).
+cbRegFile Table contenant les identifiants des applications désirant être notifiées lors
+de la modification d'une table spécifique.
+cbRegMessage Table contenant les identifiants des applications acceptant de recevoir des
+messages.
+cbRegUser Table contenant les identifiants des applications désirant être notifiées lors
+de nouvelles connexions / déconnexions.
+cbSysTable Table contenant la description des types de base Sage 100cloud contenus
+dans la base de données SQL Server.
+cbUserSession Table contenant les identifiants des postes et applications connectés à la
+base de données.
+cbSysAbonnement Table contenant le paramétrage défini pour la synchronisation comptable.
+cbSysLogRecord Table contenant les données de la synchronisation comptable.
+cbSysSite Table contenant le paramétrage défini pour la communication de site à site.
+cbSysLibre Table de définition des informations libres.
+cbSysLink Table des bases liées.
+L'ajout, la modification ou la suppression d'enregistrements dans ces tables, ainsi que la manipulation des
+verrous sur les tables et enregistrements, s'effectuent par l'exécution de procédures stockées. Ces
+procédures sont décrites ci-après :
+© 2020 Sage 105
+=== PAGE 96 ===
+Annexes
+Procédures stockées
+CB_Connect
+Paramètres en Entrée
+CB_Type varchar(4) : Type de base
+Le type de la base peut prendre une des valeurs suivantes :
+• CPTA : Base comptable
+• CIAL : Base Commerciale
+• IMMO : Base Immobilisation
+• TRES : Base Moyen de Paiement
+• FTRS : Base Trésorerie
+Cette procédure doit être exécutée à l'ouverture de l'application. Elle effectue les opérations suivantes :
+• Lance les CB_PurgeXXX
+• Envoie une notification de connexion aux SPID présents dans cbRegUser
+• Inscrit le SPID dans cbUserSession
+CB_Disconnect
+Aucun argument n'est requis.
+Cette procédure est exécutée à la fermeture de l'application. Elle effectue les opérations suivantes :
+• Lance les CB_PurgeXXX
+• Envoie une notification de déconnexion aux SPID présents dans cbRegUser
+CB_IsFileLock
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG')
+• CbType (smallint) : Type de verrou (0,1,2,3) :
+- 0 : Shared (partagé)
+- 1 : Exclusif
+- 2 : Delete (suppression)
+- 3 : Modification
+Paramètres en Sortie
+Retourne un message d'erreur si le fichier est verrouillé
+CB_IsFileLock @cbFile sysname, @cbType smallint, @lRes int OUTPUT
+Cette procédure vérifie si un fichier est verrouillé. Elle est appelée uniquement par les déclencheurs de
+table.
+© 2020 Sage 106
+=== PAGE 97 ===
+Annexes
+CB_IsRecordLock
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG')
+• CbMarq (int) : Marqueur de l'enregistrement
+Paramètres en Sortie
+Retourne un message d'erreur si le fichier est verrouillé
+CB_IsFileLock @cbFile sysname, @cbType smallint, @lRes int OUTPUT
+Cette procédure vérifie si un enregistrement est verrouillé. Elle est appelée uniquement par les déclen-
+cheurs de table.
+CB_IsVracLock
+Paramètres en Entrée
+CbFile (sysname) : Nom du fichier (ex 'P_DEVISE')
+Paramètres en Sortie
+Retourne un message d'erreur si le fichier est verrouillé
+CB_IsVracLock @cbFile sysname, @lRes int
+Cette procédure vérifie si une table paramètre est verrouillée. Elle est appelée uniquement par les dé-
+clencheurs de table.
+CB_LockFile
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG')
+• CbType (smallint) : Type de verrou (0,1,2,3) :
+- 0 : Shared (partagé)
+- 1 : Exclusive
+- 2 : Delete (suppression)
+- 3 : Modification
+Paramètres en Sortie
+Retourne un message d'erreur si le fichier est déjà verrouillé.
+CB_LockFile @cbFile SysName, @cbType Smallint, @lRes int output
+Cette procédure permet de verrouiller une table générale (table F_*).
+© 2020 Sage 107
+=== PAGE 98 ===
+Annexes
+CB_LockRecord
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG')
+• CbType (smallint) : Type de verrou (3,4)
+- 3 : Modification
+- 4 : Read (lecture)
+• CbMarq (int) : Numéro de l'enregistrement à verrouiller
+Paramètres en Sortie
+Retourne un message d'erreur si le fichier est verrouillé.
+CB_LockRecord @cbFile sysname, @cbType smallint, @cbMarq int, @lRes int output
+Cette procédure permet de verrouiller un enregistrement.
+CB_LockVrac
+Paramètres en Entrée
+CbFile (sysname) : Nom du fichier (ex 'P_DEVISE')
+CB_LockVrac @cbFile sysname
+Cette procédure permet de verrouiller une table paramètre (table P_*).
+CB_MaintenanceIndex
+Aucun argument n'est requis.
+CB_MaintenanceIndex
+Cette procédure permet de réindexer les tables de la base de données, ainsi que de mettre à jour les
+statistiques.
+CB_Notify
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG')
+• CbType (smallint) : type de notification (cf. table cbNotification)
+• CbIndMod (smallint) : liste des index modifiés si CbType=5
+• CbMarq (in) : marqueur enregistrement
+© 2020 Sage 108
+=== PAGE 99 ===
+Annexes
+CB_Notify @cbFile sysname, @cbType smallint, @cbIndMod smallint, @cbMarq int
+Cette procédure est utilisée par une application pour notifier les autres applications de la modification
+d'une table, de sa connexion ou de l'envoi d'un message. Pour plus de renseignements nous vous conseil-
+lons de vous référer au chapitre relatif aux notifications.
+CB_PurgeLock
+Aucun argument n'est requis.
+CB_PurgeLock
+Suppression des verrous d'un SPID donné.
+CB_PurgeMessage
+Aucun argument n'est requis.
+CB_PurgeMessage
+Suppression des enregistrements de la table cbMessage pour
+• cbSession = @@SPID et
+• cbSession NOT IN (SELECT spid FROM master..sysprocesses)
+CB_PurgeNotification
+Suppression des enregistrements de la table cbNotification pour
+• cbSession = @@SPID et
+• cbSession NOT IN (SELECT spid FROM master..sysprocesses)
+CB_PurgeRegFile
+Aucun argument n'est requis.
+CB_PurgeRegFile
+Suppression des enregistrements de la table cbRegFile pour
+• cbSession = @@SPID et
+• cbSession NOT IN (SELECT spid FROM master..sysprocesses)
+CB_PurgeRegMessage
+Aucun argument n'est requis
+CB_PurgeRegMessage
+Suppression des enregistrements de la table cbRegMessage pour
+• cbSession = @@SPID et
+• cbSession NOT IN (SELECT spid FROM master..sysprocesses)
+© 2020 Sage 109
+=== PAGE 100 ===
+Annexes
+CB_PurgeRegUser
+Aucun argument n'est requis
+CB_PurgeRegUser
+Suppression des enregistrements de la table cbRegUser pour
+• cbSession = @@SPID et
+• cbSession NOT IN (SELECT spid FROM master..sysprocesses)
+CB_PurgeUserSession
+Aucun argument n'est requis
+CB_PurgeUserSession
+Suppression des enregistrements de la table cbUserSession pour
+• cbSession = @@SPID et
+• cbSession NOT IN (SELECT spid FROM master..sysprocesses)
+CB_RegisterFile
+Paramètres en Entrée
+CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG')
+CB_RegisterFile @cbFile
+Ajout d'enregistrements dans la table cbRegFile.
+CB_RegisterMessage
+Aucun argument n'est requis
+CB_RegisterMessage
+Ajout d'enregistrements dans la table cbRegMessage.
+CB_RegisterUser
+Aucun argument n'est requis
+CB_RegisterUser
+Ajout d'enregistrements dans la table cbRegUser.
+© 2020 Sage 110
+=== PAGE 101 ===
+Annexes
+CB_SendMessage
+Paramètres en Entrée
+• CbUser (smallint) : SPID du destinataire
+• CbMessage (varchar(255) : texte du message
+• CB_SendMessage @cbUser smallint, @cbMessage varchar(255)
+Cette procédure permet d'envoyer un message via l'application (commande Fichier / Configuration sys-
+tème et partage) vers une autre application.
+CB_UnLockFile
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG')
+• CbType (smallint) : Type de verrou (0,1,2,3)
+• CB_UnLockFile @cbFile sysname, @cbType smallint
+Cette procédure permet de « déverrouiller » une table générale (table F_*).
+CB_UnLockRecord
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG')
+• CbType (char(1)) : Type de verrou ('M')
+• CbMarq (in) : Numéro de l'enregistrement à déverrouiller
+• CB_UnLockRecord @cbFile sysname, @cbType char(1), @cbMarq int
+Cette procédure permet de « déverrouiller » un enregistrement.
+CB_UnLockVrac
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'P_DEVISE')
+• CB_UnLockRecord @cbFile sysname, @cbType char(1), @cbMarq int
+Cette procédure permet de « déverrouiller » une table paramètre (table P_*).
+CB_UnRegisterFile
+© 2020 Sage 111
+=== PAGE 102 ===
+Annexes
+Paramètres en Entrée
+• CbFile (sysname) : Nom du fichier (ex 'F_COMPTEG'
+• CB_UnRegisterFile @cbFile sysname
+Supprime des enregistrements dans les tables cbRegFile et cbNotification.
+CB_UnRegisterMessage
+Aucun argument n'est requis
+CB_UnRegisterMessage
+Supprime des enregistrements dans les tables cbRegMessage et cbNotification.
+CB_UnRegisterUser
+Aucun argument n'est requis
+CB_UnRegisterUser
+Supprime des enregistrements dans les tables cbRegUser et cbNotification.
+Procédures stockées, clés et Triggers
+Procédures stockées Sage d'accès aux données
+Dans un objectif d'optimisation des processus des applications Sage 100cloud Premium, toutes les
+opérations de sélection suivant des index ont été écrites sous forme de procédures stockées.
+A chaque index de chaque table (XXX) correspondent 7 procédures stockées qui permettent, suivant les
+champs de l'index, d'accéder aux enregistrements de différentes manières :
+• CB_EqGreaterXXX : Accès à l'enregistrement en >=
+• CB_EqLesserXXX : Accès à l'enregistrement en <=
+• CB_EqualXXX : Accès à l'enregistrement en =
+• CB_GreaterXXX : Accès à l'enregistrement en >
+• CB_LesserXXX : Accès à l'enregistrement en <
+• CB_NextICTXXX : Accès à l'enregistrement suivant (pour cette procédure seul le champ cbMarq de
+type compteur est passé en paramètre)
+• CB_PrevXXX : Accès à l'enregistrement précédent (pour cette procédure seul le champ cbMarq de
+type compteur est passé en paramètre)
+L'ordre de tri correspond à l'ordre des champs de l'index. Ainsi si un index est composé des champs ch1,
+ch2 et ch3 l'ordre de tri s'effectuera en premier sur le champ ch1 puis sur le champ ch2 et enfin sur le
+champ ch3.
+Vous trouverez ci-dessous un exemple de procédure d'accès à un enregistrement pour un accès en supé-
+rieur ou égal avec l'index ICT_CANUM de la table F_COMPTET composé des trois champs :
+• N_Analytique (smallint)
+• cbCA_Num (varbinary)
+• cbCT_Num (varbinary)
+© 2020 Sage 112
+=== PAGE 103 ===
+Annexes
+Exemple :
+Procédures stockées Système
+• CB_UpdateLinkCPTACIAL
+• CB_UpdateLinkCPTAIMMO
+• CB_UpdateLinkCIALCPTA
+• CB_UpdateLinkIMMOCPTA
+• CB_UpdateLinkTRESCPTA
+• CB_UpdateLinkFTRSCPTA
+Ces procédures permettent de créer des contraintes et des déclencheurs inter bases.
+Par exemple, CB_UpdateLinkCPTACIAL, créée des contraintes et déclencheurs sur les tables de la base
+comptable. Les contrôles réalisés par ces éléments s'appuient sur les données de la base commerciale
+stockée dans la même base que la base comptable.
+Les déclencheurs (Triggers)
+Pour chaque table des bases de données Sage100cloud Premium, différents types de déclencheurs sont
+implémentés.
+Les déclencheurs sont des composants qui s'exécutent à chaque opération d'écriture (ajout, modification
+ou suppression) sur les enregistrements d'une table. Ils permettent ainsi d'assurer la cohérence et
+l'intégrité des bases de données Sage100cloud Premium.
+Lorsqu'une contrainte d'intégrité n'est pas respectée, alors les transactions devant ajouter, modifier ou
+supprimer les données sont annulées (Rollback) et un message d'erreur est retourné.
+Toutefois, tous les contrôles de cohérence ne sont pas intégrés dans ces déclencheurs. Le domaine de
+validité des champs n'est par exemple pas contrôlé par les déclencheurs, ainsi il serait possible d'insérer
+des incohérences dans la base en écrivant les données en natif SQL. C'est pourquoi il est vivement consei- l
+© 2020 Sage 113
+=== PAGE 104 ===
+Annexes
+lé, que tous les développements spécifiques en écriture sur les bases SQL, utilisent soit Sage Driver
+ODBC, soit Sage Objets Métiers.
+La liste des déclencheurs implémentés sur les tables est détaillée ci-après :
+Triggers CBase
+TG_CBINS_XXX
+C'est un trigger d'insertion qui effectue les opérations suivantes :
+• Test des locks du fichier et mise à jour des champs calculés CBase,
+• Allocation des champs de type compteur s'ils sont égaux à 0 ou à null
+TG_CBUPD_XXX
+C'est un trigger en modification qui effectue les opérations suivantes.
+• Test si l'enregistrement et le fichier sont lockés,
+• Mise à jour des champs calculés Cbase,
+• Test des champs modifiés pour les champs faisant parti d'un index compteur ou non modifiable,
+• Affectation du champ cbModification.
+TG_CBDEL_XXX
+C'est un trigger en suppression qui effectue les opérations suivantes.
+• Test si l'enregistrement et le fichier sont lockés.
+Triggers Applicatifs
+Les tests de cohérence et d'intégrité propres à chaque application Sage 100cloud Premium sont appelés
+Triggers applicatifs dont voici la liste :
+• TG_INS_XXX (trigger en insertion),
+• TG_DEL_XXX (trigger en suppression),
+• TG_UPD_XXX (trigger en modification).
+Contraintes d'intégrité et index
+L'intégrité et la cohérence des bases Sage 100cloud Premium est d'abord assurée par les Triggers que
+nous avons vus ci- dessus.
+Cependant gérer les relations entre les tables en Transact SQL dans les triggers est pénalisant en
+performance. Pour cela, à chaque table sont associées des contraintes de clés primaires et étrangères.
+© 2020 Sage 114
+=== PAGE 105 ===
+Annexes
+Clés Primaires et index
+Pour chaque table XXX (ex F_ARTICLE) est associée
+• Une clé primaire sur le champ cbMarq : PK_CBMARQ_XXX
+• Un index par index CBase avec le nom de l'index CBase et cbMarq en dernière position.
+Contraintes CBase
+Une contrainte unique par index unique ou compteur : UK_XXX (avec XXX = nom de l'index)
+Contrainte Not Null pour les champs NotNull
+Contraintes Application
+Contrainte unique UKA_XXX_YYY (avec XXX=nom du fichier, YYY= nom du champ contrainte)
+Contrainte de clé étrangère FKA_XXX_YYY (avec XXX = nom du fichier, YYY= nom du champ contrainte)
+Exemple :
+FKA_F_DOCLIGNE_AR_REF : contrainte clé étrangère entre F_DOCLIGNE et F_ARTICLE sur le champ
+AR_REF
+Mécanismes de notification
+Principes généraux de notification
+L'utilisation des applications Sage 100 c Premium en accès Client/Serveur nécessite que les applications
+soient notifiées de tout changement de certaines activités relatives à la base de données, telles que :
+• Modification d'une table,
+• Connexion / Déconnexion d'une application Sage 100cloud Premium,
+• Présence d'un message à leur attention.
+Pour ce faire, à la fréquence définie par le paramètre Délai de réaffichage (par défaut 5 secondes),
+chaque application Sage 100cloud Premium interroge la table cbNotification pour déterminer les
+événements qui lui sont envoyés par les autres applications.
+Chaque application Sage 100cloud Premium, connectée à la base, peut, si elle le désire, recevoir des
+notifications. Pour ce faire chaque application devra s'inscrire dans les tables suivantes :
+• cbRegFile si elle désire être notifiée de la modification d'une table précise,
+• cbRegUser si elle désire être notifiée de la connexion / déconnexion d'une application Sage
+100cloud Premium,
+• cbRegMessage si elle désire pouvoir recevoir des messages par l'intermédiaire des procédures
+stockées suivantes :
+- CB_RegisterFile,
+- CB_PurgeRegUser,
+- CB_RegisterMessage.
+© 2020 Sage 115
+=== PAGE 106 ===
+Annexes
+Pour annuler ces demandes, l'application pourra utiliser l'une des procédures stockées suivantes :
+• CB_UnRegisterFile,
+• CB_UnPurgeRegUser,
+• CB_UnRegisterMessage.
+Les notifications sont écrites dans la table cbNotification par la fonction CB_Notify.
+Les messages sont écrits dans la table cbMessage par la procédure stockée CB_SendMessage.
+A chaque application accédant à une base de données correspond un SPID (ID de processus serveur
+du processus utilisateur en cours) unique attribué par Microsoft SQL Server qui est utilisé dans
+les différentes tables et procédure stockées.
+Exemple d'utilisation des notifications
+Envoi de message
+L'envoi d'un message d'une application Sage 100cloud Comptabilité Premium vers une application
+Sage 100cloud Gestion Commerciale Premium :
+(1) La comptabilité essaie d'envoyer un message à la gestion commerciale (SPID=9) par la commande :
+CB_SendMessage 9, 'message de test'
+Cette procédure vérifie si la gestion commerciale accepte les messages en vérifiant la présence du SPID=9
+dans la table cbRegMessage sinon la commande s'arrête.
+© 2020 Sage 116
+=== PAGE 107 ===
+Annexes
+La procédure écrit ensuite le message dans la table cbMessage, puis écrit une notification de présence
+de message pour le SPID=9 dans la table cbNotification.
+(2) Au maximum 5 secondes plus tard la gestion commerciale interroge la table cbNotification et trouve
+une notification de message par la requête :
+SELECT TOP 1 * FROM cbNotification WHERE cbSession = @@SPID
+La notification est alors détruite par la requête suivante :
+DELETE FROM cbNotification WHERE cbModif = 28
+(3) La gestion commerciale interroge la table cbMessage et trouve le message envoyé par la comptabilité
+par la requête : SELECT TOP 1 * FROM cbMessage WHERE cbSession = @@SPID
+Le message est alors détruit par la requête suivante :
+DELETE FROM cbMessage WHERE cbModif = 6
+Modification de table
+Trois programmes Sage 100cloud Comptabilité Premium visualisent simultanément les comptes tiers.
+Sage 100cloud Comptabilité Premium de SPID égale à 13 modifie l'intitulé d'un compte tiers.
+L'exemple suivant présente donc l'envoie de notifications de modification de table de la Comptabilité
+(SPID=13) vers les deux autres Comptabilités (SPID=9 et SPID=12) :
+(1) La comptabilité (SPID=13) essaie d'envoyer une notification de modification de table par la
+procédure :
+CB_Notify 'F_COMPTET', 5, 0, 5
+Cette procédure recherche dans la table cbRegFile les SPID des autres applications désirant être notifiées
+de modification de la table des comptes tiers. Elle trouve donc les SPID 9 et 12 et leur envoie une
+notification de modification de table dans la table cbNotification
+(2) Au maximum du délai de réaffichage (par défaut 5 secondes), la Comptabilité 100 de SPID=9 interroge
+la table des notifications par la requête :
+© 2020 Sage 117
+=== PAGE 108 ===
+Annexes
+SELECT TOP 1 * FROM cbNotification WHERE cbSession = @@SPID
+La notification est alors détruite par la requête suivante :
+DELETE FROM cbNotification WHERE cbModif = 43
+L'application procède alors au rafraîchissement de sa fenêtre de visualisation des comptes tiers
+(3) Idem (2) pour la Comptabilité de SPID=12
+Utilisation des verrous
+Les applications Sage 100cloud Premium utilisent des mécanismes de verrouillage propriétaires (« Locks
+réseaux ») avec des verrous de type fichier et enregistrements.
+Ces verrous dans cette version Microsoft SQL Server sont gérés via des procédures stockées (CB_LockFile,
+CB_UnlockFile, CB_LockRecord, et CB_UnLockRecord). Les différents types de verrous sont décrits ci-des-
+sous.
+Différents types de verrous
+Verrou partagé
+Ce verrou est un verrou partageable, il permet aux autres de lire mais leur interdit toute modification en
+écriture (ajout, suppression, modifications). S'il y a déjà un verrou en exclusif, il y a attente.
+Verrou en exclusif
+Ce verrou est un verrou exclusif, il interdit aux autres utilisateurs toutes actions. S'il y a déjà un verrou
+partagé, il y a attente.
+Verrou en destruction
+Ce verrou interdit aux autres utilisateurs de faire des suppressions.
+Verrou en modification
+Ce verrou interdit toute modification. Il est interdit s'il y a déjà un verrou en modification.
+© 2020 Sage 118
+=== PAGE 109 ===
+Annexes
+Les verrous des fichiers et des enregistrements
+Les verrous décrits ci-dessus sont utilisés pour verrouiller les fichiers et les enregistrements. Ces verrous
+(destruction et modification) sont utilisés fréquemment dans les applications Sage100cloud Premium afin
+de gérer les accès concurrents en accès client/serveur.
+Les procédures stockées indiquées ci-dessous sont décrites dans le chapitre consacré aux procédures
+stockées.
+Les verrous partagés et en exclusifs posés par les applications Sage 100cloud Premium ne sont
+pas de réels verrous SQL, il s'agit d'un mécanisme de verrouillage interne. Ainsi, pour que des
+développements spécifiques puissent interagir avec les applications Sage100cloud Premium
+en tenant compte des verrous posés par les applications, il sera nécessaire d'utiliser la
+procédure CB_LockFile.
+Verrous sur les fichiers
+Ajout d'un verrou fichier
+Pour verrouiller un fichier, utiliser la procédure stockée :
+CB_LockFile.
+Suppression d'un verrou fichier
+Pour supprimer un verrou dans un fichier, utilisez la procédure stockée :
+CB_UnLockFile
+Verrous sur les enregistrements
+Ajout d'un verrou sur un enregistrement
+Pour verrouiller un enregistrement d'un fichier, utilisez la procédure stockée :
+CB_LockRecord
+Suppression d'un verrou sur un enregistrement
+Pour supprimer un verrou d'un enregistrement, utilisez la procédure stockée :
+CB_UnLockRecord
+© 2020 Sage 119
+=== PAGE 110 ===
+Annexes
+Fonctionnement de ces verrous
+Comme décrit ci-dessus, vous pouvez verrouiller des enregistrements d'un fichier ou tout le fichier. En
+accès client/serveur ces verrous ont des implications au niveau fonctionnel dans les applications Sage
+100cloud Premium, lors de l'insertion, la modification ou la suppression d'enregistrements.
+Insertion
+Si le fichier est verrouillé en Exclusif alors message : Cet élément est en cours d'utilisation
+Si le fichier est verrouillé en Partagé alors message : Cet élément est en cours d'utilisation
+Si le fichier est verrouillé en Modification alors message : Cet élément est en cours d'utilisation
+Modification
+Si le fichier est verrouillé en Modification alors message : Cet élément est en cours d'utilisation
+Si le fichier est verrouillé en Partagé alors message : Cet élément est en cours d'utilisation Si
+le fichier est verrouillé en Exclusif alors message : Cet élément est en cours d'utilisation Si
+l'enregistrement est verrouillé alors message : Cet élément est en cours d'utilisation
+Suppression
+Si le fichier est verrouillé en Modification alors message : Cet élément est en cours d'utilisation
+Si le fichier est verrouillé en Suppression alors message : Suppression impossible
+Si le fichier est verrouillé en Partagé alors message : Cet élément est en cours d'utilisation Si
+le fichier est verrouillé en Exclusif alors message : Cet élément est en cours d'utilisation Si
+l'enregistrement est verrouillé alors message : Cet élément est en cours d'utilisation
+© 2020 Sage 120
+=== PAGE 111 ===
+Annexes
+Gestion des verrous dans les applications Sage 100cloud Premium
+Listes (Verrous en suppression)
+Suppression impossible via un autre poste.
+Message : Suppression impossible
+Insertion ou modification
+Table Maître
+• Sans Test de cohérence
+Insertion
+• Avec Tests d'unicité
+Exemple :
+Insertion dans le fichier F_ENUMSTAT
+Verrouillage du fichier en Exclusif
+Test d'existence (Intitulé)
+Insertion
+Déverrouillage du Fichier en Exclusif
+• Avec Tests d'existence (lien avec d'autres fichiers)
+Exemple :
+Insertion dans le fichier F_COMPTEG avec le lien vers le fichier F_COMPTER
+Verrouillage du fichier en Exclusif (F_COMPTEG)
+Verrouillage partagé du fichier lié (F_COMPTER)
+Test d'existence (CR_Num de F_COMPTER)
+Insertion
+Déverrouillage partagé du fichier (F_COMPTER)
+Déverrouillage du fichier en Exclusif (F_COMPTEG)
+Le verrou partagé sur F_COMPTER est posé uniquement pour éviter que l'on supprime le
+Compte Reporting entre le test d'existence et l'insertion.
+Table Fils
+Exemple :
+Insertion dans F_REGLEMENTT (Fichier FILS de F_COMPTET)
+Verrouillage de l'enregistrement du Fichier Maître en modification (F_COMPTET)
+Ensuite même principe que pour le fichier Maître appliqué à la table FILS (F_REGLEMENTT)
+Suppression du verrou de l'enregistrement du fichier Maître en modification.
+© 2020 Sage 121
+=== PAGE 112 ===
+Annexes
+Supprimer tous les verrous suite à un « plantage » d'application
+Si une application connectée à une base est interrompue brutalement elle n'aura pas la possibilité de
+supprimer les verrous qu'elle aura pu poser. Il est donc nécessaire de supprimer manuellement ces
+verrous.
+Il faut :
+1 . déconnecter toutes les applications connectées aux bases Sage 100cloud Premium,
+2 . puis exécuter la commande dbcc cbsqlxp (free) depuis, par exemple, SQL Server Management
+Studio.
+Une fois ces deux procédures effectuées vos applications pourront alors se connecter à nouveau aux bases
+de données.
+Lecture et écriture dans les tables Sage
+Vous trouverez dans ce chapitre des conseils et exemples d'écriture dans les bases de données de Sage
+100cloud Premium.
+Ils vous seront utiles pour des développements externes.
+Conseils
+Lecture
+Si vous souhaitez n'effectuer que des opérations de lecture sur les bases Sage 100cloud Premium, vous
+pouvez accéder directement aux données via Sage driver ODBC ou via le provider OLEDB de SQL Server.
+Fonctions avancées
+Le montant HT et le montant TTC sont stockés au niveau de chaque ligne de document de Sage 100cloud
+Gestion commerciale Premium.
+Cela vous permet de réaliser des états statistiques de gestion commerciale et notamment, de calculer
+des chiffres d'affaire, marge ou autres directement en mode natif SQL Server.
+Certains états sont intégrés en mode natif SQL, tel que l'état Statistiques clients en mode Rapide
+simplifié par exemple. Afin de connaître les méthodes de calculs des indicateurs affichés dans ces états,
+utilisez le générateur de profils de SQL Server pour créer une trace afin de visualiser la requête SQL
+générée. Celle-ci pourra ensuite être adaptée suivant vos besoins.
+Ecriture via les kits d'ouverture
+L'écriture dans les bases Sage100cloud Premium est théoriquement possible via un outil de
+développement externe.
+© 2020 Sage 122
+=== PAGE 113 ===
+Annexes
+Cependant, il est fortement conseillé d'écrire dans les bases et utilisant Sage Objets Métiers ou Sage
+Driver ODBC et non directement. En effet, ces kits d'ouverture effectuent des contrôles de cohérence
+et d'intégrité qui ne sont pas inclus dans les triggers ou clés étrangères des bases Sage 100cloud.
+De plus des opérations comme la mise à jour des stocks en saisie de lignes de documents, sont gérées
+automatiquement par Sage Objets Métiers et Sage 100 ODBC. Ceci serait très compliqué à réaliser par
+vous-même.
+L'écriture dans les bases en utilisant Sage Objets Métiers ou Sage Driver ODBC vous permettra donc de
+sécuriser vos développements externes. Dans le cas contraire, vous pourriez rencontrer des
+dysfonctionnements applicatifs, suite à des problèmes de cohérence des bases Sage.
+Administration et recommandations
+Optimisation et réorganisation de la base
+Il est fortement conseillé de lancer régulièrement le traitement Réorganisation de la base relationnelle
+du logiciel de Maintenance après avoir effectué des saisies d'écriture.
+Ce traitement permet en effet de réindexer les tables de votre base et de mettre à jour les statistiques.
+SQL Server se sert en effet des statistiques collectées pour choisir le meilleur plan d'exécution d'une
+requête et de ce fait avoir des statistiques régulièrement à jour vous permet d'avoir toujours des
+performances optimales.
+La fréquence de réorganisation de la base est à définir en fonction du volume d'écritures saisies et des
+performances, mais en moyenne lancez ce traitement au moins 1 à 2 fois par semaine.
+Développements externes et options SQL
+Sage100cloud Premium utilise des index sur des champs calculés. Ces champs calculés n'existaient pas
+dans les anciennes versions.
+L'utilisation de ces champs impose que certaines options soient activées, notamment pour la création
+d'index, les commandes DBCC et les commandes de mise à jour (insert, update, delete).
+Vous trouverez ci-dessous toutes les options et commandes nécessaires à l'utilisation des index sur les
+champs calculés de Sage 100cloud Premium.
+Options
+La création et la manipulation d'index sur des colonnes calculées nécessite que les options SET ARITHA-
+BORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER, ANSI_NULLS, ANSI_PADDING et ANSI_WARNINGS
+soient activées (valeur ON). L'option NUMERIC_ROUNDABORT doit être désactivée (OFF).
+Si l'une de ces options ne comporte pas la valeur requise, les ordres tels que INSERT, UPDATE, DELETE,
+CREATE INDEX sur les tables comportant des index sur des colonnes calculées échouent avec un message
+d'erreur tel que :
+« INSERT a échoué car les options suivantes comportent des paramètres incorrects : ARITHABORT,
+QUOTED_IDENTIFIER »
+© 2020 Sage 123
+=== PAGE 114 ===
+Annexes
+Ordres SQL relatifs aux index
+Les options citées ci-dessus sont nécessaires pour toutes manipulations d'index sur des colonnes
+calculées, à savoir :
+• CREATE INDEX,
+• Opérations de mise à jour : INSERT, DELETE, UPDATE,
+• Opérations sur les index : ALTER INDEX...
+Paramétrage de ces options
+SQL Server permet de paramétrer ces options à l'aide de plusieurs commandes :
+• Commande 'ALTER DATABASE' : définition de paramètres pour la base de données en cours et
+valables pour toutes les sessions.
+• SET : définition d'options pour la session SQL en cours.
+Commande « ALTER DATABASE »
+Syntaxe : ALTER DATABASE [Base_de_données] SET [paramètre] [valeur].
+Commande à exécuter :
+ALTER DATABASE [Base_de_données] SET
+ARITHABORT ON,
+CONCAT_NULL_YIELDS_NULL ON,
+QUOTED_IDENTIFIER ON,
+ANSI_NULLS ON,
+ANSI_PADDING ON,
+ANSI_WARNINGS ON,
+NUMERIC_ROUNDABORT OFF
+GO
+© 2020 Sage 124
+=== PAGE 115 ===
+Annexes
+Pour visualiser les valeurs affectées aux paramètres ci-dessus, il convient d'interroger la vue
+système sys.databases pour sélectionner les champs correspondants à ces paramètres pour la
+base de données souhaitée :
+SELECT is_arithabort_on,
+is_concat_null_yields_null_on,
+is_quoted_identifier_on,
+is_ansi_nulls_on,
+is_ansi_padding_on,
+is_ansi_warnings_on,
+is_numeric_roundabort_on
+FROM sys.databases WHERE name='Base_de_données'
+Lorsque l'option est activée, le champ correspondant à l'option contiendra la valeur 1.
+Utilisation de la commande SET
+La commande SET permet de définir les options pour la session en cours. C'est le principe utilisé pour
+Sage 100cloud Premium à chaque ouverture de base avec les paramètres décrits ci-dessous.
+Pour toutes les opérations sur les index sur des champs calculés, il convient pour chaque session
+utilisateur de lancer les ordres suivants avant d'exécuter toute opération sur ces index.
+SET ANSI_PADDING, ANSI_WARNINGS, CONCAT_NULL_YIELDS_NULL, ARITHABORT, QUOTED_IDENTIFIER,
+ANSI_NULLS on
+et
+SET NUMERIC_ROUNDABORT off
+Exemple 1
+Création de l'index IDX_ABREGE sur la table F_BANQUE
+SET ANSI_PADDING, ANSI_WARNINGS, CONCAT_NULL_YIELDS_NULL, ARITHABORT, QUOTED_IDENTIFIER,
+ANSI_NULLS on
+SET NUMERIC_ROUNDABORT off
+CREATE INDEX IDX_ABREGE ON F_BANQUE(cbBQ_Abrege)
+Ce principe est valable même au niveau programmation, si vous utilisez par exemple les ADO (ActiveX
+Data Objects) pour insérer un élément dans une table comme dans l'exemple suivant :
+Exemple 2
+Insertion dans une table via les ADO en VB
+Dim oConn As New ADODB.Connection
+Dim sConnect As String
+© 2020 Sage 125
+=== PAGE 116 ===
+Annexes
+Dim SQL As String
+sConnect="Provider='sqloledb';Data Source='DEVLIGNE100';" & _
+"Initial Catalog='TEST2';Integrated Security='SSPI';"
+oConn.Open sConnect
+SQL = "set
+ANSI_PADDING,ANSI_WARNINGS,CONCAT_NULL_YIELDS_NULL,ARITHABORT, QUOTED_IDENTIFIER,ANSI_-
+NULLS on "
+oConn.Execute SQL
+SQL = "set NUMERIC_ROUNDABORT off"
+oConn.Execute SQL
+SQL = "INSERT INTO …"
+oConn.Execute SQL
+Plan de maintenance
+Ce chapitre vous donne toutes les informations nécessaires à l'utilisation du plan de maintenance avec
+les bases Sage100cloud Premium, ainsi que des solutions techniques pour ces différents cas.
+Erreur d'exécution du plan de maintenance
+Sous SQL Server, l'exécution d'un plan de maintenance sur les bases de données Sage100cloud Premium
+échoue avec le message d'erreur suivant :
+« Microsoft SQL-DMO (ODBC SQLState : 42000)] Erreur 1934 : [Microsoft][ODBC SQL Server Dri-
+ver][SQL Server]DBCC a échoué car les options SET suivantes comportent des paramètres
+incorrects : 'QUOTED_IDENTIFIER' »
+Cette erreur est liée à l'utilisation d'index sur des champs calculés et se reproduit quelle que soit la base
+de données utilisée (base Sage ou non Sage), même si toutes les options sont bien positionnées.
+Options requises pour les champs calculés
+Certaines options doivent être en effet validées avant toute manipulation sur des champs calculés.
+Les informations suivantes se trouvent dans la documentation en ligne de SQL Server sous la commande
+SET :
+« Lors de la création et de la manipulation d'index sur des colonnes calculées ou des vues indexées, les
+options SET ARITHABORT, CONCAT_NULL_YIELDS_NULL, QUOTED_IDENTIFIER, ANSI_NULLS, ANSI_PADDING
+et ANSI_WARNINGS doivent être activées (valeur ON). L'option NUMERIC_ROUNDABORT doit être désactivée
+(OFF).
+Si l'une de ces options ne comporte pas la valeur requise, les actions INSERT, UPDATE et DELETE sur les
+vues indexées ou les tables comportant des index dans des colonnes calculées échouent. SQL Server génère
+une erreur et affiche la liste des options aux valeurs incorrectes. Par ailleurs, SQL Server traite les
+instructions SELECT sur ces tables ou vues indexées comme si les index sur les colonnes calculées ou sur
+les vues n'existaient pas ».
+© 2020 Sage 126
+=== PAGE 117 ===
+Annexes
+Plan de maintenance
+SQL Server permet de créer un plan de maintenance de façon simple et rapide via un assistant dans SQL
+Server Management Studio.
+Il permet entre autres de :
+• Réorganiser les pages d'index et les données,
+• Mettre à jour les statistiques,
+• Vérifier l'intégrité de la base de données,
+• Sauvegarder la base de données dans le cadre du plan de maintenance.
+Cet assistant crée alors plusieurs travaux ayant chacun une fonction spécifique.
+Cependant le plan de maintenance de SQL Server ne positionne pas les bonnes options citées ci-dessus
+lors de manipulations d'index sur des champs calculés, d'où l'erreur pour tous les travaux manipulant
+des index.
+La sauvegarde fonctionne par contre normalement.
+Solution technique
+Afin de « contourner » ce problème, il faut :
+• Générer manuellement, via un script SQL, les commandes lancées par le plan de maintenance
+concernant les index.
+SCRIPT
+Vous trouverez ci-dessous un exemple de procédure permettant de générer les commandes les plus
+fréquentes du plan de maintenance relatives aux index :
+• Réorganisation des pages d'index et de données,
+• Mise à jour des statistiques,
+Lancez ce script via l'Analyseur de requêtes en remplaçant « Base_de_donnees » par le nom de votre base
+de données
+USE [Base_de_donnees]
+GO
+SET ANSI_PADDING,ANSI_WARNINGS,CONCAT_NULL_YIELDS_NULL,ARITHABORT,QUOTED_IDENTIFIER,AN-
+SI_NULLS ON;
+SET NUMERIC_ROUNDABORT OFF;
+EXEC CB_MaintenanceIndex GO
+Informations complémentaires
+La procédure stockée CB_MaintenanceIndex est la procédure utilisée par le programme Maintenance pour
+exécuter le traitement de réorganisation de la base relationnelle.
+© 2020 Sage 127
+=== PAGE 118 ===
+Annexes
+Équivalence des types des champs Sage 100cloud / Microsoft SQL Server
+Sage 100cloud Microsoft SQL Server
+Chaîne Alphanumérique Varchar
+Numérique : Entier long Int
+Numérique : Entier Smallint
+Numérique : Réel double Numéric
+Texte Text
+Date Smalldatetime
+Informations libres
+Les informations libres sont des champs supplémentaires qu'il est possible de créer pour certaines tables
+par les applications Sage 100cloud Premium.
+Sage 100cloud Comptabilité Premium
+Intitulé Table
+Comptes généraux F_COMPTEG
+Sections analytiques F_COMPTEA
+(comptes analytiques)
+Comptes tiers F_COMPTET
+Ecritures comptables F_ECRITUREC
+Sage 100cloud Gestion Commerciale Premium
+Intitulé Table
+Articles F_ARTICLE
+Entêtes d'abonnements F_ABOENTETE
+Lignes d'abonnements F_ABOLIGNE
+Entêtes de documents F_DOCENTETE
+Lignes de documents F_DOCLIGNE
+Numéros série/lot F_LOTSERIE
+Ressources F_RESSOURCEPROD
+© 2020 Sage 128
+=== PAGE 119 ===
+Annexes
+Équivalence de types : Information libre Sage 100cloud / Données Microsoft SQL Server
+Type information libre Sage Type de données Microsoft SQL Server Taille
+100cloud
+Texte longueur n Varchar n
+Valeur Numeric 13
+Date Smalldatetime 4
+Montant Numeric 13
+Table Varchar 21
+Date Longue DateTime 8
+© 2020 Sage 130
+=== PAGE 120 ===
+Annexes
+Ajout / Suppression d'informations libres sous Microsoft SQL Server
+Principe
+Afin que les informations libres que vous souhaitez créer soient visibles dans les produits Sage 100cloud
+Premium, il faut créer des enregistrements dans 2 tables.
+• Création dans les tables indiquées ci-dessus,
+• Création dans la table cbSysLibre.
+Vous trouverez ci-dessous les différents champs à renseigner dans les deux tables en prenant comme
+exemple la table F_ARTICLE déjà composée de trois informations libres avec les différents cas possibles
+de type d'informations libres.
+Les quatre premières colonnes du tableau correspondent aux données de la table " Table " et les cinq
+autres aux données de la table cbSysLibre.
+Donc vous aurez à créer pour chaque ligne du tableau, deux enregistrements.
+• Création de l'information libre « Chp_Text » de type « Texte » de longueur 13 caractères
+(position 4)
+• Création de l'information libre « Chp_Montant » de type « Montant »
+• Création de l'information libre « Chp_Table » de type « Table »
+Type de
+Type info cbSyslibre. cbSyslibre. cbSyslibre. cbSyslibre. cbSyslibre.
+Table données Taille
+libre Sage CB_File CB_Name CB_Pos CB_Type CB_Len
+SQL
+100cloud
+F_ARTICLE Texte (13 Varchar 13 F_ARTICLE Chp_Text 4 9 14 (=13+1)
+car.)
+F_ARTICLE Montant Numeric 13 F_ARTICLE Chp_Montant 5 20 8
+F_ARTICLE Table Varchar 21 F_ARTICLE Chp_Table 6 22 22
+F_ARTICLE Date SmallDateTi 4 F_ARTICLE Chp_Date 7 3 2
+me
+F_ARTICLE Date Longue DateTime 8 F_ARTICLE Chp_DateLongue 8 14 4
+F_ARTICLE Valeur Numeric 13 F_ARTICLE Chp_Valeur 9 7 8
+• Création de l'information libre « Chp_Date » de type « Date »
+• Création de l'information libre « Chp_DateLongue » de type « Date longue »
+• Création de l'information libre « Chp_Valeur » de type « Valeur »
+© 2020 Sage 131
+=== PAGE 121 ===
+Annexes
+Création d'un nouveau champ sous Microsoft SQL Server
+Pour ajouter une information libre sous Microsoft SQL Server, vous pouvez utiliser SQL Server Management
+Studio.
+Utilisez alors la procédure suivante :
+1 . Sélectionnez la table concernée.
+2 . Dans le menu contextuel du dossier Colonnes, sélectionnez Nouvelle colonne.
+3 . Ajoutez une colonne à cette table en respectant les types présentés dans le tableau ci-dessus
+(pour supprimer une ligne, la sélectionner et utiliser la touche Suppr du clavier).
+Vous pouvez également ajouter une information libre par l'instruction SQL ALTER TABLE :
+Exemple :
+Création
+ALTER TABLE F_ARTICLE ADD Couleur VARCHAR(20) NULL
+Suppression
+ALTER TABLE F_ARTICLE DROP COLUMN couleur
+La création d'informations libres manuellement via des requêtes SQL avec des types qui ne sont
+pas ceux indiqués ci-dessus peut avoir un impact sur les applications Sage 100cloud Premium.
+Vous ne pouvez pas créer des informations libres avec n'importe quel type de données !
+Les informations libres doivent être créées dans les 2 tables comme décrit précédemment,
+sinon celles-ci ne seront pas visibles dans l'application.
+Vous trouverez dans le tableau ci-dessous les conséquences d'une création d'informations libres suivant
+le type de données SQL.
+Type SQL de l'information libre Conséquences dans les applications Sage 100cloud
+Binary L'information libre est invisible dans l'application
+Char (N) L'information libre est créée avec le type « TEXTE » et une
+longueur de N.
+DateTime L'information libre est créée avec le type « Date »
+Decimal L'information libre est créée avec le type « Valeur »
+Float L'information libre est invisible dans l'application
+Image L'information libre est invisible dans l'application
+Int Dans l'application le Popup du « Type » est vide
+Money L'information libre est invisible dans l'application
+Nchar L'information libre est invisible dans l'application
+Ntext L'information libre est invisible dans l'application
+Numeric L'information libre est créée avec le type « Valeur »
+Nvarchar L'information libre est invisible dans l'application
+Real L'information libre est invisible dans l'application
+SmallDateTime L'information libre est créée avec le type « Date »
+SmallInt Dans l'application le Popup du « Type » est vide
+SmallMoney L'information libre est invisible dans l'application
+© 2020 Sage 132
+=== PAGE 122 ===
+Annexes
+Type SQL de l'information libre Conséquences dans les applications Sage 100cloud
+Text L'information libre est invisible dans l'application
+TimeStamp L'information libre est invisible dans l'application
+TinyInt L'information libre est invisible dans l'application
+UniqueIdentifie L'information libre est invisible dans l'application
+Varbinary L'information libre est invisible dans l'application
+VarChar(N) L'information libre est créée avec le type « TEXTE » et une
+longueur de N.
+Une information libre insérée sous Microsoft SQL Server ne sera visible à partir de l'application
+Sage 100cloud Premium que suite à une déconnexion / connexion de l'application.
+Pour être visibles dans les applications Sage 100cloud Premium, les informations libres doivent
+être créées dans les tables f_compteg, f_comptea, f_comptet, f_ecriturec, f_article,
+f_docentete, f_docligne, F_ABOENTETE, F_ABOLIGNE, F_LOTSERIE, F_RESSOURCEPROD et
+également dans la table cbSYsLibre.
+© 2020 Sage 133

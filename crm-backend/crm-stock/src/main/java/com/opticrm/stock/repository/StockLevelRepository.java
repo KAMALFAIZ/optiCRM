@@ -15,6 +15,13 @@ import java.util.UUID;
 @Repository
 public interface StockLevelRepository extends JpaRepository<StockLevel, UUID> {
 
+    /**
+     * Bulk load — évite N+1 lors de l'import inventaire Sage.
+     * JOIN FETCH warehouse pour construire la clé composite sans query supplémentaire.
+     */
+    @Query("SELECT s FROM StockLevel s JOIN FETCH s.warehouse WHERE s.product.id IN :productIds")
+    List<StockLevel> findByProductIdIn(@Param("productIds") List<UUID> productIds);
+
     @Query("SELECT s FROM StockLevel s WHERE s.product.id = :productId AND s.warehouse.id = :warehouseId")
     Optional<StockLevel> findByProductIdAndWarehouseId(
             @Param("productId") UUID productId,

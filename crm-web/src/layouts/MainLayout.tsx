@@ -23,7 +23,6 @@ import {
   SunOutlined,
   MoonOutlined,
   EnvironmentOutlined,
-  CarOutlined,
   ScheduleOutlined,
   FundProjectionScreenOutlined,
   ShoppingCartOutlined,
@@ -39,6 +38,16 @@ import {
   CustomerServiceOutlined,
   SafetyCertificateOutlined,
   ThunderboltOutlined,
+  CarOutlined,
+  GiftOutlined,
+  SendOutlined,
+  ReconciliationOutlined,
+  RadarChartOutlined,
+  BoxPlotOutlined,
+  RetweetOutlined,
+  CompassOutlined,
+  FileProtectOutlined,
+  DatabaseOutlined,
 } from '@ant-design/icons';
 
 import { useAppDispatch, useAppSelector } from '@/store';
@@ -47,6 +56,7 @@ import { toggleTheme, selectThemeMode } from '@/features/settings/themeSlice';
 import { usePermissions } from '@/hooks/usePermissions';
 import GlobalSearchBar from '@/components/GlobalSearchBar';
 import AiAssistant from '@/components/ai/AiAssistant';
+import OfflineBanner from '@/components/OfflineBanner';
 
 const { Header, Sider, Content } = Layout;
 const { useBreakpoint } = Grid;
@@ -108,7 +118,6 @@ const menuItems: MenuProps['items'] = [
       { key: '/activities', icon: <CalendarOutlined />, label: 'Activités' },
       { key: '/planning', icon: <ScheduleOutlined />, label: 'Planning' },
       { key: '/visits', icon: <EnvironmentOutlined />, label: 'Visites' },
-      { key: '/tours', icon: <CarOutlined />, label: 'Tournées' },
       { key: '/expense-reports', icon: <DollarOutlined />, label: 'Notes de frais' },
       { key: '/field-dashboard', icon: <FundProjectionScreenOutlined />, label: 'Tableau terrain' },
     ],
@@ -132,23 +141,38 @@ const menuItems: MenuProps['items'] = [
     ],
   },
   {
-    key: 'automation',
-    icon: <ThunderboltOutlined />,
-    label: 'Automatisation',
-    children: [
-      { key: '/workflows', icon: <ThunderboltOutlined />, label: 'Workflows' },
-    ],
-  },
-  {
     key: 'pilotage',
     icon: <LineChartOutlined />,
     label: 'Pilotage',
     children: [
       { key: '/forecast', icon: <RiseOutlined />, label: 'Prévisions' },
       { key: '/kpis', icon: <BarChartOutlined />, label: 'KPIs Commerciaux' },
+      { key: '/supervision-commerciaux', icon: <TeamOutlined />, label: 'Supervision Commerciaux' },
+      { key: '/supervisor-team', icon: <UserOutlined />, label: 'Mon Équipe' },
       { key: '/objectives', icon: <AimOutlined />, label: 'Objectifs' },
       { key: '/sales-tracking', icon: <LineChartOutlined />, label: 'Suivi Ventes' },
       { key: '/reports', icon: <BarChartOutlined />, label: 'Rapports' },
+    ],
+  },
+  {
+    key: 'livraison',
+    icon: <CarOutlined />,
+    label: 'Livraison',
+    children: [
+      { key: '/delivery/dashboard',    icon: <DashboardOutlined />,         label: 'Tableau de bord' },
+      { key: '/delivery/tours',        icon: <CarOutlined />,               label: 'Tournées' },
+      { key: '/delivery/lines',        icon: <SendOutlined />,              label: 'Lignes de livraison' },
+      { key: '/delivery/vehicle-loads',icon: <BoxPlotOutlined />,           label: 'Chargement véhicule' },
+      { key: '/delivery/pre-orders',   icon: <ReconciliationOutlined />,    label: 'Pré-commandes' },
+      { key: '/delivery/promotions',   icon: <GiftOutlined />,              label: 'Promotions / Gratuités' },
+      { key: '/delivery/returns',      icon: <RetweetOutlined />,           label: 'Retours' },
+      { key: '/delivery/replenishment',icon: <ShoppingOutlined />,          label: 'Réapprovisionnement' },
+      { key: '/delivery/settlement',   icon: <FileProtectOutlined />,       label: 'Clôture / Solde' },
+      { key: '/delivery/credit-aging', icon: <ClockCircleOutlined />,       label: 'Balance crédit' },
+      { key: '/delivery/objectives',   icon: <AimOutlined />,               label: 'Objectifs rep.' },
+      { key: '/delivery/reports',      icon: <RadarChartOutlined />,        label: 'Rapports livraison' },
+      { key: '/delivery/batches',      icon: <ReconciliationOutlined />,    label: 'Lots / FEFO' },
+      { key: '/delivery/gps',          icon: <CompassOutlined />,           label: 'Suivi GPS' },
     ],
   },
   {
@@ -156,10 +180,21 @@ const menuItems: MenuProps['items'] = [
     icon: <SettingOutlined />,
     label: 'Administration',
     children: [
-      { key: '/users', icon: <TeamOutlined />, label: 'Utilisateurs' },
+      { key: '/workflows', icon: <ThunderboltOutlined />, label: 'Workflows' },
+      { key: '/users', icon: <UserOutlined />, label: 'Utilisateurs' },
+      { key: '/teams', icon: <TeamOutlined />, label: 'Équipes' },
       { key: '/admin/roles', icon: <SafetyCertificateOutlined />, label: 'Rôles & Permissions' },
       { key: '/admin/pricing-categories', icon: <TagsOutlined />, label: 'Catégories tarifaires' },
-      { key: '/integration', icon: <ApiOutlined />, label: 'Intégrations' },
+      { key: '/admin/tenants', icon: <DatabaseOutlined />, label: 'Clients SaaS' },
+      {
+        key: 'integration-group',
+        icon: <ApiOutlined />,
+        label: 'Intégrations',
+        children: [
+          { key: '/integration',       icon: <ApiOutlined />,        label: 'Mappings CSV' },
+          { key: '/integration/sage',  icon: <ThunderboltOutlined />, label: 'Sage 100 / Auto-Sync' },
+        ],
+      },
       { key: '/settings', icon: <SettingOutlined />, label: 'Paramètres' },
     ],
   },
@@ -300,7 +335,7 @@ export default function MainLayout() {
         mode="inline"
         theme="dark"
         selectedKeys={[location.pathname]}
-        defaultOpenKeys={['crm', 'inventory', 'finance', 'odyssee', 'terrain', 'projets', 'marketing', 'automation', 'pilotage', 'admin']}
+        defaultOpenKeys={[]}
         items={filteredMenuItems}
         onClick={handleMenuClick}
         style={{ borderRight: 0, background: 'transparent', marginTop: 8, paddingBottom: 24 }}
@@ -499,6 +534,9 @@ export default function MainLayout() {
             </Dropdown>
           </Space>
         </Header>
+
+        {/* ── OFFLINE BANNER ── */}
+        <OfflineBanner />
 
         {/* ── CONTENT ── */}
         <Content

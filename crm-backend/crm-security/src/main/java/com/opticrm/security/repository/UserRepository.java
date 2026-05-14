@@ -17,6 +17,17 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
 
+    /**
+     * Load a User by email with team and territory eagerly fetched (LEFT JOIN FETCH).
+     * Use this instead of findByEmail() whenever lazy associations (team, territory)
+     * will be accessed outside a transactional context.
+     */
+    @Query("SELECT u FROM User u " +
+           "LEFT JOIN FETCH u.team " +
+           "LEFT JOIN FETCH u.territory " +
+           "WHERE u.email = :email")
+    Optional<User> findByEmailFetched(@Param("email") String email);
+
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u WHERE u.isActive = true")
@@ -103,6 +114,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.role.id = :roleId")
     long countByRoleId(@Param("roleId") UUID roleId);
+
+    @Query("SELECT COUNT(u) FROM User u WHERE u.team.id = :teamId")
+    long countByTeamId(@Param("teamId") UUID teamId);
 
     // --- Batch operations ---
     @Query("SELECT u FROM User u WHERE u.id IN :ids")

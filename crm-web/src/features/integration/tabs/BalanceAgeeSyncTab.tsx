@@ -6,7 +6,7 @@ import {
 import {
   CloudUploadOutlined, CheckCircleOutlined,
   ReloadOutlined, InfoCircleOutlined, DatabaseOutlined, CodeOutlined,
-  DollarOutlined,
+  DollarOutlined, SaveOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import sageIntegrationApi, {
@@ -24,14 +24,35 @@ const SAGE_HEADERS = [
 
 const DEFAULT_SQL = `SELECT
   CT_Num,
-  ISNULL(NonEchu,   0)   BA_NonEchu,
-  ISNULL(Echu1a30,  0)   BA_Echu1a30,
-  ISNULL(Echu31a60, 0)   BA_Echu31a60,
-  ISNULL(Echu61a90, 0)   BA_Echu61a90,
-  ISNULL(Echu91Plus,0)   BA_Echu91Plus,
-  ISNULL(TotalDu,   0)   BA_TotalDu
-FROM [GROUPE_ALBOUGHAZE].[dbo].[V_BalanceAgee]
-WHERE ISNULL(TotalDu, 0) != 0`;
+  ISNULL(SUM(CASE WHEN DATEDIFF(DAY, DO_Date, GETDATE()) <= 0
+                  THEN SoldeDu END), 0)   BA_NonEchu,
+  ISNULL(SUM(CASE WHEN DATEDIFF(DAY, DO_Date, GETDATE()) BETWEEN  1 AND 30
+                  THEN SoldeDu END), 0)   BA_Echu1a30,
+  ISNULL(SUM(CASE WHEN DATEDIFF(DAY, DO_Date, GETDATE()) BETWEEN 31 AND 60
+                  THEN SoldeDu END), 0)   BA_Echu31a60,
+  ISNULL(SUM(CASE WHEN DATEDIFF(DAY, DO_Date, GETDATE()) BETWEEN 61 AND 90
+                  THEN SoldeDu END), 0)   BA_Echu61a90,
+  ISNULL(SUM(CASE WHEN DATEDIFF(DAY, DO_Date, GETDATE()) > 90
+                  THEN SoldeDu END), 0)   BA_Echu91Plus,
+  ISNULL(SUM(SoldeDu), 0)                BA_TotalDu
+FROM (
+  SELECT
+    F.DO_Tiers    CT_Num,
+    F.DO_Date,
+    F.DO_NetAPayer
+      - ISNULL((
+          SELECT SUM(R.RC_Montant)
+          FROM   dbo.F_REGLECH R
+          WHERE  R.DO_Type  IN (6, 7)
+            AND  R.DO_Piece  = F.DO_Piece
+        ), 0)     SoldeDu
+  FROM  dbo.F_DOCENTETE F
+  WHERE F.DO_Type IN (6, 7)
+) T
+WHERE SoldeDu > 0
+GROUP BY CT_Num
+HAVING SUM(SoldeDu) > 0
+ORDER BY BA_TotalDu DESC`;
 
 const fmt = (v: any) => {
   if (v == null || v === '' || v === 0 || v === '0') return '—';
@@ -117,7 +138,7 @@ export default function BalanceAgeeSyncTab() {
   const { message } = App.useApp();
   const [pastedData, setPastedData] = useState('');
   const [label, setLabel] = useState('');
-  const [sqlQuery, setSqlQuery] = useState(DEFAULT_SQL);
+  const [sqlQuery, setSqlQuery] = useState(() => localStorage.getItem('sage.query.balance_agee') || DEFAULT_SQL);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -133,7 +154,7 @@ export default function BalanceAgeeSyncTab() {
       const req = await sageIntegrationApi.createRequest({ entityType: 'BALANCE_AGEE', label: label || undefined, rows });
       setRequest(req); setStep(1);
       message.success(`Prévisualisation générée : ${req.totalItems} compte(s) analysé(s).`);
-    } catch (e: any) { message.error(e?.response?.data?.message || 'Erreur lors de la prévisualisation.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de la prévisualisation.'); }
     finally { setLoading(false); }
   };
 
@@ -151,7 +172,7 @@ export default function BalanceAgeeSyncTab() {
       });
       setRequest(req); setStep(1);
       message.success(`${rows.length} ligne(s) de balance âgée importée(s) depuis Sage.`);
-    } catch (e: any) { message.error(e?.response?.data?.message || e?.message || 'Erreur lors de l\'import.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || e?.message || 'Erreur lors de l\'import.'); }
     finally { setImporting(false); }
   };
 
@@ -162,8 +183,13 @@ export default function BalanceAgeeSyncTab() {
       const updated = await sageIntegrationApi.applyRequest(request.id);
       setRequest(updated); setStep(2);
       message.success(`Balance âgée enregistrée — ${updated.successItems} snapshot(s) créé(s), ${updated.errorItems} erreur(s).`);
-    } catch (e: any) { message.error(e?.response?.data?.message || 'Erreur lors de l\'application.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de l\'application.'); }
     finally { setApplying(false); }
+  };
+
+  const handleSaveQuery = () => {
+    localStorage.setItem('sage.query.balance_agee', sqlQuery);
+    message.success('Requête balance âgée enregistrée');
   };
 
   const handleReset = () => { setPastedData(''); setLabel(''); setRequest(null); setStep(0); };
@@ -183,10 +209,6 @@ export default function BalanceAgeeSyncTab() {
               <Input placeholder="Ex : Balance Âgée Fin Février 2026" value={label} onChange={e => setLabel(e.target.value)} style={{ maxWidth: 400 }} />
             </Form.Item>
 
-            <Alert type="info" showIcon className="mb-4"
-              message="Fonctionnement des snapshots"
-              description="Chaque import crée un nouveau snapshot de balance âgée par compte. Les données historiques sont conservées. Les comptes doivent être synchronisés pour le matching par CT_Num." />
-
             <Collapse className="mb-4" style={{ background: '#fff1f2', borderColor: '#fecdd3' }} items={[{
               key: 'sql',
               label: <Space><DatabaseOutlined style={{ color: '#dc2626' }} /><Text strong style={{ color: '#dc2626' }}>Import direct depuis Sage SQL Server</Text><Tag color="red">Recommandé</Tag></Space>,
@@ -196,11 +218,18 @@ export default function BalanceAgeeSyncTab() {
                     message="Colonnes mappées"
                     description="CT_Num → code compte Sage, BA_NonEchu, BA_Echu1a30 (1-30j), BA_Echu31a60 (31-60j), BA_Echu61a90 (61-90j), BA_Echu91Plus (91j+), BA_TotalDu. Adaptez la vue V_BalanceAgee à votre configuration Sage." />
                   <TextArea rows={9} value={sqlQuery} onChange={e => setSqlQuery(e.target.value)} style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 12 }} />
-                  <Tooltip title="Importe la balance âgée depuis Sage">
-                    <Button type="primary" icon={<DatabaseOutlined />} loading={importing} onClick={handleImportFromSage} style={{ background: '#dc2626', borderColor: '#dc2626' }}>
-                      Exécuter et importer depuis Sage
-                    </Button>
-                  </Tooltip>
+                  <Space>
+                    <Tooltip title="Importe la balance âgée depuis Sage">
+                      <Button type="primary" icon={<DatabaseOutlined />} loading={importing} onClick={handleImportFromSage} style={{ background: '#dc2626', borderColor: '#dc2626' }}>
+                        Exécuter et importer depuis Sage
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Enregistrer la requête SQL pour les prochaines sessions">
+                      <Button icon={<SaveOutlined />} onClick={handleSaveQuery}>
+                        Enregistrer la requête
+                      </Button>
+                    </Tooltip>
+                  </Space>
                 </div>
               ),
             }]} />

@@ -42,6 +42,7 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   // Pilotage
   '/forecast': 'reporting',
   '/kpis': 'reporting',
+  '/supervision-commerciaux': 'reporting',
   '/objectives': 'reporting',
   '/sales-tracking': 'reporting',
   '/reports': 'reporting',
@@ -52,6 +53,21 @@ export const ROUTE_PERMISSION_MAP: Record<string, string> = {
   '/integration': 'admin',
   '/integration/sage': 'admin',
   '/settings': 'admin',
+  // Livraison
+  '/delivery/dashboard':     'delivery',
+  '/delivery/tours':         'delivery',
+  '/delivery/lines':         'delivery',
+  '/delivery/vehicle-loads': 'delivery',
+  '/delivery/pre-orders':    'delivery',
+  '/delivery/promotions':    'delivery',
+  '/delivery/returns':       'delivery',
+  '/delivery/replenishment': 'delivery',
+  '/delivery/settlement':    'delivery',
+  '/delivery/credit-aging':  'delivery',
+  '/delivery/objectives':    'delivery',
+  '/delivery/reports':       'delivery',
+  '/delivery/batches':       'delivery',
+  '/delivery/gps':           'delivery',
 };
 
 /**
@@ -67,6 +83,7 @@ export const GROUP_PERMISSION_MAP: Record<string, string[]> = {
   projets: ['projects'],
   marketing: ['marketing'],
   pilotage: ['reporting'],
+  livraison: ['delivery'],
   admin: ['admin'],
 };
 

@@ -12,6 +12,19 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 // ── Runtime caching (équivalent de la config workbox dans vite.config.ts) ────
 
+// Cache delivery endpoints — NetworkFirst (données fraîches en priorité, fallback cache)
+registerRoute(
+  ({ url }) => /^\/api\/v1\/delivery\/(tour|line|vehicle-load|pre-order|batch|objective|dashboard|credit-aging)(\/.*)?$/.test(url.pathname),
+  new NetworkFirst({
+    cacheName: 'delivery-api',
+    networkTimeoutSeconds: 4,
+    plugins: [
+      new ExpirationPlugin({ maxEntries: 300, maxAgeSeconds: 60 * 60 * 8 }), // 8h
+      new CacheableResponsePlugin({ statuses: [0, 200] }),
+    ],
+  })
+);
+
 // Cache les requêtes GET des entités principales — NetworkFirst
 registerRoute(
   ({ url }) => /^\/api\/v1\/(accounts|contacts|leads|opportunities|reference-data|custom-fields)(\/.*)?$/.test(url.pathname),

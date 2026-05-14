@@ -29,8 +29,12 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // Inject tenant ID so the backend always knows which tenant to target
-    const tenantId = (state as any).tenant?.tenant?.id;
+    // Inject tenant ID so the backend always knows which tenant to target.
+    // Priority: resolved publicInfo > full tenant > persisted in localStorage
+    const tenantId =
+      (state as any).tenant?.publicInfo?.id ??
+      (state as any).tenant?.tenant?.id ??
+      localStorage.getItem('opticrm_tenant_id');
     if (tenantId && config.headers) {
       config.headers['X-Tenant-ID'] = tenantId;
     }
@@ -73,7 +77,11 @@ apiClient.interceptors.response.use(
       !navigator.onLine
     );
 
-    if (isNetworkError && originalRequest) {
+    // URLs temps-réel : jamais mise en queue offline (Sage SQL, imports, requêtes longues)
+    const NON_QUEUEABLE = ['/sage/', '/integration/execute-query', '/integration/import'];
+    const isNonQueueable = NON_QUEUEABLE.some(p => (originalRequest?.url ?? '').includes(p));
+
+    if (isNetworkError && originalRequest && !isNonQueueable) {
       const method = (originalRequest.method?.toLowerCase() ?? '') as MutationMethod;
       if (MUTATION_METHODS.includes(method)) {
         const url = originalRequest.url ?? '';

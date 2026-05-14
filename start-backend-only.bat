@@ -8,8 +8,8 @@ echo ================================================================
 echo.
 
 :: Configuration Java et Maven
-set "JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.10+7"
-set "MAVEN_HOME=C:\Program Files\Apache\Maven\apache-maven-3.9.14"
+set "JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot"
+set "MAVEN_HOME=C:\Tools\apache-maven-3.9.6"
 set "PATH=%JAVA_HOME%\bin;%MAVEN_HOME%\bin;%PATH%"
 
 if not exist "%JAVA_HOME%\bin\java.exe" (

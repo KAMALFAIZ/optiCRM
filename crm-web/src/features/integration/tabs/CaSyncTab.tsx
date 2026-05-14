@@ -113,7 +113,7 @@ export default function CaSyncTab() {
       setStep(1);
       message.success(`Prévisualisation générée : ${req.totalItems} ligne(s) analysée(s).`);
     } catch (e: any) {
-      message.error(e?.response?.data?.message || 'Erreur lors de la prévisualisation.');
+      message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de la prévisualisation.');
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,7 @@ export default function CaSyncTab() {
       setStep(2);
       message.success(`CA synchronisé : ${updated.successItems} compte(s) mis à jour, ${updated.errorItems} erreur(s).`);
     } catch (e: any) {
-      message.error(e?.response?.data?.message || 'Erreur lors de l\'application.');
+      message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de l\'application.');
     } finally {
       setApplying(false);
     }
@@ -153,15 +153,6 @@ export default function CaSyncTab() {
           { title: 'Prévisualiser', icon: <InfoCircleOutlined /> },
           { title: 'Appliquer', icon: <CheckCircleOutlined /> },
         ]}
-      />
-
-      {/* ── Info ── */}
-      <Alert
-        type="info"
-        showIcon
-        className="mb-4"
-        message="Mise à jour du CA annuel"
-        description="Cet onglet met à jour le champ Chiffre d'affaires annuel de chaque compte client à partir des statistiques Sage. Chaque ligne est identifiée par le code client (CT_Num)."
       />
 
       {/* ── Étape 1 : Saisie ── */}

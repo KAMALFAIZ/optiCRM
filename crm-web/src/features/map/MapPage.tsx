@@ -30,6 +30,11 @@ L.Icon.Default.mergeOptions({
 const DEFAULT_CENTER: [number, number] = [31.7917, -7.0926];
 const DEFAULT_ZOOM = 6;
 
+const OSM_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>';
+const ESRI_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const ESRI_ATTRIBUTION = 'Tiles &copy; Esri';
+
 // ── Stades config ────────────────────────────────────────────────────────────
 const STADES = [
   { value: 'ETUDE_CONCEPTION', label: 'Étude / Conception', color: '#1890ff' },
@@ -297,6 +302,7 @@ export default function MapPage() {
   // Layer toggles
   const [showC, setShowC] = useState(true);
   const [showD, setShowD] = useState(true);
+  const [satellite, setSatellite] = useState(false);
 
   // Stade filter
   const [stadeFilter, setStadeFilter] = useState<string[]>(STADES.map(s => s.value));
@@ -414,6 +420,19 @@ export default function MapPage() {
           {/* Layer toggles C / D */}
           <Card size="small" title={<><FilterOutlined style={{ marginRight: 6 }} />Couches</>}>
             <Space direction="vertical" style={{ width: '100%' }}>
+              <button
+                onClick={() => setSatellite(v => !v)}
+                style={{
+                  width: '100%', padding: '6px 12px',
+                  background: satellite ? '#1677ff' : '#f5f5f5',
+                  color: satellite ? '#fff' : '#333',
+                  border: `1px solid ${satellite ? '#1677ff' : '#d9d9d9'}`,
+                  borderRadius: 6, cursor: 'pointer', fontWeight: 600, fontSize: 12,
+                  transition: 'all 0.2s',
+                }}
+              >
+                {satellite ? '🗺 Vue Plan' : '🛰 Vue Satellite'}
+              </button>
               <div
                 onClick={() => setShowC(v => !v)}
                 style={{
@@ -592,8 +611,8 @@ export default function MapPage() {
                 scrollWheelZoom
               >
                 <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution={satellite ? ESRI_ATTRIBUTION : OSM_ATTRIBUTION}
+                  url={satellite ? ESRI_URL : OSM_URL}
                 />
 
                 {proximityTarget && flyCenter

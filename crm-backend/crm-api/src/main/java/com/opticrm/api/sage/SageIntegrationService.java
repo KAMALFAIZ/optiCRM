@@ -9,6 +9,7 @@ import com.opticrm.api.sage.repository.BalanceAgeeSnapshotRepository;
 import com.opticrm.api.sage.repository.SageSyncItemRepository;
 import com.opticrm.api.sage.repository.SageSyncRequestRepository;
 import com.opticrm.common.exception.ResourceNotFoundException;
+import com.opticrm.tenant.context.TenantContext;
 import com.opticrm.core.account.entity.Account;
 import com.opticrm.core.account.repository.AccountRepository;
 import com.opticrm.core.contact.entity.Contact;
@@ -27,8 +28,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -37,9 +40,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class SageIntegrationService {
+
+    // Self-injection pour que @Async soit intercepté par le proxy Spring
+    @org.springframework.context.annotation.Lazy
+    @org.springframework.beans.factory.annotation.Autowired
+    private SageIntegrationService self;
 
     private final SageSyncRequestRepository    requestRepository;
     private final SageSyncItemRepository       itemRepository;
@@ -70,23 +78,54 @@ public class SageIntegrationService {
 
         syncReq = requestRepository.save(syncReq);
 
-        // ── Pré-charger tous les comptes par sage_code en un seul appel ──────
-        // Évite N×3 requêtes individuelles (1 requête batch à la place)
+        // ── Pré-charger comptes ET produits en 1 requête chacun (évite N+1) ──
         List<String> sageCodes = req.getRows().stream()
-                .map(row -> getString(row, "sage_code", "ct_num", "code", "ref"))
+                .map(row -> getString(row, "sage_code", "ct_num", "code", "ref", "ar_ref"))
                 .filter(s -> s != null && !s.isBlank())
                 .distinct()
                 .collect(Collectors.toList());
 
+        // SQL Server limite à 2100 paramètres — on charge par batches de 1000
         Map<String, Account> accountBySageCode = sageCodes.isEmpty() ? Collections.emptyMap()
-                : accountRepository.findBySageCodeIn(sageCodes).stream()
-                        .collect(Collectors.toMap(Account::getSageCode, a -> a, (a1, a2) -> a1));
+                : loadInBatches(sageCodes, 1000,
+                        batch -> accountRepository.findBySageCodeIn(batch),
+                        Account::getSageCode);
+
+        Map<String, com.opticrm.stock.entity.Product> productBySageCode = sageCodes.isEmpty() ? Collections.emptyMap()
+                : loadInBatches(sageCodes, 1000,
+                        batch -> productRepository.findBySageCodeIn(batch),
+                        com.opticrm.stock.entity.Product::getSageCode);
+
+        // ── INVENTORY : pré-chargement dépôts + niveaux de stock ─────────────
+        Map<String, Warehouse>  warehouseByCode  = Collections.emptyMap();
+        Map<String, StockLevel> stockLevelByKey  = new HashMap<>();
+        if ("INVENTORY".equalsIgnoreCase(req.getEntityType())) {
+            List<String> deCodes = req.getRows().stream()
+                    .map(row -> getString(row, "de_no", "depot"))
+                    .filter(s -> s != null && !s.isBlank()).distinct().collect(Collectors.toList());
+            if (!deCodes.isEmpty()) {
+                warehouseByCode = warehouseRepository.findByCodeIn(deCodes).stream()
+                        .collect(Collectors.toMap(Warehouse::getCode, w -> w));
+            }
+            if (!productBySageCode.isEmpty()) {
+                List<UUID> productIds = productBySageCode.values().stream()
+                        .map(Product::getId).collect(Collectors.toList());
+                for (int i = 0; i < productIds.size(); i += 1000) {
+                    List<UUID> batch = productIds.subList(i, Math.min(i + 1000, productIds.size()));
+                    stockLevelRepository.findByProductIdIn(batch).forEach(sl ->
+                            stockLevelByKey.put(sl.getProduct().getId() + "_" + sl.getWarehouse().getId(), sl));
+                }
+            }
+        }
+        final Map<String, Warehouse>  warehouseByCodeF = warehouseByCode;
+        final Map<String, StockLevel> stockLevelByKeyF = stockLevelByKey;
 
         // Créer les items avec preview (matching)
         List<SageSyncItem> items = new ArrayList<>();
         int idx = 0;
         for (Map<String, Object> row : req.getRows()) {
-            SageSyncItem item = buildItem(syncReq, row, req.getEntityType(), idx++, accountBySageCode);
+            SageSyncItem item = buildItem(syncReq, row, req.getEntityType(), idx++,
+                    accountBySageCode, productBySageCode, warehouseByCodeF, stockLevelByKeyF);
             items.add(item);
         }
         itemRepository.saveAll(items);
@@ -98,21 +137,125 @@ public class SageIntegrationService {
 
     // ─── Appliquer une requête (CREATE / UPDATE en base CRM) ──────────────────
 
-    @Transactional
+    // Retourne immédiatement (PROCESSING) — traitement en arrière-plan via @Async
     public SageSyncRequestDto applyRequest(UUID requestId) {
+        SageSyncRequest syncReq = markProcessing(requestId);
+        UUID tenantId = TenantContext.get(); // capture avant de changer de thread
+        self.applyAsync(requestId, syncReq.getEntityType(), tenantId);
+        return mapToDto(syncReq, null);
+    }
+
+    @Async("sageTaskExecutor")
+    public void applyAsync(UUID requestId, String entityType, UUID tenantId) {
+        TenantContext.set(tenantId); // propager le contexte tenant dans le thread async
+        try {
+            List<UUID> itemIds = itemRepository.findIdsByRequestIdOrderByRowIndex(requestId);
+            int success = 0, errors = 0, skips = 0;
+            int batchSize = 100;
+            int flushEvery = 5; // flush les compteurs vers la DB tous les 5 batches
+            int batchCount = 0;
+            for (int i = 0; i < itemIds.size(); i += batchSize) {
+                List<UUID> batchIds = itemIds.subList(i, Math.min(i + batchSize, itemIds.size()));
+                int[] counts = self.applyBatch(batchIds, entityType);
+                success += counts[0];
+                errors  += counts[1];
+                skips   += counts[2];
+                batchCount++;
+                if (batchCount % flushEvery == 0) {
+                    self.flushProgress(requestId, success, errors, skips);
+                }
+            }
+            self.finalizeRequest(requestId, success, errors, skips);
+            log.info("Import async terminé — requestId={} succes={} erreurs={} ignores={}", requestId, success, errors, skips);
+        } finally {
+            TenantContext.clear();
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void flushProgress(UUID requestId, int success, int errors, int skips) {
+        requestRepository.findById(requestId).ifPresent(r -> {
+            r.setProcessedItems(success + errors + skips);
+            r.setSuccessItems(success);
+            r.setErrorItems(errors);
+            r.setSkipItems(skips);
+            requestRepository.save(r);
+        });
+    }
+
+    @Transactional
+    protected SageSyncRequest markProcessing(UUID requestId) {
         SageSyncRequest syncReq = requestRepository.findByIdWithCreatedBy(requestId)
                 .orElseThrow(() -> new ResourceNotFoundException("SyncRequest", requestId.toString()));
-
         if (!"PENDING".equals(syncReq.getStatus())) {
             throw new IllegalStateException("Requête déjà traitée (statut : " + syncReq.getStatus() + ")");
         }
-
         syncReq.setStatus("PROCESSING");
-        requestRepository.save(syncReq);
+        return requestRepository.save(syncReq);
+    }
 
-        List<SageSyncItem> items = itemRepository.findByRequestIdOrderByRowIndex(requestId);
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int[] applyBatch(List<UUID> itemIds, String entityType) {
+        List<SageSyncItem> items = itemRepository.findAllById(itemIds);
+
+        // ── PRODUCTS : pré-chargement produits + catégories ─────────────────
+        Map<String, Product> productCache = Collections.emptyMap();
+        Map<String, ProductCategory> catCache = new HashMap<>();
+        if ("PRODUCTS".equalsIgnoreCase(entityType)) {
+            List<String> sageCodes = items.stream()
+                    .map(i -> getString(i.getRawData(), "ar_ref", "sage_code", "code", "ref"))
+                    .filter(s -> s != null && !s.isBlank()).distinct().collect(Collectors.toList());
+            if (!sageCodes.isEmpty()) {
+                productCache = productRepository.findBySageCodeIn(sageCodes).stream()
+                        .collect(Collectors.toMap(Product::getSageCode, p -> p));
+            }
+            List<String> famCodes = items.stream()
+                    .map(i -> getString(i.getRawData(), "fa_codefamille", "ar_famille", "famille", "category"))
+                    .filter(s -> s != null && !s.isBlank())
+                    .map(s -> s.length() > 20 ? s.substring(0, 20).toUpperCase() : s.toUpperCase())
+                    .distinct().collect(Collectors.toList());
+            if (!famCodes.isEmpty()) {
+                productCategoryRepository.findByCodeIn(famCodes).forEach(c -> catCache.put(c.getCode(), c));
+            }
+        }
+        final Map<String, Product> productCacheF = productCache;
+        final Map<String, ProductCategory> catCacheF = catCache;
+
+        // ── INVENTORY : pré-chargement produits, dépôts, niveaux de stock ──
+        Map<String, Product>    invProductCache    = Collections.emptyMap();
+        Map<String, Warehouse>  invWarehouseCache  = new HashMap<>();
+        Map<String, StockLevel> invStockLevelCache = new HashMap<>();
+        if ("INVENTORY".equalsIgnoreCase(entityType)) {
+            List<String> arRefs = items.stream()
+                    .map(i -> getString(i.getRawData(), "ar_ref", "sage_code"))
+                    .filter(s -> s != null && !s.isBlank()).distinct().collect(Collectors.toList());
+            List<String> deCodes = items.stream()
+                    .map(i -> getString(i.getRawData(), "de_no", "depot"))
+                    .filter(s -> s != null && !s.isBlank()).distinct().collect(Collectors.toList());
+            if (!arRefs.isEmpty()) {
+                invProductCache = loadInBatches(arRefs, 1000,
+                        batch -> productRepository.findBySageCodeIn(batch), Product::getSageCode);
+            }
+            if (!deCodes.isEmpty()) {
+                warehouseRepository.findByCodeIn(deCodes)
+                        .forEach(w -> invWarehouseCache.put(w.getCode(), w));
+            }
+            if (!invProductCache.isEmpty()) {
+                List<UUID> productIds = invProductCache.values().stream()
+                        .map(Product::getId).collect(Collectors.toList());
+                for (int i = 0; i < productIds.size(); i += 1000) {
+                    List<UUID> batch = productIds.subList(i, Math.min(i + 1000, productIds.size()));
+                    stockLevelRepository.findByProductIdIn(batch).forEach(sl ->
+                            invStockLevelCache.put(
+                                    sl.getProduct().getId() + "_" + sl.getWarehouse().getId(), sl));
+                }
+            }
+        }
+        final Map<String, Product>    invProductCacheF    = invProductCache;
+        final Map<String, Warehouse>  invWarehouseCacheF  = invWarehouseCache;
+        final Map<String, StockLevel> invStockLevelCacheF = invStockLevelCache;
+
         int success = 0, errors = 0, skips = 0;
-
         for (SageSyncItem item : items) {
             if ("SKIP".equals(item.getAction())) {
                 item.setStatus("SKIPPED");
@@ -120,7 +263,14 @@ public class SageIntegrationService {
                 continue;
             }
             try {
-                applyItem(item, syncReq.getEntityType());
+                if ("PRODUCTS".equalsIgnoreCase(entityType)) {
+                    applyProductCached(item, item.getRawData(), productCacheF, catCacheF);
+                } else if ("INVENTORY".equalsIgnoreCase(entityType)) {
+                    applyInventoryCached(item, item.getRawData(),
+                            invProductCacheF, invWarehouseCacheF, invStockLevelCacheF);
+                } else {
+                    applyItem(item, entityType);
+                }
                 item.setStatus("DONE");
                 item.setProcessedAt(LocalDateTime.now());
                 success++;
@@ -132,18 +282,47 @@ public class SageIntegrationService {
                 log.warn("Erreur sync item {}: {}", item.getSageRef(), e.getMessage());
             }
         }
-
+        // Sauvegarder tous les produits modifiés en une seule opération batch
+        if ("PRODUCTS".equalsIgnoreCase(entityType) && !productCacheF.isEmpty()) {
+            productRepository.saveAll(productCacheF.values());
+        }
+        // Sauvegarder tous les niveaux de stock modifiés en une seule opération batch
+        if ("INVENTORY".equalsIgnoreCase(entityType) && !invStockLevelCacheF.isEmpty()) {
+            List<StockLevel> saved = stockLevelRepository.saveAll(invStockLevelCacheF.values());
+            // Renseigner crmId pour les nouvelles entrées (id généré après saveAll)
+            Map<String, UUID> keyToId = saved.stream()
+                    .collect(Collectors.toMap(
+                            sl -> sl.getProduct().getId() + "_" + sl.getWarehouse().getId(),
+                            StockLevel::getId, (a, b) -> a));
+            for (SageSyncItem item : items) {
+                if (item.getCrmId() == null && "DONE".equals(item.getStatus())) {
+                    String arRef = getString(item.getRawData(), "ar_ref", "sage_code");
+                    String deNo  = getString(item.getRawData(), "de_no", "depot");
+                    Product p = invProductCacheF.get(arRef);
+                    Warehouse w = invWarehouseCacheF.get(deNo);
+                    if (p != null && w != null) {
+                        item.setCrmId(keyToId.get(p.getId() + "_" + w.getId()));
+                    }
+                }
+            }
+        }
         itemRepository.saveAll(items);
+        return new int[]{success, errors, skips};
+    }
 
-        syncReq.setStatus(errors == 0 ? "DONE" : (success > 0 ? "DONE" : "ERROR"));
+    @Transactional
+    public SageSyncRequestDto finalizeRequest(UUID requestId, int success, int errors, int skips) {
+        SageSyncRequest syncReq = requestRepository.findByIdWithCreatedBy(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("SyncRequest", requestId.toString()));
+        syncReq.setStatus(success > 0 || skips > 0 ? "DONE" : "ERROR");
         syncReq.setProcessedItems(success + errors + skips);
         syncReq.setSuccessItems(success);
         syncReq.setErrorItems(errors);
         syncReq.setSkipItems(skips);
         syncReq.setProcessedAt(LocalDateTime.now());
         requestRepository.save(syncReq);
-
-        return mapToDto(syncReq, items);
+        // Retourne sans les items (trop volumineux) — le frontend recharge si besoin
+        return mapToDto(syncReq, null);
     }
 
     // ─── Lecture ──────────────────────────────────────────────────────────────
@@ -178,12 +357,15 @@ public class SageIntegrationService {
     // ─── Matching & Mapping privé ─────────────────────────────────────────────
 
     /**
-     * Construit un SageSyncItem en utilisant le cache pré-chargé (accountBySageCode).
-     * Évite les N+1 queries : la majorité des lignes sont résolues via le Map en mémoire.
+     * Construit un SageSyncItem en utilisant les caches pré-chargés.
+     * Évite les N+1 queries : toutes les entités sont résolues via les Maps en mémoire.
      */
     private SageSyncItem buildItem(SageSyncRequest req, Map<String, Object> row,
                                    String entityType, int idx,
-                                   Map<String, Account> accountBySageCode) {
+                                   Map<String, Account> accountBySageCode,
+                                   Map<String, com.opticrm.stock.entity.Product> productBySageCode,
+                                   Map<String, Warehouse> warehouseByCode,
+                                   Map<String, StockLevel> stockLevelByKey) {
         String sageRef = getString(row, "sage_code", "ct_num", "code", "ref");
         UUID crmId = null;
         String action = "CREATE";
@@ -212,8 +394,9 @@ public class SageIntegrationService {
             }
             case "PRODUCTS" -> {
                 String arRef = getString(row, "ar_ref", "sage_code", "code", "ref");
-                Optional<Product> existing = (arRef != null)
-                        ? productRepository.findBySageCode(arRef) : Optional.empty();
+                Optional<Product> existing = (arRef != null && productBySageCode.containsKey(arRef))
+                        ? Optional.of(productBySageCode.get(arRef))
+                        : (arRef != null ? productRepository.findBySageCode(arRef) : Optional.empty());
                 if (existing.isPresent()) {
                     crmId = existing.get().getId();
                     action = "UPDATE";
@@ -222,19 +405,18 @@ public class SageIntegrationService {
                 }
             }
             case "INVENTORY" -> {
-                // Matching par (sageCode produit + code dépôt)
-                String arRef   = getString(row, "ar_ref", "sage_code");
-                String deNo    = getString(row, "de_no", "depot");
+                // Matching par (sageCode produit + code dépôt) — 100 % depuis les caches
+                String arRef = getString(row, "ar_ref", "sage_code");
+                String deNo  = getString(row, "de_no", "depot");
                 if (arRef != null && deNo != null) {
-                    Optional<Product> prod = productRepository.findBySageCode(arRef);
-                    Optional<Warehouse> wh = warehouseRepository.findByCode(deNo);
-                    if (prod.isPresent() && wh.isPresent()) {
-                        Optional<StockLevel> sl = stockLevelRepository
-                                .findByProductIdAndWarehouseId(prod.get().getId(), wh.get().getId());
-                        if (sl.isPresent()) {
-                            crmId = sl.get().getId();
+                    Product   prod = productBySageCode.get(arRef);
+                    Warehouse wh   = warehouseByCode.get(deNo);
+                    if (prod != null && wh != null) {
+                        StockLevel sl = stockLevelByKey.get(prod.getId() + "_" + wh.getId());
+                        if (sl != null) {
+                            crmId  = sl.getId();
                             action = "UPDATE";
-                            diff = diffInventory(sl.get(), row);
+                            diff   = diffInventory(sl, row);
                             if (diff.isEmpty()) action = "SKIP";
                         }
                     }
@@ -430,18 +612,52 @@ public class SageIntegrationService {
 
     // ── Produits ──────────────────────────────────────────────────────────────
 
-    /**
-     * Applique un enregistrement Sage F_ARTICLE sur un produit CRM.
-     *
-     * Mapping :
-     *   AR_Ref        → sageCode (clé de matching)
-     *   AR_Design     → name
-     *   AR_PrixVen    → unitPrice
-     *   AR_PrixAch    → costPrice
-     *   AR_Unite      → unitOfMeasure
-     *   FA_CodeFamille / AR_Famille → category.name (find or create)
-     *   AR_Sommeil    → isActive (0 = actif, 1 = sommeil)
-     */
+    /** Version optimisée avec caches pré-chargés (évite N+1). */
+    private void applyProductCached(SageSyncItem item, Map<String, Object> data,
+                                    Map<String, Product> productCache,
+                                    Map<String, ProductCategory> catCache) {
+        String arRef = getString(data, "ar_ref", "sage_code", "code", "ref");
+        if (arRef == null) return;
+
+        Product product = productCache.computeIfAbsent(arRef, k ->
+                Product.builder().code(k).name(k).unitPrice(java.math.BigDecimal.ZERO).build());
+
+        product.setSageCode(arRef);
+
+        String name = getString(data, "ar_design", "name", "designation");
+        if (name != null) product.setName(name);
+
+        java.math.BigDecimal unitPrice = getBigDecimal(data, "ar_prixven", "unit_price", "prix_vente");
+        if (unitPrice != null) product.setUnitPrice(unitPrice);
+
+        java.math.BigDecimal costPrice = getBigDecimal(data, "ar_prixach", "cost_price", "prix_achat");
+        if (costPrice != null) product.setCostPrice(costPrice);
+
+        String uom = getString(data, "ar_unite", "unit_of_measure", "unite");
+        if (uom != null) product.setUnitOfMeasure(uom);
+
+        String famCode = getString(data, "fa_codefamille", "ar_famille", "famille", "category");
+        if (famCode != null && !famCode.isBlank()) {
+            String catKey = famCode.length() > 20 ? famCode.substring(0, 20).toUpperCase() : famCode.toUpperCase();
+            ProductCategory cat = catCache.computeIfAbsent(catKey, k -> {
+                ProductCategory newCat = new ProductCategory();
+                newCat.setCode(k);
+                newCat.setName(famCode);
+                return productCategoryRepository.save(newCat);
+            });
+            product.setCategory(cat);
+        }
+
+        String sommeil = getString(data, "ar_sommeil", "sommeil");
+        if (sommeil != null) {
+            product.setIsActive("0".equals(sommeil.trim()) || "false".equalsIgnoreCase(sommeil.trim()));
+        }
+
+        product.setSageSyncedAt(Instant.now());
+        item.setCrmId(product.getId());
+        // Le save est fait en masse via itemRepository.saveAll + productRepository.saveAll dans applyBatch
+    }
+
     private void applyProduct(SageSyncItem item, Map<String, Object> data) {
         String arRef = getString(data, "ar_ref", "sage_code", "code", "ref");
         if (arRef == null) return;
@@ -472,7 +688,6 @@ public class SageIntegrationService {
         String uom = getString(data, "ar_unite", "unit_of_measure", "unite");
         if (uom != null) product.setUnitOfMeasure(uom);
 
-        // Famille → catégorie (find or create)
         String famCode = getString(data, "fa_codefamille", "ar_famille", "famille", "category");
         if (famCode != null && !famCode.isBlank()) {
             ProductCategory cat = productCategoryRepository.findByCode(famCode.toUpperCase())
@@ -485,7 +700,6 @@ public class SageIntegrationService {
             product.setCategory(cat);
         }
 
-        // AR_Sommeil : 0 = actif, 1 = en sommeil (inactif)
         String sommeil = getString(data, "ar_sommeil", "sommeil");
         if (sommeil != null) {
             product.setIsActive("0".equals(sommeil.trim()) || "false".equalsIgnoreCase(sommeil.trim()));
@@ -508,6 +722,50 @@ public class SageIntegrationService {
      *   AS_QteRes  → quantityReserved
      *   AR_PAMP    → averageCost
      */
+    /**
+     * Version cachée de applyInventory — élimine le N+1 :
+     * produit, dépôt et niveau de stock sont résolus via les Maps pré-chargées,
+     * sans aucun appel repository par item.
+     * Le saveAll est effectué en masse dans applyBatch après la boucle.
+     */
+    private void applyInventoryCached(SageSyncItem item, Map<String, Object> data,
+                                      Map<String, Product>    productCache,
+                                      Map<String, Warehouse>  warehouseCache,
+                                      Map<String, StockLevel> stockLevelCache) {
+        String arRef = getString(data, "ar_ref", "sage_code");
+        String deNo  = getString(data, "de_no",  "depot");
+        if (arRef == null || deNo == null) return;
+
+        Product product = productCache.get(arRef);
+        if (product == null) {
+            log.warn("Inventaire (cached) : produit introuvable AR_Ref={}", arRef);
+            return;
+        }
+
+        // Dépôt : cache d'abord, création unique si absent (edge-case)
+        Warehouse warehouse = warehouseCache.computeIfAbsent(deNo, code ->
+                warehouseRepository.findByCode(code).orElseGet(() -> warehouseRepository.save(
+                        Warehouse.builder()
+                                .code(code.length() > 20 ? code.substring(0, 20) : code)
+                                .name("Dépôt " + code)
+                                .build())));
+
+        String slKey = product.getId() + "_" + warehouse.getId();
+        StockLevel stockLevel = stockLevelCache.computeIfAbsent(slKey, k ->
+                StockLevel.builder().product(product).warehouse(warehouse).build());
+
+        java.math.BigDecimal qteSto = getBigDecimal(data, "as_qtesto", "quantity_on_hand", "qte_stock");
+        java.math.BigDecimal qteRes = getBigDecimal(data, "as_qteres", "quantity_reserved", "qte_reserve");
+        java.math.BigDecimal pamp   = getBigDecimal(data, "ar_pamp",   "average_cost",     "pamp");
+
+        if (qteSto != null) stockLevel.setQuantityOnHand(qteSto);
+        if (qteRes != null) stockLevel.setQuantityReserved(qteRes);
+        if (pamp   != null) stockLevel.setAverageCost(pamp);
+
+        // crmId défini après saveAll dans applyBatch pour les nouvelles entrées
+        if (stockLevel.getId() != null) item.setCrmId(stockLevel.getId());
+    }
+
     private void applyInventory(SageSyncItem item, Map<String, Object> data) {
         String arRef = getString(data, "ar_ref", "sage_code");
         String deNo  = getString(data, "de_no", "depot");
@@ -834,5 +1092,18 @@ public class SageIntegrationService {
     private User currentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email).orElse(null);
+    }
+
+    /** Charge des entités par sage_code en sous-batches pour respecter la limite SQL Server (2100 params). */
+    private <T> Map<String, T> loadInBatches(
+            List<String> codes, int batchSize,
+            java.util.function.Function<List<String>, List<T>> loader,
+            java.util.function.Function<T, String> keyExtractor) {
+        Map<String, T> result = new HashMap<>();
+        for (int i = 0; i < codes.size(); i += batchSize) {
+            List<String> batch = codes.subList(i, Math.min(i + batchSize, codes.size()));
+            loader.apply(batch).forEach(e -> result.put(keyExtractor.apply(e), e));
+        }
+        return result;
     }
 }

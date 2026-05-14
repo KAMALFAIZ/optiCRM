@@ -5,7 +5,7 @@ import {
 } from 'antd';
 import {
   UserOutlined, CloudUploadOutlined, CheckCircleOutlined,
-  ReloadOutlined, InfoCircleOutlined, DatabaseOutlined, CodeOutlined,
+  ReloadOutlined, InfoCircleOutlined, DatabaseOutlined, CodeOutlined, SaveOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import sageIntegrationApi, {
@@ -90,7 +90,7 @@ export default function ContactsSyncTab() {
   const { message } = App.useApp();
   const [pastedData, setPastedData] = useState('');
   const [label, setLabel] = useState('');
-  const [sqlQuery, setSqlQuery] = useState(DEFAULT_SQL);
+  const [sqlQuery, setSqlQuery] = useState(() => localStorage.getItem('sage.query.contacts') || DEFAULT_SQL);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -118,7 +118,7 @@ export default function ContactsSyncTab() {
       setStep(1);
       message.success(`Prévisualisation générée : ${req.totalItems} ligne(s) analysée(s).`);
     } catch (e: any) {
-      message.error(e?.response?.data?.message || 'Erreur lors de la prévisualisation.');
+      message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de la prévisualisation.');
     } finally {
       setLoading(false);
     }
@@ -133,10 +133,15 @@ export default function ContactsSyncTab() {
       setStep(2);
       message.success(`Synchronisation appliquée : ${updated.successItems} réussie(s), ${updated.errorItems} erreur(s).`);
     } catch (e: any) {
-      message.error(e?.response?.data?.message || 'Erreur lors de l\'application.');
+      message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de l\'application.');
     } finally {
       setApplying(false);
     }
+  };
+
+  const handleSaveQuery = () => {
+    localStorage.setItem('sage.query.contacts', sqlQuery);
+    message.success('Requête contacts enregistrée');
   };
 
   const handleReset = () => {
@@ -168,7 +173,7 @@ export default function ContactsSyncTab() {
       setStep(1);
       message.success(`${rows.length} contact(s) importés depuis Sage — ${req.totalItems} ligne(s) analysée(s).`);
     } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || 'Erreur lors de l\'import depuis Sage.';
+      const msg = e?.response?.data?.error?.message || e?.response?.data?.message || e?.message || 'Erreur lors de l\'import depuis Sage.';
       message.error(msg);
     } finally {
       setImporting(false);
@@ -248,6 +253,11 @@ export default function ContactsSyncTab() {
                         style={{ background: '#7c3aed', borderColor: '#7c3aed' }}
                       >
                         Exécuter et importer depuis Sage
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Enregistrer la requête SQL pour les prochaines sessions">
+                      <Button icon={<SaveOutlined />} onClick={handleSaveQuery}>
+                        Enregistrer la requête
                       </Button>
                     </Tooltip>
                   </div>

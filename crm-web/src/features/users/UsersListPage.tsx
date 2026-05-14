@@ -263,17 +263,19 @@ export default function UsersListPage() {
     onChange: (keys) => setSelectedRowKeys(keys),
   };
 
+  const isSuperAdmin = (user: UserListItem) => user.role?.name === 'SUPER_ADMIN';
+
   const getActions = (user: UserListItem): MenuProps['items'] => [
     { key: 'edit', icon: <EditOutlined />, label: 'Modifier', onClick: () => handleEdit(user) },
     { key: 'password', icon: <KeyOutlined />, label: 'Changer le mot de passe', onClick: () => handlePasswordOpen(user.id) },
     { key: 'history', icon: <HistoryOutlined />, label: 'Historique', onClick: () => handleOpenHistory(user) },
     { type: 'divider' },
     user.isActive
-      ? { key: 'deactivate', icon: <StopOutlined />, label: 'Désactiver', danger: true, onClick: () => handleDeactivate(user.id) }
+      ? { key: 'deactivate', icon: <StopOutlined />, label: 'Désactiver', danger: true, disabled: isSuperAdmin(user), onClick: () => !isSuperAdmin(user) && handleDeactivate(user.id) }
       : { key: 'activate', icon: <CheckCircleOutlined />, label: 'Activer', onClick: () => handleActivate(user.id) },
-    { key: 'unlock', icon: <UnlockOutlined />, label: 'Déverrouiller', onClick: () => handleUnlock(user.id) },
+    { key: 'unlock', icon: <UnlockOutlined />, label: 'Déverrouiller', disabled: isSuperAdmin(user), onClick: () => !isSuperAdmin(user) && handleUnlock(user.id) },
     { type: 'divider' },
-    { key: 'delete', icon: <DeleteOutlined />, label: 'Supprimer', danger: true, onClick: () => handleDelete(user) },
+    { key: 'delete', icon: <DeleteOutlined />, label: 'Supprimer', danger: true, disabled: isSuperAdmin(user), onClick: () => !isSuperAdmin(user) && handleDelete(user) },
   ];
 
   const columns: ColumnsType<UserListItem> = [

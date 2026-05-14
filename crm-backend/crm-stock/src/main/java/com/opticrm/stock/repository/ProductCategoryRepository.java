@@ -15,6 +15,8 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
 
     Optional<ProductCategory> findByCode(String code);
 
+    List<ProductCategory> findByCodeIn(List<String> codes);
+
     boolean existsByCode(String code);
 
     @Query("SELECT c FROM ProductCategory c WHERE c.parentCategory IS NULL ORDER BY c.sortOrder, c.name")

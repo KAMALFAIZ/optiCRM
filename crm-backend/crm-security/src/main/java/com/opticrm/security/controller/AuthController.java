@@ -51,6 +51,9 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> logoutAll(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("UNAUTHORIZED", "Not authenticated"));
+        }
         authService.logoutAll(principal.getId());
         return ResponseEntity.ok(ApiResponse.success(null));
     }
@@ -59,6 +62,9 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("UNAUTHORIZED", "Not authenticated"));
+        }
         UserResponse response = authService.getCurrentUser(principal.getId());
         return ResponseEntity.ok(ApiResponse.success(response));
     }

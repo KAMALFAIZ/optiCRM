@@ -26,8 +26,18 @@ export interface Tenant {
   createdAt: string;
 }
 
+export interface TenantPublicInfo {
+  id: string;
+  slug: string;
+  name: string;
+  logoUrl: string;
+  primaryColor: string;
+  status: string;
+}
+
 export interface TenantState {
   tenant: Tenant | null;
+  publicInfo: TenantPublicInfo | null;
   plans: SubscriptionPlan[];
   isLoading: boolean;
   error: string | null;

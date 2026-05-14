@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,6 +28,7 @@ public class UserExportService {
             "Prénom", "Nom", "Email", "Téléphone", "Rôle", "Équipe", "Territoire", "Statut", "Dernière connexion", "Date création"
     };
 
+    @Transactional(readOnly = true)
     public byte[] exportToExcel(String search, UUID roleId, Boolean isActive) throws IOException {
         String searchTerm = (search != null && !search.trim().isEmpty()) ? search.trim() : "";
 

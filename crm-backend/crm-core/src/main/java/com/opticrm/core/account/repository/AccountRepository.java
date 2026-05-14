@@ -70,4 +70,6 @@ public interface AccountRepository extends JpaRepository<Account, UUID>, JpaSpec
 
     @Query("SELECT a FROM Account a WHERE a.latitude IS NOT NULL AND a.longitude IS NOT NULL ORDER BY a.name ASC")
     List<Account> findAllGeolocated();
+
+    Optional<Account> findByPhone(String phone);
 }

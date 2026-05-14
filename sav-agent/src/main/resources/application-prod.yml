@@ -1,0 +1,19 @@
+# =============================================================================
+# SAV Agent - Configuration PRODUCTION
+# =============================================================================
+# Activer avec : --spring.profiles.active=prod
+# Toutes les valeurs sensibles doivent être en variables d'environnement.
+# =============================================================================
+
+logging:
+  level:
+    root: WARN
+    com.opticrm.agent: INFO
+    org.springframework.web.socket: WARN
+
+sav-agent:
+  # Sécurité renforcée en production
+  security:
+    strict-mode: true
+  shell:
+    enabled: false

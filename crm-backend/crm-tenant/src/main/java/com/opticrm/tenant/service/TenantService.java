@@ -7,12 +7,14 @@ import com.opticrm.tenant.exception.TenantNotFoundException;
 import com.opticrm.tenant.repository.TenantRepository;
 import com.opticrm.tenant.repository.SubscriptionPlanRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TenantService {
@@ -35,6 +37,11 @@ public class TenantService {
     }
 
     @Transactional(readOnly = true)
+    public Tenant findBySlug(String slug) {
+        return tenantRepository.findBySlug(slug.toLowerCase().trim()).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
     public boolean isSlugAvailable(String slug) {
         return !tenantRepository.existsBySlug(slug);
     }
@@ -54,7 +61,8 @@ public class TenantService {
 
     @Transactional
     public Tenant updateStatus(UUID tenantId, Tenant.TenantStatus status) {
-        Tenant tenant = getById(tenantId);
+        Tenant tenant = tenantRepository.findByIdWithPlan(tenantId)
+                .orElseThrow(() -> new TenantNotFoundException(tenantId.toString()));
         tenant.setStatus(status);
         return tenantRepository.save(tenant);
     }
@@ -66,6 +74,13 @@ public class TenantService {
 
     @Transactional(readOnly = true)
     public List<Tenant> getAllTenants() {
-        return tenantRepository.findAll();
+        return tenantRepository.findAllWithPlan();
+    }
+
+    @Transactional
+    public void deleteTenant(UUID tenantId) {
+        Tenant tenant = tenantRepository.findByIdWithPlan(tenantId)
+                .orElseThrow(() -> new TenantNotFoundException(tenantId.toString()));
+        tenantRepository.delete(tenant);
     }
 }

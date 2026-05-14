@@ -1,6 +1,11 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
+
+const OSM_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const ESRI_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const ESRI_ATTRIBUTION = 'Tiles &copy; Esri';
 
 // Fix default marker icon issue with webpack/vite
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -85,6 +90,8 @@ export default function LocationMap({
     [polyline, validMarkers]
   );
 
+  const [satellite, setSatellite] = useState(false);
+
   const mapCenter = center || (validMarkers.length > 0 ? [validMarkers[0].lat, validMarkers[0].lng] as [number, number] : DEFAULT_CENTER);
   const mapZoom = zoom || (validMarkers.length > 0 ? 12 : DEFAULT_ZOOM);
 
@@ -93,35 +100,50 @@ export default function LocationMap({
   }
 
   return (
-    <MapContainer
-      center={mapCenter}
-      zoom={mapZoom}
-      style={{ height, width: '100%', borderRadius: 8, ...style }}
-      scrollWheelZoom
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <FitBounds markers={validMarkers} />
-      {polylinePositions.length >= 2 && (
-        <Polyline positions={polylinePositions} color="#1890ff" weight={3} opacity={0.7} dashArray="8" />
-      )}
-      {validMarkers.map((marker, idx) => (
-        <Marker
-          key={`${marker.lat}-${marker.lng}-${idx}`}
-          position={[marker.lat, marker.lng]}
-          icon={createNumberedIcon(marker.number, marker.color || 'blue')}
-        >
-          {(marker.popup || marker.label) && (
-            <Popup>
-              {marker.label && <strong>{marker.label}</strong>}
-              {marker.label && marker.popup && <br />}
-              {marker.popup && <span>{marker.popup}</span>}
-            </Popup>
-          )}
-        </Marker>
-      ))}
-    </MapContainer>
+    <div style={{ position: 'relative' }}>
+      <MapContainer
+        center={mapCenter}
+        zoom={mapZoom}
+        style={{ height, width: '100%', borderRadius: 8, ...style }}
+        scrollWheelZoom
+      >
+        <TileLayer
+          attribution={satellite ? ESRI_ATTRIBUTION : OSM_ATTRIBUTION}
+          url={satellite ? ESRI_URL : OSM_URL}
+        />
+        <FitBounds markers={validMarkers} />
+        {polylinePositions.length >= 2 && (
+          <Polyline positions={polylinePositions} color="#1890ff" weight={3} opacity={0.7} dashArray="8" />
+        )}
+        {validMarkers.map((marker, idx) => (
+          <Marker
+            key={`${marker.lat}-${marker.lng}-${idx}`}
+            position={[marker.lat, marker.lng]}
+            icon={createNumberedIcon(marker.number, marker.color || 'blue')}
+          >
+            {(marker.popup || marker.label) && (
+              <Popup>
+                {marker.label && <strong>{marker.label}</strong>}
+                {marker.label && marker.popup && <br />}
+                {marker.popup && <span>{marker.popup}</span>}
+              </Popup>
+            )}
+          </Marker>
+        ))}
+      </MapContainer>
+      <button
+        onClick={() => setSatellite(v => !v)}
+        style={{
+          position: 'absolute', bottom: 16, right: 10, zIndex: 1000,
+          background: satellite ? '#1677ff' : '#fff',
+          color: satellite ? '#fff' : '#333',
+          border: '2px solid rgba(0,0,0,0.2)',
+          borderRadius: 6, padding: '4px 10px', fontSize: 12,
+          cursor: 'pointer', fontWeight: 600, boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+        }}
+      >
+        {satellite ? '🗺 Plan' : '🛰 Satellite'}
+      </button>
+    </div>
   );
 }

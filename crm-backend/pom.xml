@@ -29,6 +29,7 @@
         <module>crm-communication</module>
         <module>crm-reporting</module>
         <module>crm-workflow</module>
+        <module>crm-delivery</module>
         <module>crm-api</module>
     </modules>
 
@@ -95,6 +96,11 @@
             <dependency>
                 <groupId>com.opticrm</groupId>
                 <artifactId>crm-workflow</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.opticrm</groupId>
+                <artifactId>crm-delivery</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

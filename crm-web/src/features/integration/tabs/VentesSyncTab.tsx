@@ -6,7 +6,7 @@ import {
 import {
   CloudUploadOutlined, CheckCircleOutlined,
   ReloadOutlined, InfoCircleOutlined, DatabaseOutlined, CodeOutlined,
-  ShoppingCartOutlined,
+  ShoppingCartOutlined, SaveOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import sageIntegrationApi, {
@@ -26,7 +26,7 @@ const DEFAULT_SQL = `SELECT
   CONVERT(VARCHAR, DO_Date, 23)   DO_Date,
   ISNULL(DO_TotalHT,  0)          DO_TotalHT,
   ISNULL(DO_TotalTTC, 0)          DO_TotalTTC
-FROM [GROUPE_ALBOUGHAZE].[dbo].[F_DOCENTETE]
+FROM [dbo].[F_DOCENTETE]
 WHERE DO_Type = 7
   AND DO_Statut < 3
   AND DO_Date >= DATEADD(MONTH, -1, GETDATE())`;
@@ -82,7 +82,7 @@ export default function VentesSyncTab() {
   const { message } = App.useApp();
   const [pastedData, setPastedData] = useState('');
   const [label, setLabel] = useState('');
-  const [sqlQuery, setSqlQuery] = useState(DEFAULT_SQL);
+  const [sqlQuery, setSqlQuery] = useState(() => localStorage.getItem('sage.query.ventes') || DEFAULT_SQL);
   const [loading, setLoading] = useState(false);
   const [applying, setApplying] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -98,7 +98,7 @@ export default function VentesSyncTab() {
       const req = await sageIntegrationApi.createRequest({ entityType: 'VENTES', label: label || undefined, rows });
       setRequest(req); setStep(1);
       message.success(`Prévisualisation générée : ${req.totalItems} vente(s) analysée(s).`);
-    } catch (e: any) { message.error(e?.response?.data?.message || 'Erreur lors de la prévisualisation.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de la prévisualisation.'); }
     finally { setLoading(false); }
   };
 
@@ -116,7 +116,7 @@ export default function VentesSyncTab() {
       });
       setRequest(req); setStep(1);
       message.success(`${rows.length} vente(s) importée(s) depuis Sage.`);
-    } catch (e: any) { message.error(e?.response?.data?.message || e?.message || 'Erreur lors de l\'import.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || e?.message || 'Erreur lors de l\'import.'); }
     finally { setImporting(false); }
   };
 
@@ -127,8 +127,13 @@ export default function VentesSyncTab() {
       const updated = await sageIntegrationApi.applyRequest(request.id);
       setRequest(updated); setStep(2);
       message.success(`${updated.successItems} vente(s) appliquée(s) sur les CA des comptes, ${updated.errorItems} erreur(s).`);
-    } catch (e: any) { message.error(e?.response?.data?.message || 'Erreur lors de l\'application.'); }
+    } catch (e: any) { message.error(e?.response?.data?.error?.message || e?.response?.data?.message || 'Erreur lors de l\'application.'); }
     finally { setApplying(false); }
+  };
+
+  const handleSaveQuery = () => {
+    localStorage.setItem('sage.query.ventes', sqlQuery);
+    message.success('Requête ventes enregistrée');
   };
 
   const handleReset = () => { setPastedData(''); setLabel(''); setRequest(null); setStep(0); };
@@ -148,10 +153,6 @@ export default function VentesSyncTab() {
               <Input placeholder="Ex : Ventes Février 2026" value={label} onChange={e => setLabel(e.target.value)} style={{ maxWidth: 400 }} />
             </Form.Item>
 
-            <Alert type="info" showIcon className="mb-4"
-              message="Mode d'intégration"
-              description="Les ventes sont agrégées par compte (CT_Num → sageCode) et incrémentent le CA annuel du compte CRM. Les comptes doivent être synchronisés au préalable." />
-
             <Collapse className="mb-4" style={{ background: '#f5f3ff', borderColor: '#ddd6fe' }} items={[{
               key: 'sql',
               label: <Space><DatabaseOutlined style={{ color: '#7c3aed' }} /><Text strong style={{ color: '#7c3aed' }}>Import direct depuis Sage SQL Server</Text><Tag color="purple">Recommandé</Tag></Space>,
@@ -161,11 +162,18 @@ export default function VentesSyncTab() {
                     message="Colonnes mappées"
                     description="CT_Num (code client Sage), DO_Piece (n° pièce), DO_Date (date), DO_TotalHT (montant HT), DO_TotalTTC (montant TTC). DO_Type=7 = Factures clients." />
                   <TextArea rows={9} value={sqlQuery} onChange={e => setSqlQuery(e.target.value)} style={{ fontFamily: 'monospace', fontSize: 12, marginBottom: 12 }} />
-                  <Tooltip title="Importe les ventes depuis Sage">
-                    <Button type="primary" icon={<DatabaseOutlined />} loading={importing} onClick={handleImportFromSage} style={{ background: '#7c3aed', borderColor: '#7c3aed' }}>
-                      Exécuter et importer depuis Sage
-                    </Button>
-                  </Tooltip>
+                  <Space>
+                    <Tooltip title="Importe les ventes depuis Sage">
+                      <Button type="primary" icon={<DatabaseOutlined />} loading={importing} onClick={handleImportFromSage} style={{ background: '#7c3aed', borderColor: '#7c3aed' }}>
+                        Exécuter et importer depuis Sage
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Enregistrer la requête SQL pour les prochaines sessions">
+                      <Button icon={<SaveOutlined />} onClick={handleSaveQuery}>
+                        Enregistrer la requête
+                      </Button>
+                    </Tooltip>
+                  </Space>
                 </div>
               ),
             }]} />
