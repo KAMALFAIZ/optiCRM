@@ -53,3 +53,6 @@ coverage/
 
 # Credentials / test files
 login.json
+
+# Claude Code local config
+.claude/

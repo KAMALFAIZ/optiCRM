@@ -1,0 +1,38 @@
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_NULLS ON;
+GO
+
+-- Migration V29: Table des paramètres applicatifs (clé-valeur)
+IF OBJECT_ID('app_settings', 'U') IS NULL
+BEGIN
+CREATE TABLE app_settings (
+    key         NVARCHAR(255) PRIMARY KEY,
+    value       NVARCHAR(MAX),
+    category    NVARCHAR(100) NOT NULL DEFAULT 'general',
+    created_at  DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE(),
+    updated_at  DATETIMEOFFSET NOT NULL DEFAULT GETUTCDATE()
+)
+END;
+
+IF NOT EXISTS (SELECT name FROM sys.indexes WHERE name = 'idx_app_settings_category' AND object_id = OBJECT_ID('app_settings'))
+    CREATE INDEX idx_app_settings_category ON app_settings(category);
+
+-- Paramètres SMTP par défaut (désactivé)
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.enabled')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.enabled',   'false',              'smtp');
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.host')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.host',      '',                   'smtp');
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.port')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.port',      '587',                'smtp');
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.username')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.username',  '',                   'smtp');
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.password')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.password',  '',                   'smtp');
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.from')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.from',      'noreply@opticrm.ma', 'smtp');
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.from_name')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.from_name', 'OptiCRM',            'smtp');
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.starttls')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.starttls',  'true',               'smtp');
+IF NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'smtp.auth')
+    INSERT INTO app_settings (key, value, category) VALUES ('smtp.auth',      'true',               'smtp');

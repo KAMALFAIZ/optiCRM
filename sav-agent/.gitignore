@@ -1,0 +1,12 @@
+target/
+logs/
+*.log
+.env
+*.jar
+!.env.example
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath

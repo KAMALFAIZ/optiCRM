@@ -1,0 +1,160 @@
+spring:
+  application:
+    name: opticrm-api
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  datasource:
+    url: ${DATABASE_URL:jdbc:sqlserver://localhost;databaseName=opticrm;encrypt=false;trustServerCertificate=true;sendStringParametersAsUnicode=true}
+    username: ${DATABASE_USERNAME:}
+    password: ${DATABASE_PASSWORD:}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-init-sql: "SET QUOTED_IDENTIFIER ON; SET ANSI_NULLS ON"
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+        format_sql: false
+        default_schema: dbo
+        jdbc:
+          batch_size: 100
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
+        # Multi-tenancy discriminator (Hibernate 6): filtre automatique par tenant_id
+        multiTenancy: DISCRIMINATOR
+    open-in-view: false
+
+  flyway:
+    enabled: ${FLYWAY_ENABLED:false}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+    out-of-order: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 60000
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+    time-zone: Africa/Casablanca
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# Upload & App Configuration
+app:
+  upload:
+    dir: ./uploads/avatars
+
+  # Deployment mode: saas | onpremise (default)
+  deployment:
+    mode: ${DEPLOYMENT_MODE:onpremise}
+    root-domain: ${ROOT_DOMAIN:opticrm.ma}
+    default-tenant-id: ${DEFAULT_TENANT_ID:00000000-0000-0000-0000-000000000001}
+    cors-allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+
+# Anthropic AI Configuration
+anthropic:
+  api-key: ${ANTHROPIC_API_KEY:}
+
+# Google Calendar OAuth2
+google:
+  calendar:
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+    redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:8081/api/v1/google-calendar/callback}
+    frontend-base-url: ${FRONTEND_BASE_URL:http://localhost:5173}
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:}
+  access-token-expiration: 28800000  # 8 heures
+  refresh-token-expiration: 604800000  # 7 days
+  issuer: opticrm
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8081}
+  servlet:
+    context-path: /
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.opticrm: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+    org.hibernate.type.descriptor.sql.BasicBinder: WARN
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    com.opticrm: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    root: WARN
+    com.opticrm: INFO

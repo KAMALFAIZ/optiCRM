@@ -1,0 +1,284 @@
+[1/104] Circuit 1: الرباط - المحيط
+(node:35520) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  → 19 rows
+  waiting 22s...
+[2/104] Circuit 2: الرباط - شالة
+  → 20 rows
+  waiting 22s...
+[3/104] Circuit 3: الصخيرات - تمارة
+  → 21 rows
+  waiting 22s...
+[4/104] Circuit 4: الخميسات - أولماس
+  → 23 rows
+  waiting 22s...
+[5/104] Circuit 5: تيفلت - الرماني
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  → 18 rows
+  waiting 22s...
+[6/104] Circuit 6: المحمدية
+  → 20 rows
+  waiting 22s...
+[7/104] Circuit 7: أكادير -إدا وتنان
+  → 19 rows
+  waiting 22s...
+[8/104] Circuit 8: إنزكان-آيت ملول
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 24s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 32s
+  gave up: getaddrinfo ENOTFOUND www.elections.ma
+  → 0 rows
+  waiting 22s...
+[9/104] Circuit 9: اشتوكة-آيت باها
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  → 12 rows
+  waiting 22s...
+[10/104] Circuit 10: تارودانت الجنوبية
+  → 14 rows
+  waiting 22s...
+[11/104] Circuit 11: تارودانت الشمالية
+  → 8 rows
+  waiting 22s...
+[12/104] Circuit 12: تيزنيت
+  → 13 rows
+  waiting 22s...
+[13/104] Circuit 13: ورزازات
+  → 16 rows
+  waiting 22s...
+[14/104] Circuit 14: زاكورة
+  → 12 rows
+  waiting 22s...
+[15/104] Circuit 15: الحسيمة
+  → 14 rows
+  waiting 22s...
+[16/104] Circuit 16: تازة
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 24s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 32s
+  → 19 rows
+  waiting 22s...
+[17/104] Circuit 17: تاونات - تيسة
+  error: socket hang up – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  → 12 rows
+  waiting 22s...
+[18/104] Circuit 18: القرية - غفساي
+  → 7 rows
+  waiting 22s...
+[19/104] Circuit 19: بني ملال
+  → 16 rows
+  waiting 22s...
+[20/104] Circuit 20: بزو - واويزاغت
+  → 14 rows
+  waiting 22s...
+[21/104] Circuit 21: أزيلال - دمنات
+  → 10 rows
+  waiting 22s...
+[22/104] Circuit 22: مولاي يعقوب
+  → 15 rows
+  waiting 22s...
+[23/104] Circuit 23: صفرو
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 24s
+  → 19 rows
+  waiting 22s...
+[24/104] Circuit 24: بولمان
+  → 14 rows
+  waiting 22s...
+[25/104] Circuit 25: كلميم
+  → 21 rows
+  waiting 22s...
+[26/104] Circuit 26: طاطا
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  → 9 rows
+  waiting 22s...
+[27/104] Circuit 27: أسا - الزاك
+  → 10 rows
+  waiting 22s...
+[28/104] Circuit 28: السمارة
+  → 13 rows
+  waiting 22s...
+[29/104] Circuit 29: طانطان
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  → 20 rows
+  waiting 22s...
+[30/104] Circuit 30: القنيطرة
+  → 22 rows
+  waiting 22s...
+[31/104] Circuit 31: الغرب
+  → 16 rows
+  waiting 22s...
+[32/104] Circuit 32: سيدي قاسم
+  → 15 rows
+  waiting 22s...
+[33/104] Circuit 33: العيون
+  → 23 rows
+  waiting 22s...
+[34/104] Circuit 34: بوجدور
+  → 12 rows
+  waiting 22s...
+[35/104] Circuit 35: شيشاوة
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 24s
+  → 10 rows
+  waiting 22s...
+[36/104] Circuit 36: الحوز
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  → 10 rows
+  waiting 22s...
+[37/104] Circuit 37: قلعة السراغنة
+  → 16 rows
+  waiting 22s...
+[38/104] Circuit 38: الصويرة
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 16 rows
+  waiting 22s...
+[39/104] Circuit 39: الحاجب
+  → 16 rows
+  waiting 22s...
+[40/104] Circuit 40: إفران
+  → 18 rows
+  waiting 22s...
+[41/104] Circuit 41: خنيفرة
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 24s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 32s
+
+  waiting 22s...
+[42/104] Circuit 42: الرشيدية
+  → 16 rows
+  waiting 22s...
+[43/104] Circuit 43: وادي الذهب
+  → 21 rows
+  waiting 22s...
+[44/104] Circuit 44: أوسرد
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 12 rows
+  waiting 22s...
+[45/104] Circuit 45: وجدة - أنجاد
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 20 rows
+  waiting 22s...
+Resumed from circuit index 45, 687 rows loaded
+[46/104] Circuit 46: جرادة
+(node:41048) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 11 rows
+  waiting 22s...
+[47/104] Circuit 47: بركان
+  → 13 rows
+  waiting 22s...
+[48/104] Circuit 48: تاوريرت
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 15 rows
+  waiting 22s...
+[49/104] Circuit 49: فجيج
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 12 rows
+  waiting 22s...
+[50/104] Circuit 50: الناضور
+  → 19 rows
+  waiting 22s...
+[51/104] Circuit 51: آسفي
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo ENOTFOUND www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 25 rows
+  waiting 22s...
+[52/104] Circuit 52: الجديدة
+  → 22 rows
+  waiting 22s...
+[53/104] Circuit 53: سطات
+  → 21 rows
+  waiting 22s...
+[54/104] Circuit 54: خريبكة
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 19 rows
+  waiting 22s...
+[55/104] Circuit 55: بنسليمان
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 17 rows
+  waiting 22s...
+[56/104] Circuit 56: طنجة - أصيلة
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  error: socket hang up – retry in 24s
+  retry 3 via IP 194.204.212.11
+  → 23 rows
+  waiting 22s...
+[57/104] Circuit 57: تطوان
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 15 rows
+  waiting 22s...
+[58/104] Circuit 58: العرائش
+  → 15 rows
+  waiting 22s...
+[59/104] Circuit 59: شفشاون
+  → 15 rows
+  waiting 22s...
+[60/104] Circuit 60: سلا المدينة
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 17 rows
+  waiting 22s...
+[61/104] Circuit 61: سلا الجديدة
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 18 rows
+  waiting 22s...
+[62/104] Circuit 62: الدار البيضاء - أنفا
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 20 rows
+  waiting 22s...
+[63/104] Circuit 63: الفداء - مرس السلطان
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 21 rows
+  waiting 22s...
+[64/104] Circuit 64: عين السبع - الحي المحمدي
+  → 17 rows
+  waiting 22s...
+Resumed from circuit index 65, 1042 rows loaded
+[66/104] Circuit 66: الحي الحسني
+(node:38016) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  → 20 rows
+  waiting 22s...
+[67/104] Circuit 67: سيدي البرنوصي
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 22 rows
+  waiting 22s...
+[68/104] Circuit 68: ابن امسيك
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 16 rows
+  waiting 22s...
+[69/104] Circuit 69: مولاي رشيد
+  → 18 rows
+  waiting 22s...
+[70/104] Circuit 70: النواصر
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  → 17 rows
+  waiting 22s...
+[71/104] Circuit 71: مديونة
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 8s
+  error: getaddrinfo EAI_AGAIN www.elections.ma – retry in 16s
+  retry 2 via IP 194.204.212.11
+  → 11 rows
+  waiting 22s...

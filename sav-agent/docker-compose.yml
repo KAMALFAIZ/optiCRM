@@ -1,0 +1,61 @@
+# =============================================================================
+# SAV Agent - Docker Compose
+# =============================================================================
+# Usage: docker-compose up -d
+# =============================================================================
+
+version: '3.8'
+
+services:
+  sav-agent:
+    build: .
+    image: opticrm/sav-agent:1.0.0
+    container_name: sav-agent
+    restart: unless-stopped
+
+    environment:
+      # OBLIGATOIRE : Configurer ces valeurs
+      AGENT_API_KEY: ${AGENT_API_KEY:?Clé API obligatoire}
+      AGENT_CENTRAL_URL: ${AGENT_CENTRAL_URL:-wss://crm.example.com/ws/agent}
+      AGENT_NAME: ${AGENT_NAME:-SAV-Agent-Docker}
+
+      # Base locale (optionnel)
+      LOCAL_DB_ENABLED: ${LOCAL_DB_ENABLED:-false}
+      LOCAL_DB_URL: ${LOCAL_DB_URL:-}
+      LOCAL_DB_USER: ${LOCAL_DB_USER:-}
+      LOCAL_DB_PASSWORD: ${LOCAL_DB_PASSWORD:-}
+
+      # HTTP local
+      LOCAL_HTTP_ENABLED: ${LOCAL_HTTP_ENABLED:-true}
+      LOCAL_HTTP_BASE_URL: ${LOCAL_HTTP_BASE_URL:-http://host.docker.internal:8090}
+
+      # Shell (désactivé par défaut)
+      SHELL_ENABLED: "false"
+
+      # JVM
+      JAVA_OPTS: "-Xms128m -Xmx512m"
+
+    ports:
+      - "${AGENT_MGMT_PORT:-9091}:9091"  # Health check
+
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+      - ./exports:/app/exports
+      - ./imports:/app/imports
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Accès au réseau de l'hôte
+
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9091/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

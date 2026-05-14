@@ -1,0 +1,41 @@
+﻿src/features/accounts/AccountDetailPage.tsx(21,3): error TS6133: 'Tooltip' is declared but its value is never read.
+src/features/accounts/AccountDetailPage.tsx(36,3): error TS6133: 'TeamOutlined' is declared but its value is never read.
+src/features/accounts/AccountDetailPage.tsx(37,3): error TS6133: 'DollarOutlined' is declared but its value is never read.
+src/features/accounts/AccountFormModal.tsx(74,46): error TS2339: Property 'dateProchaineAction' does not exist on type 'Account'.
+src/features/accounts/AccountFormModal.tsx(75,35): error TS2339: Property 'dateProchaineAction' does not exist on type 'Account'.
+src/features/accounts/HealthScoreWidget.tsx(28,15): error TS6133: 'Title' is declared but its value is never read.
+src/features/chantiers/ChantierDetailPage.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/features/chantiers/ChantierDetailPage.tsx(6,3): error TS6133: 'Divider' is declared but its value is never read.
+src/features/chantiers/ChantiersListPage.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/features/finance/AgedBalancePage.tsx(263,55): error TS2322: Type '{ children: Element; index: number; align: "right"; style: CSSProperties; }' is not assignable to type 'IntrinsicAttributes & SummaryCellProps'.
+  Property 'style' does not exist on type 'IntrinsicAttributes & SummaryCellProps'.
+src/features/finance/AgedBalancePage.tsx(266,55): error TS2322: Type '{ children: Element; index: number; align: "right"; style: CSSProperties; }' is not assignable to type 'IntrinsicAttributes & SummaryCellProps'.
+  Property 'style' does not exist on type 'IntrinsicAttributes & SummaryCellProps'.
+src/features/finance/AgedBalancePage.tsx(269,55): error TS2322: Type '{ children: Element; index: number; align: "right"; style: CSSProperties; }' is not assignable to type 'IntrinsicAttributes & SummaryCellProps'.
+  Property 'style' does not exist on type 'IntrinsicAttributes & SummaryCellProps'.
+src/features/finance/AgedBalancePage.tsx(272,55): error TS2322: Type '{ children: Element; index: number; align: "right"; style: CSSProperties; }' is not assignable to type 'IntrinsicAttributes & SummaryCellProps'.
+  Property 'style' does not exist on type 'IntrinsicAttributes & SummaryCellProps'.
+src/features/finance/AgedBalancePage.tsx(275,55): error TS2322: Type '{ children: Element; index: number; align: "right"; style: CSSProperties; }' is not assignable to type 'IntrinsicAttributes & SummaryCellProps'.
+  Property 'style' does not exist on type 'IntrinsicAttributes & SummaryCellProps'.
+src/features/finance/AgedBalancePage.tsx(278,55): error TS2322: Type '{ children: string; index: number; align: "right"; style: { fontSize: number; accentColor?: AccentColor | undefined; alignContent?: AlignContent | undefined; ... 853 more ...; glyphOrientationVertical?: GlyphOrientationVertical | undefined; }; }' is not assignable to type 'IntrinsicAttributes & SummaryCellProps'.
+  Property 'style' does not exist on type 'IntrinsicAttributes & SummaryCellProps'.
+src/features/finance/AgedBalancePage.tsx(281,56): error TS2322: Type '{ children: Element; index: number; align: "center"; style: CSSProperties; }' is not assignable to type 'IntrinsicAttributes & SummaryCellProps'.
+  Property 'style' does not exist on type 'IntrinsicAttributes & SummaryCellProps'.
+src/features/finance/InvoicesListPage.tsx(204,31): error TS6133: 'record' is declared but its value is never read.
+src/features/finance/InvoicesListPage.tsx(235,29): error TS6133: 'record' is declared but its value is never read.
+src/features/finance/InvoicesListPage.tsx(279,14): error TS18048: 'stats.overdueAmount' is possibly 'undefined'.
+src/features/finance/InvoicesListPage.tsx(280,128): error TS18047: 'stats' is possibly 'null'.
+src/features/finance/PaymentsListPage.tsx(172,24): error TS6133: 'record' is declared but its value is never read.
+src/features/finance/PaymentsListPage.tsx(272,14): error TS18048: 'stats.pendingPayments' is possibly 'undefined'.
+src/features/finance/PaymentsListPage.tsx(273,59): error TS18047: 'stats' is possibly 'null'.
+src/features/finance/SalesOrdersListPage.tsx(179,31): error TS6133: 'record' is declared but its value is never read.
+src/features/leads/LeadDetailPage.tsx(45,3): error TS6133: 'TeamOutlined' is declared but its value is never read.
+src/features/leads/LeadDetailPage.tsx(79,7): error TS6133: 'findColor' is declared but its value is never read.
+src/features/leads/LeadDetailPage.tsx(644,9): error TS2322: Type 'string | undefined' is not assignable to type 'string | null'.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/features/leads/LeadsListPage.tsx(120,5): error TS2552: Cannot find name 'navigate'. Did you mean 'navigator'?
+src/features/map/MapPage.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/features/objections/ObjectionsListPage.tsx(275,14): error TS18048: 'stats.openObjections' is possibly 'undefined'.
+src/features/objections/ObjectionsListPage.tsx(276,59): error TS18047: 'stats' is possibly 'null'.
+src/features/users/UsersListPage.tsx(358,14): error TS18048: 'stats.activeUsers' is possibly 'undefined'.
+src/features/users/UsersListPage.tsx(359,59): error TS18047: 'stats' is possibly 'null'.

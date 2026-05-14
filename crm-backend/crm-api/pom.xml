@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.opticrm</groupId>
+        <artifactId>crm-backend</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>crm-api</artifactId>
+    <name>CRM API</name>
+    <description>Main API Application - Entry Point</description>
+
+    <dependencies>
+        <!-- All modules -->
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-tenant</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-stock</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-finance</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-communication</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-reporting</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-workflow</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.opticrm</groupId>
+            <artifactId>crm-delivery</artifactId>
+        </dependency>
+
+        <!-- Anthropic AI -->
+        <dependency>
+            <groupId>com.anthropic</groupId>
+            <artifactId>anthropic-java</artifactId>
+        </dependency>
+
+        <!-- SQL Server JDBC -->
+        <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>12.4.2.jre11</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Spring Boot Starters -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Database -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <!-- OpenAPI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
+        <!-- DevTools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>mssqlserver</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.opticrm.api.CrmApiApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
