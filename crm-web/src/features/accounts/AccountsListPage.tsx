@@ -68,12 +68,14 @@ const AccountsListPage: React.FC = () => {
   const [mapLoading, setMapLoading] = useState(false);
   const [refSocietes, setRefSocietes] = useState<ReferenceDataItem[]>([]);
   const [refTypes, setRefTypes] = useState<ReferenceDataItem[]>([]);
+  const [representants, setRepresentants] = useState<string[]>([]);
 
   useEffect(() => {
     referenceDataApi.getAll().then((data) => {
       setRefSocietes(data[REFERENCE_CATEGORIES.SOCIETE_AFFECTATION] ?? []);
       setRefTypes(data[REFERENCE_CATEGORIES.TYPE_COMPTE] ?? []);
     }).catch(() => {});
+    accountsApi.getRepresentants().then(setRepresentants).catch(() => {});
   }, []);
 
   const loadGeolocated = useCallback(async () => {
@@ -476,6 +478,20 @@ const AccountsListPage: React.FC = () => {
                 onChange={(value) => dispatch(setFilters({ industryId: value, page: 0 }))}
                 value={filters.industryId}
                 showSearch
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+              />
+            </Col>
+            <Col span={5}>
+              <Select
+                placeholder="Représentant"
+                allowClear
+                showSearch
+                style={{ width: '100%' }}
+                options={representants.map(r => ({ value: r, label: r }))}
+                onChange={(value) => dispatch(setFilters({ representant: value, page: 0 }))}
+                value={filters.representant}
                 filterOption={(input, option) =>
                   (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                 }

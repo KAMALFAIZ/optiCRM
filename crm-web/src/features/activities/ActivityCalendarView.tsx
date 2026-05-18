@@ -23,19 +23,20 @@ interface Props {
   onEventClick: (id: string) => void;
   onDateClick: () => void;
   onEventReschedule?: (id: string, start: string, end?: string) => void;
+  assignedToId?: string;
 }
 
-export default function ActivityCalendarView({ onEventClick, onDateClick, onEventReschedule }: Props) {
+export default function ActivityCalendarView({ onEventClick, onDateClick, onEventReschedule, assignedToId }: Props) {
   const dispatch = useAppDispatch();
   const { calendarEvents } = useAppSelector((state) => state.activities);
   const { events: googleEvents, status: gcStatus } = useAppSelector((state) => state.googleCalendar);
 
   const loadEvents = useCallback((start: string, end: string) => {
-    dispatch(fetchCalendarEvents({ from: start, to: end }));
+    dispatch(fetchCalendarEvents({ from: start, to: end, assignedToId }));
     if (gcStatus?.connected) {
       dispatch(fetchGoogleCalendarEvents({ from: start, to: end }));
     }
-  }, [dispatch, gcStatus?.connected]);
+  }, [dispatch, gcStatus?.connected, assignedToId]);
 
   const handleEventDrop = async (info: any) => {
     const id = info.event.id;
@@ -84,7 +85,7 @@ export default function ActivityCalendarView({ onEventClick, onDateClick, onEven
     const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
     loadEvents(start, end);
-  }, [loadEvents]);
+  }, [loadEvents, assignedToId]);
 
   const crmEvents = calendarEvents.map((event) => ({
     id: event.id,

@@ -21,6 +21,8 @@ import { selectUser } from '@/features/auth/authSlice';
 import { ACTIVITY_TYPES, ACTIVITY_STATUSES, ACTIVITY_PRIORITIES, ACTIVITY_TRANSPORT_MODES } from '@/types/activity';
 import apiClient from '@/api/client';
 import usersApi from '@/api/users';
+import supervisorApi from '@/api/supervisor';
+import type { CollaboratorSummary } from '@/types/dashboard';
 
 
 const { Text } = Typography;
@@ -466,6 +468,16 @@ export default function ActivityFormModal({ open, editingId, onClose, onSuccess 
   const dispatch = useAppDispatch();
   const { selectedActivity, loading } = useAppSelector((state) => state.activities);
   const currentUser = useAppSelector(selectUser);
+  const roleName: string = (currentUser?.role as any)?.name ?? (currentUser?.role as any) ?? '';
+  const isSuperviseur = ['SUPERVISEUR', 'SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(roleName);
+
+  // Collaborateurs (pour admins/superviseurs)
+  const [collaborators, setCollaborators] = useState<CollaboratorSummary[]>([]);
+  useEffect(() => {
+    if (isSuperviseur) {
+      supervisorApi.getAssignableUsers().then(setCollaborators).catch(() => {});
+    }
+  }, [isSuperviseur]);
 
   // AI state
   const [aiSubjectLoading, setAiSubjectLoading] = useState(false);
@@ -843,6 +855,23 @@ export default function ActivityFormModal({ open, editingId, onClose, onSuccess 
                     }))} />
                   </Form.Item>
                 </div>
+
+                {/* Commercial — visible admin/superviseur uniquement */}
+                {isSuperviseur && (
+                  <Form.Item name="assignedToId" label="Commercial">
+                    <Select
+                      placeholder="Sélectionner un commercial..."
+                      allowClear
+                      showSearch
+                      optionFilterProp="label"
+                      options={collaborators.map((c) => ({
+                        value: c.userId,
+                        label: c.fullName,
+                        title: c.email,
+                      }))}
+                    />
+                  </Form.Item>
+                )}
 
                 {/* Sujet avec bouton IA */}
                 <Form.Item name="subject" label="Sujet" rules={[{ required: true, message: 'Sujet requis' }]}>

@@ -58,7 +58,7 @@ public class AccountService {
     @Transactional(readOnly = true)
     public Page<AccountListDto> list(PageRequest pageRequest, String search, String accountType,
                                      String assignedToId, String territoryId, Boolean hasSageCode,
-                                     String societeAffectation) {
+                                     String societeAffectation, String representant) {
         Page<Account> accounts;
 
         // COMMERCIAL ne voit que ses propres comptes
@@ -70,7 +70,10 @@ public class AccountService {
             }
         }
 
-        if (societeAffectation != null && !societeAffectation.isBlank()) {
+        if (representant != null && !representant.isBlank()) {
+            accounts = accountRepository.findByRepresentantIgnoreCase(representant.trim(),
+                    pageRequest.toPageable("name", Sort.Direction.ASC));
+        } else if (societeAffectation != null && !societeAffectation.isBlank()) {
             accounts = accountRepository.findBySocieteAffectation(societeAffectation,
                     pageRequest.toPageable("name", Sort.Direction.ASC));
         } else if (Boolean.TRUE.equals(hasSageCode)) {
@@ -94,6 +97,11 @@ public class AccountService {
         }
 
         return accounts.map(this::mapToListDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> listRepresentants() {
+        return accountRepository.findDistinctRepresentants();
     }
 
     @Transactional

@@ -12,6 +12,7 @@ export interface AccountsQueryParams {
   territoryId?: string;
   hasSageCode?: boolean;
   societeAffectation?: string;
+  representant?: string;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
 }
@@ -29,6 +30,7 @@ export const accountsApi = {
       territoryId: params.territoryId,
       hasSageCode: params.hasSageCode,
       societeAffectation: params.societeAffectation,
+      representant: params.representant,
       sortBy: params.sortBy,
       sortDirection: params.sortDirection,
     };
@@ -112,6 +114,11 @@ export const accountsApi = {
 
   deletePhoto: async (accountId: string, photoId: string): Promise<void> => {
     await apiClient.delete(`/accounts/${accountId}/photos/${photoId}`);
+  },
+
+  getRepresentants: async (): Promise<string[]> => {
+    const response = await apiClient.get<ApiResponse<string[]>>('/accounts/representants');
+    return response.data.data || [];
   },
 
   getHealthScore: async (accountId: string): Promise<HealthScoreDto> => {

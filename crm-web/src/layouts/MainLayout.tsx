@@ -242,6 +242,8 @@ export default function MainLayout() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const themeMode = useAppSelector(selectThemeMode);
+  const tenantInfo = useAppSelector((state: any) => state.tenant?.publicInfo ?? state.tenant?.tenant ?? null);
+  const tenantName = tenantInfo?.name ?? localStorage.getItem('opticrm_tenant_slug') ?? null;
   const isDark = themeMode === 'dark';
   const { canAccessRoute, canAccessGroup } = usePermissions();
   const screens = useBreakpoint();
@@ -277,6 +279,19 @@ export default function MainLayout() {
   };
 
   const userMenuItems: MenuProps['items'] = [
+    ...(tenantName ? [{
+      key: 'tenant-info',
+      disabled: true,
+      label: (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 0' }}>
+          <DatabaseOutlined style={{ color: '#405189', fontSize: 13 }} />
+          <span style={{ fontSize: 12, color: '#405189', fontWeight: 600, textTransform: 'capitalize' }}>
+            {tenantName}
+          </span>
+        </div>
+      ),
+    }] : []),
+    ...(tenantName ? [{ type: 'divider' as const }] : []),
     {
       key: 'profile',
       icon: <ProfileOutlined />,
@@ -289,7 +304,7 @@ export default function MainLayout() {
       label: 'Paramètres',
       onClick: () => navigate('/settings'),
     },
-    { type: 'divider' },
+    { type: 'divider' as const },
     {
       key: 'logout',
       icon: <LogoutOutlined />,
@@ -323,9 +338,16 @@ export default function MainLayout() {
             <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: '#fff', fontFamily: 'Poppins, sans-serif', flexShrink: 0 }}>
               O
             </div>
-            <span style={{ color: '#fff', fontSize: 18, fontWeight: 700, fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.3px' }}>
-              OptiCRM
-            </span>
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
+              <span style={{ color: '#fff', fontSize: 18, fontWeight: 700, fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.3px' }}>
+                OptiCRM
+              </span>
+              {tenantName && (
+                <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 10, fontFamily: 'Poppins, sans-serif', textTransform: 'capitalize', letterSpacing: 0.5 }}>
+                  {tenantName}
+                </span>
+              )}
+            </div>
           </div>
         )}
       </div>

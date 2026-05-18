@@ -14,6 +14,9 @@ import dayjs from 'dayjs';
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { createVisit, updateVisit, fetchVisitById, clearSelectedVisit } from './visitsSlice';
+import { selectUser } from '@/features/auth/authSlice';
+import { supervisorApi } from '@/api/supervisor';
+import type { CollaboratorSummary } from '@/types/dashboard';
 import { streamChat } from '@/api/ai';
 import { VISIT_TYPES, VISIT_STATUSES, VISIT_OUTCOMES, VISIT_INTEREST_LEVELS, VISIT_TRANSPORT_MODES, VISIT_FOLLOWUP_PRIORITIES } from '@/types/visit';
 import { GpsLocationPicker } from '@/components/maps';
@@ -372,6 +375,20 @@ export default function VisitFormModal({ open, editingId, onClose, onSuccess }: 
   const [form] = Form.useForm();
   const dispatch = useAppDispatch();
   const { selectedVisit, loading } = useAppSelector((state) => state.visits);
+  const currentUser = useAppSelector(selectUser);
+
+  // Rôle
+  const roleName: string = (currentUser?.role as any)?.name ?? currentUser?.role ?? '';
+  const isSuperviseur = ['SUPERVISEUR', 'SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(roleName);
+
+  // Collaborateurs pour le champ "Assigné à"
+  const [collaborators, setCollaborators] = useState<CollaboratorSummary[]>([]);
+
+  useEffect(() => {
+    if (isSuperviseur) {
+      supervisorApi.getAssignableUsers().then(setCollaborators).catch(() => {});
+    }
+  }, [isSuperviseur]);
 
   // AI state
   const [aiSubjectLoading, setAiSubjectLoading] = useState(false);
@@ -607,6 +624,23 @@ export default function VisitFormModal({ open, editingId, onClose, onSuccess }: 
                     <Select allowClear options={VISIT_OUTCOMES.map((o) => ({ value: o.value, label: o.label }))} />
                   </Form.Item>
                 </div>
+
+                {/* Assigné à — visible uniquement pour admin/superviseur */}
+                {isSuperviseur && (
+                  <Form.Item name="assignedToId" label="Assigné à">
+                    <Select
+                      placeholder="Sélectionner un commercial..."
+                      allowClear
+                      showSearch
+                      optionFilterProp="label"
+                      options={collaborators.map((c) => ({
+                        value: c.userId,
+                        label: c.fullName,
+                        title: c.email,
+                      }))}
+                    />
+                  </Form.Item>
+                )}
 
                 {/* Sujet avec bouton IA */}
                 <Form.Item name="subject" label="Sujet" rules={[{ required: true, message: 'Sujet requis' }]}>

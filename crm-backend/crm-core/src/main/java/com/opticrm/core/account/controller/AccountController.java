@@ -44,7 +44,8 @@ public class AccountController {
             @RequestParam(required = false) String assignedToId,
             @RequestParam(required = false) String territoryId,
             @RequestParam(required = false) Boolean hasSageCode,
-            @RequestParam(required = false) String societeAffectation
+            @RequestParam(required = false) String societeAffectation,
+            @RequestParam(required = false) String representant
     ) {
         PageRequest pageRequest = PageRequest.builder()
                 .page(page)
@@ -53,12 +54,18 @@ public class AccountController {
                 .sortDirection(sortDirection)
                 .build();
 
-        Page<AccountListDto> result = accountService.list(pageRequest, search, accountType, assignedToId, territoryId, hasSageCode, societeAffectation);
+        Page<AccountListDto> result = accountService.list(pageRequest, search, accountType, assignedToId, territoryId, hasSageCode, societeAffectation, representant);
 
         return ResponseEntity.ok(ApiResponse.success(
                 result.getContent(),
                 PageMeta.from(result)
         ));
+    }
+
+    @GetMapping("/representants")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    public ResponseEntity<ApiResponse<List<String>>> getRepresentants() {
+        return ResponseEntity.ok(ApiResponse.success(accountService.listRepresentants()));
     }
 
     @GetMapping("/geolocated")

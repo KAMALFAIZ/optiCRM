@@ -6,6 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
 import frLocale from '@fullcalendar/core/locales/fr';
 import { Card, Space, Select, Tag, Drawer, Descriptions, Button, message } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 import {
   PhoneOutlined,
   MailOutlined,
@@ -27,6 +28,10 @@ import { VisitListItem, VISIT_TYPES } from '@/types/visit';
 import { TourListItem } from '@/types/tour';
 import type { TaskListItem } from '@/types/project';
 import type { TicketListItem } from '@/types/ticket';
+import { useAppSelector } from '@/store';
+import { selectUser } from '@/features/auth/authSlice';
+import supervisorApi from '@/api/supervisor';
+import type { CollaboratorSummary } from '@/types/dashboard';
 
 interface CalendarEvent {
   id: string;
@@ -84,6 +89,18 @@ export default function PlanningPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(null);
+  const [commercialId, setCommercialId] = useState<string | undefined>();
+  const [collaborators, setCollaborators] = useState<CollaboratorSummary[]>([]);
+
+  const currentUser = useAppSelector(selectUser);
+  const roleName: string = (currentUser?.role as any)?.name ?? (currentUser?.role as any) ?? '';
+  const isSuperviseur = ['SUPERVISEUR', 'SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(roleName);
+
+  useEffect(() => {
+    if (isSuperviseur) {
+      supervisorApi.getAssignableUsers().then(setCollaborators).catch(() => {});
+    }
+  }, [isSuperviseur]);
 
   const loadEvents = useCallback(async (start: string, end: string) => {
     setLoading(true);
@@ -91,13 +108,13 @@ export default function PlanningPage() {
       const promises: Promise<any>[] = [];
 
       if (sourceFilter === 'all' || sourceFilter === 'activities') {
-        promises.push(activitiesApi.getCalendarEvents(start, end));
+        promises.push(activitiesApi.getCalendarEvents(start, end, commercialId));
       } else {
         promises.push(Promise.resolve([]));
       }
 
       if (sourceFilter === 'all' || sourceFilter === 'visits') {
-        promises.push(visitsApi.getCalendarEvents(start, end));
+        promises.push(visitsApi.getCalendarEvents(start, end, commercialId));
       } else {
         promises.push(Promise.resolve([]));
       }
@@ -247,7 +264,7 @@ export default function PlanningPage() {
     } finally {
       setLoading(false);
     }
-  }, [sourceFilter]);
+  }, [sourceFilter, commercialId]);
 
   useEffect(() => {
     if (dateRange) {
@@ -468,6 +485,21 @@ export default function PlanningPage() {
         title="Planning"
         extra={
           <Space>
+            {isSuperviseur && (
+              <Select
+                placeholder={<><UserOutlined /> Commercial</>}
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                style={{ minWidth: 190 }}
+                onChange={(val) => setCommercialId(val || undefined)}
+                options={collaborators.map((c) => ({
+                  value: c.userId,
+                  label: c.fullName,
+                  title: c.email,
+                }))}
+              />
+            )}
             <Select
               value={sourceFilter}
               onChange={setSourceFilter}

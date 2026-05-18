@@ -18,14 +18,18 @@ import {
   EyeOutlined,
   FilterOutlined,
   ReloadOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { fetchActivities, deleteActivity, completeActivity, fetchActivityById, clearSelectedActivity, setFilters } from './activitiesSlice';
 import { ActivityListItem, ACTIVITY_TYPES, ACTIVITY_STATUSES, ACTIVITY_PRIORITIES, ACTIVITY_TRANSPORT_MODES } from '@/types/activity';
+import { selectUser } from '@/features/auth/authSlice';
 import ActivityFormModal from './ActivityFormModal';
 import ActivityCalendarView from './ActivityCalendarView';
+import supervisorApi from '@/api/supervisor';
+import type { CollaboratorSummary } from '@/types/dashboard';
 
 const { Text } = Typography;
 const { Search } = Input;
@@ -43,12 +47,23 @@ export default function ActivitiesListPage() {
   const { message } = App.useApp();
   const dispatch = useAppDispatch();
   const { items, loading, pagination, filters, selectedActivity } = useAppSelector((state) => state.activities);
+  const currentUser = useAppSelector(selectUser);
+  const roleName: string = (currentUser?.role as any)?.name ?? (currentUser?.role as any) ?? '';
+  const isSuperviseur = ['SUPERVISEUR', 'SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(roleName);
 
   const [viewMode, setViewMode] = useState<string>('list');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [collaborators, setCollaborators] = useState<CollaboratorSummary[]>([]);
+  const [calendarAssignedToId, setCalendarAssignedToId] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (isSuperviseur) {
+      supervisorApi.getAssignableUsers().then(setCollaborators).catch(() => {});
+    }
+  }, [isSuperviseur]);
 
   const loadData = useCallback(() => {
     dispatch(fetchActivities(filters));
@@ -68,6 +83,11 @@ export default function ActivitiesListPage() {
 
   const handleTypeFilter = (value: string) => {
     dispatch(setFilters({ activityType: value || undefined, page: 1 }));
+  };
+
+  const handleCommercialFilter = (value: string) => {
+    dispatch(setFilters({ assignedToId: value || undefined, page: 1 }));
+    setCalendarAssignedToId(value || undefined);
   };
 
   const handleDelete = (id: string) => {
@@ -277,14 +297,32 @@ export default function ActivitiesListPage() {
         title={
           <Row gutter={12} align="middle" style={{ padding: '8px 0' }}>
             <Col flex="auto">
-              <Search
-                placeholder="Rechercher..."
-                allowClear
-                enterButton
-                size="small"
-                onSearch={handleSearch}
-                style={{ maxWidth: 260 }}
-              />
+              <Space wrap>
+                <Search
+                  placeholder="Rechercher..."
+                  allowClear
+                  enterButton
+                  size="small"
+                  onSearch={handleSearch}
+                  style={{ maxWidth: 240 }}
+                />
+                {isSuperviseur && (
+                  <Select
+                    placeholder={<><UserOutlined /> Commercial</>}
+                    allowClear
+                    showSearch
+                    optionFilterProp="label"
+                    size="small"
+                    style={{ minWidth: 190 }}
+                    onChange={handleCommercialFilter}
+                    options={collaborators.map((c) => ({
+                      value: c.userId,
+                      label: c.fullName,
+                      title: c.email,
+                    }))}
+                  />
+                )}
+              </Space>
             </Col>
             <Col>
               <Space>
@@ -348,7 +386,11 @@ export default function ActivitiesListPage() {
             }}
           />
         ) : (
-          <ActivityCalendarView onEventClick={handleEdit} onDateClick={() => setModalOpen(true)} />
+          <ActivityCalendarView
+            onEventClick={handleEdit}
+            onDateClick={() => setModalOpen(true)}
+            assignedToId={calendarAssignedToId}
+          />
         )}
       </Card>
 

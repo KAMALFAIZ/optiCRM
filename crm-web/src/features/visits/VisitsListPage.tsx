@@ -1,49 +1,116 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Card, Table, Button, Space, Input, Select, Tag, Dropdown, Modal, message, Row, Col, Drawer, Descriptions, Timeline, Rate, Typography, Tooltip } from 'antd';
+import {
+  Card, Table, Button, Space, Input, Select, Tag, Dropdown, Modal, message,
+  Row, Col, Drawer, Descriptions, Timeline, Rate, Typography, Tooltip, Avatar,
+} from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
-  PlusOutlined,
-  DeleteOutlined,
-  EditOutlined,
-  MoreOutlined,
-  LoginOutlined,
-  LogoutOutlined,
-  EnvironmentOutlined,
-  EyeOutlined,
-  FilterOutlined,
-  ReloadOutlined,
+  PlusOutlined, DeleteOutlined, EditOutlined, MoreOutlined,
+  LoginOutlined, LogoutOutlined, EnvironmentOutlined, EyeOutlined,
+  FilterOutlined, ReloadOutlined, UserOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 import { useAppDispatch, useAppSelector } from '@/store';
-import { fetchVisits, deleteVisit, checkInVisit, checkOutVisit, fetchVisitById, clearSelectedVisit, setFilters } from './visitsSlice';
-import { VisitListItem, VISIT_TYPES, VISIT_STATUSES, VISIT_OUTCOMES } from '@/types/visit';
+import { selectUser } from '@/features/auth/authSlice';
+import { fetchVisitById, clearSelectedVisit, deleteVisit, checkInVisit, checkOutVisit } from './visitsSlice';
+import visitsApi from '@/api/visits';
+import { supervisorApi } from '@/api/supervisor';
+import { CollaboratorSummary } from '@/types/dashboard';
+import { VisitListItem, Visit, VISIT_TYPES, VISIT_STATUSES, VISIT_OUTCOMES } from '@/types/visit';
 import VisitFormModal from './VisitFormModal';
 
 const { Text } = Typography;
 const { Search } = Input;
 
+interface LocalFilters {
+  search?: string;
+  status?: string;
+  visitType?: string;
+  assignedToId?: string;
+  page: number;
+  size: number;
+  sortBy: string;
+  sortDirection: 'asc' | 'desc';
+}
+
 export default function VisitsListPage() {
   const dispatch = useAppDispatch();
-  const { items, loading, pagination, filters, selectedVisit } = useAppSelector((state) => state.visits);
+  const currentUser = useAppSelector(selectUser);
+  const selectedVisit: Visit | null = useAppSelector((s: any) => s.visits.selectedVisit);
 
+  // Rôle
+  const roleName: string = (currentUser?.role as any)?.name ?? currentUser?.role ?? '';
+  const isSuperviseur = ['SUPERVISEUR', 'SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(roleName);
+  const isCommercial = !isSuperviseur;
+
+  // ── État local — données ──────────────────────────────────────────
+  const [visits, setVisits] = useState<VisitListItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(0);
+
+  // ── État local — filtres ──────────────────────────────────────────
+  const [filters, setFilters] = useState<LocalFilters>({
+    page: 1,
+    size: 20,
+    sortBy: 'visitDate',
+    sortDirection: 'desc',
+  });
+
+  // ── État UI ───────────────────────────────────────────────────────
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [collaborators, setCollaborators] = useState<CollaboratorSummary[]>([]);
 
-  const loadData = useCallback(() => {
-    dispatch(fetchVisits(filters));
-  }, [dispatch, filters]);
+  // Éviter le chargement avant que currentUser soit prêt
+  const userReady = !!currentUser?.id;
+
+  // ── Chargement collaborateurs (superviseur uniquement) ────────────
+  useEffect(() => {
+    if (isSuperviseur) {
+      supervisorApi.getAssignableUsers().then(setCollaborators).catch(() => {});
+    }
+  }, [isSuperviseur]);
+
+  // ── Chargement des visites ────────────────────────────────────────
+  const loadVisits = useCallback(async () => {
+    if (!userReady) return;
+
+    const effectiveAssignedToId = isCommercial ? currentUser!.id : filters.assignedToId;
+
+    setLoading(true);
+    try {
+      const result = await visitsApi.getAll({
+        page: filters.page,
+        size: filters.size,
+        search: filters.search,
+        status: filters.status,
+        visitType: filters.visitType,
+        assignedToId: effectiveAssignedToId,
+        sortBy: filters.sortBy,
+        sortDirection: filters.sortDirection,
+      });
+      setVisits(result.content);
+      setTotal(result.totalElements);
+    } catch (err) {
+      message.error('Erreur lors du chargement des visites');
+    } finally {
+      setLoading(false);
+    }
+  }, [filters, isCommercial, currentUser?.id, userReady]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    loadVisits();
+  }, [loadVisits]);
 
-  const handleSearch = (value: string) => {
-    dispatch(setFilters({ search: value, page: 1 }));
+  // ── Mise à jour partielle des filtres ─────────────────────────────
+  const updateFilters = (patch: Partial<LocalFilters>) => {
+    setFilters((prev) => ({ ...prev, ...patch, page: patch.page ?? 1 }));
   };
 
+  // ── Actions ───────────────────────────────────────────────────────
   const handleDelete = (id: string) => {
     Modal.confirm({
       title: 'Supprimer cette visite ?',
@@ -54,7 +121,7 @@ export default function VisitsListPage() {
       onOk: async () => {
         await dispatch(deleteVisit(id));
         message.success('Visite supprimée');
-        loadData();
+        loadVisits();
       },
     });
   };
@@ -62,13 +129,13 @@ export default function VisitsListPage() {
   const handleCheckIn = async (id: string) => {
     await dispatch(checkInVisit({ id }));
     message.success('Check-in effectué');
-    loadData();
+    loadVisits();
   };
 
   const handleCheckOut = async (id: string) => {
     await dispatch(checkOutVisit({ id }));
     message.success('Check-out effectué');
-    loadData();
+    loadVisits();
   };
 
   const handleViewDetail = (id: string) => {
@@ -88,17 +155,19 @@ export default function VisitsListPage() {
 
   const handleModalSuccess = () => {
     handleModalClose();
-    loadData();
+    loadVisits();
     message.success(editingId ? 'Visite mise à jour' : 'Visite créée');
   };
 
+  // ── Stats ─────────────────────────────────────────────────────────
   const stats = {
-    total: pagination.totalElements,
-    planned: items.filter((i) => i.status === 'planned').length,
-    inProgress: items.filter((i) => i.status === 'in_progress').length,
-    completed: items.filter((i) => i.status === 'completed').length,
+    total,
+    planned: visits.filter((i) => i.status === 'planned').length,
+    inProgress: visits.filter((i) => i.status === 'in_progress').length,
+    completed: visits.filter((i) => i.status === 'completed').length,
   };
 
+  // ── Colonnes ──────────────────────────────────────────────────────
   const columns: ColumnsType<VisitListItem> = [
     {
       title: 'Type',
@@ -136,9 +205,7 @@ export default function VisitsListPage() {
       key: 'duration',
       width: 80,
       align: 'center' as const,
-      render: (min: number) => min ? (
-        <Tag color="processing">{min} min</Tag>
-      ) : '-',
+      render: (min: number) => min ? <Tag color="processing">{min} min</Tag> : '-',
     },
     {
       title: 'Contact',
@@ -235,9 +302,10 @@ export default function VisitsListPage() {
     },
   ];
 
+  // ── Rendu ─────────────────────────────────────────────────────────
   return (
     <div>
-      {/* ── Header compact ── */}
+      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <Space size={20} align="center">
           <Text strong style={{ fontSize: 20 }}>Visites terrain</Text>
@@ -255,7 +323,6 @@ export default function VisitsListPage() {
         </Space>
       </div>
 
-      {/* ── Table Card ── */}
       <Card
         styles={{ body: { padding: '8px 16px 16px' } }}
         title={
@@ -266,14 +333,46 @@ export default function VisitsListPage() {
                 allowClear
                 enterButton
                 size="small"
-                onSearch={handleSearch}
+                onSearch={(v) => updateFilters({ search: v || undefined })}
                 style={{ maxWidth: 260 }}
               />
             </Col>
+
+            {/* Filtre "Assigné à" — toujours visible pour admin/superviseur */}
+            {isSuperviseur && (
+              <Col style={{ minWidth: 220 }}>
+                <Select
+                  placeholder={<Space size={4}><UserOutlined />Assigné à</Space>}
+                  allowClear
+                  value={filters.assignedToId ?? undefined}
+                  style={{ width: '100%' }}
+                  size="small"
+                  onChange={(v) => updateFilters({ assignedToId: v || undefined })}
+                  optionFilterProp="label"
+                  showSearch
+                  options={collaborators.map((c) => ({
+                    value: c.userId,
+                    label: c.fullName,
+                    title: c.email,
+                  }))}
+                  optionRender={(opt) => (
+                    <Space size={8}>
+                      <Avatar size={20} icon={<UserOutlined />} style={{ backgroundColor: '#405189' }} />
+                      <span>{opt.label}</span>
+                    </Space>
+                  )}
+                />
+              </Col>
+            )}
+
             <Col>
               <Space>
-                <Button size="small" icon={<FilterOutlined />} onClick={() => setShowFilters(!showFilters)}>Filtres</Button>
-                <Button size="small" icon={<ReloadOutlined />} onClick={loadData}>Actualiser</Button>
+                <Button size="small" icon={<FilterOutlined />} onClick={() => setShowFilters(!showFilters)}>
+                  Filtres
+                </Button>
+                <Button size="small" icon={<ReloadOutlined />} onClick={loadVisits}>
+                  Actualiser
+                </Button>
               </Space>
             </Col>
           </Row>
@@ -287,7 +386,8 @@ export default function VisitsListPage() {
                 allowClear
                 style={{ width: '100%' }}
                 size="small"
-                onChange={(v) => dispatch(setFilters({ status: v || undefined, page: 1 }))}
+                value={filters.status}
+                onChange={(v) => updateFilters({ status: v || undefined })}
                 options={VISIT_STATUSES.map((s) => ({ value: s.value, label: s.label }))}
               />
             </Col>
@@ -297,14 +397,34 @@ export default function VisitsListPage() {
                 allowClear
                 style={{ width: '100%' }}
                 size="small"
-                onChange={(v) => dispatch(setFilters({ visitType: v || undefined, page: 1 }))}
+                value={filters.visitType}
+                onChange={(v) => updateFilters({ visitType: v || undefined })}
                 options={VISIT_TYPES.map((t) => ({ value: t.value, label: t.label }))}
               />
             </Col>
+
+            {/* Commercial : son propre nom en lecture seule */}
+            {isCommercial && (
+              <Col span={6}>
+                <Space size={6} style={{ fontSize: 12, color: '#595959', paddingLeft: 4 }}>
+                  <Avatar size={18} icon={<UserOutlined />} style={{ backgroundColor: '#405189' }} />
+                  <span>{currentUser?.firstName} {currentUser?.lastName}</span>
+                </Space>
+              </Col>
+            )}
+
             <Col>
-              <Button size="small" onClick={() => {
-                dispatch(setFilters({ status: undefined, visitType: undefined, page: 1 }));
-              }}>Réinitialiser</Button>
+              <Button
+                size="small"
+                onClick={() => setFilters({
+                  page: 1,
+                  size: 20,
+                  sortBy: 'visitDate',
+                  sortDirection: 'desc',
+                })}
+              >
+                Réinitialiser
+              </Button>
             </Col>
           </Row>
         )}
@@ -312,16 +432,16 @@ export default function VisitsListPage() {
         <Table
           rowKey="id"
           columns={columns}
-          dataSource={items}
+          dataSource={visits}
           loading={loading}
           scroll={{ x: 1460, y: 'calc(100vh - 330px)' }}
           pagination={{
-            current: pagination.page || 1,
-            pageSize: pagination.size,
-            total: pagination.totalElements,
+            current: filters.page,
+            pageSize: filters.size,
+            total,
             showSizeChanger: true,
-            showTotal: (total, range) => `${range[0]}-${range[1]} sur ${total}`,
-            onChange: (page, pageSize) => dispatch(setFilters({ page, size: pageSize })),
+            showTotal: (t, range) => `${range[0]}-${range[1]} sur ${t}`,
+            onChange: (page, pageSize) => setFilters((prev) => ({ ...prev, page, size: pageSize })),
           }}
         />
       </Card>

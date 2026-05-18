@@ -286,7 +286,7 @@ function SupervisionCommerciauxContent() {
       ),
     },
     {
-      title: 'Win Rate',
+      title: 'Taux de gain',
       dataIndex: 'winRate',
       key: 'winRate',
       align: 'center' as const,
@@ -415,7 +415,7 @@ function SupervisionCommerciauxContent() {
             color: '#405189',
           },
           {
-            t: 'Win Rate Moyen',
+            t: 'Taux de gain moyen',
             v: pct(avgWinRate),
             icon: <RiseOutlined />,
             bg: 'rgba(247,184,75,0.14)',
@@ -525,8 +525,8 @@ function SupervisionCommerciauxContent() {
                             <Tooltip title="CA">
                               <Tag style={{ fontSize: 9, margin: 0, padding: '0 4px' }} color="green">CA {rep.revenueScore}</Tag>
                             </Tooltip>
-                            <Tooltip title="Win Rate">
-                              <Tag style={{ fontSize: 9, margin: 0, padding: '0 4px' }} color="gold">WR {rep.winRateScore}</Tag>
+                            <Tooltip title="Taux de gain">
+                              <Tag style={{ fontSize: 9, margin: 0, padding: '0 4px' }} color="gold">TG {rep.winRateScore}</Tag>
                             </Tooltip>
                             <Tooltip title="Complétion visites">
                               <Tag style={{ fontSize: 9, margin: 0, padding: '0 4px' }} color="cyan">Vis {rep.visitCompletionScore}</Tag>
@@ -619,7 +619,7 @@ function SupervisionCommerciauxContent() {
         </>
       )}
 
-      {/* ── Comparaison & Benchmarking ────────────────────────── */}
+      {/* ── Comparaison & Analyse comparative ────────────────────────── */}
       {supervision && supervision.repBenchmarks && supervision.repBenchmarks.length > 0 && supervision.teamBenchmark && (() => {
         const tb = supervision.teamBenchmark!;
         const reps = supervision.repBenchmarks;
@@ -665,7 +665,7 @@ function SupervisionCommerciauxContent() {
             ],
           },
           {
-            title: 'Win Rate',
+            title: 'Taux de gain',
             key: 'winRate',
             align: 'center' as const,
             children: [
@@ -721,10 +721,10 @@ function SupervisionCommerciauxContent() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <SwapOutlined style={{ color: '#405189' }} />
                 <span style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
-                  Comparaison & Benchmarking
+                  Comparaison & Analyse comparative
                 </span>
                 <span style={{ fontSize: 10, color: '#94a3b8', marginLeft: 'auto' }}>
-                  Moyennes : CA {formatMAD(tb.avgRevenue)} · WR {tb.avgWinRate.toFixed(1)}% · Pipeline {formatMAD(tb.avgPipeline)} · Visites {tb.avgVisits.toFixed(1)}
+                  Moyennes : CA {formatMAD(tb.avgRevenue)} · TG {tb.avgWinRate.toFixed(1)}% · Pipeline {formatMAD(tb.avgPipeline)} · Visites {tb.avgVisits.toFixed(1)}
                 </span>
               </div>
             }
@@ -1072,7 +1072,7 @@ function SupervisionCommerciauxContent() {
           labels,
           datasets: [
             {
-              label: 'Win Rate (%)',
+              label: 'Taux de gain (%)',
               data: trends.teamTrend.map((m) => num(m.winRate)),
               borderColor: '#f7b84b',
               backgroundColor: 'rgba(247,184,75,0.1)',
@@ -1138,7 +1138,7 @@ function SupervisionCommerciauxContent() {
                 <Card size="small" styles={{ body: { padding: '10px 14px' } }} style={cardS}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: '#475569', marginBottom: 6 }}>
                     {trendMetric === 'revenue' ? 'CA par Commercial' :
-                     trendMetric === 'deals' ? 'Win Rate — Évolution' :
+                     trendMetric === 'deals' ? 'Taux de gain — Évolution' :
                      'Taux Complétion Visites'}
                   </div>
                   <div style={{ height: 260 }}>
@@ -1186,7 +1186,7 @@ function SupervisionCommerciauxContent() {
                   options={[
                     { value: 'revenue', label: 'CA Réalisé' },
                     { value: 'pipeline', label: 'Pipeline' },
-                    { value: 'winRate', label: 'Win Rate' },
+                    { value: 'winRate', label: 'Taux de gain' },
                     { value: 'dealsWon', label: 'Deals gagnés' },
                     { value: 'openDeals', label: 'Deals ouverts' },
                   ]}
@@ -1287,7 +1287,7 @@ function SupervisionCommerciauxContent() {
                       {formatMAD(best.revenue)} MAD
                     </div>
                     <div style={{ fontSize: 11, color: '#64748b' }}>
-                      {num(best.dealsWon)} deals · Win {pct(best.winRate)}
+                      {num(best.dealsWon)} affaires · TG {pct(best.winRate)}
                     </div>
                   </div>
                 </div>
@@ -1297,7 +1297,7 @@ function SupervisionCommerciauxContent() {
             {/* Win rate distribution */}
             <Card
               size="small"
-              title={<span style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>Win Rate par commercial</span>}
+              title={<span style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>Taux de gain par commercial</span>}
               styles={{
                 body: { padding: '8px 14px 12px' },
                 header: { minHeight: 32, padding: '0 12px', borderBottom: '1px solid #f1f5f9' },
@@ -1412,7 +1412,7 @@ function SupervisionCommerciauxContent() {
 
                   <div>
                     <div style={{ fontSize: 10, color: '#94a3b8', marginBottom: 3 }}>
-                      Win Rate — {pct(wr)}
+                      Taux de gain — {pct(wr)}
                     </div>
                     <Progress
                       percent={parseFloat(wr.toFixed(1))}

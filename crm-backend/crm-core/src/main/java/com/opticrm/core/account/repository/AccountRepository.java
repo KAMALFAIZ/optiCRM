@@ -72,4 +72,9 @@ public interface AccountRepository extends JpaRepository<Account, UUID>, JpaSpec
     List<Account> findAllGeolocated();
 
     Optional<Account> findByPhone(String phone);
+
+    Page<Account> findByRepresentantIgnoreCase(String representant, Pageable pageable);
+
+    @Query("SELECT DISTINCT a.representant FROM Account a WHERE a.representant IS NOT NULL AND a.representant <> '' ORDER BY a.representant ASC")
+    List<String> findDistinctRepresentants();
 }
