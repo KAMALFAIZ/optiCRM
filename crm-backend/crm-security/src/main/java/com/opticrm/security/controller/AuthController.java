@@ -2,12 +2,14 @@ package com.opticrm.security.controller;
 
 import com.opticrm.common.dto.ApiResponse;
 import com.opticrm.security.dto.*;
+import com.opticrm.security.repository.UserRepository;
 import com.opticrm.security.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
@@ -84,6 +88,41 @@ public class AuthController {
     ) {
         authService.resetPassword(request);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    /**
+     * Temporary diagnostic endpoint — remove after debugging login issue.
+     * Tests BCrypt password matching directly, bypassing Spring Security chain.
+     */
+    @PostMapping("/debug-login")
+    public ResponseEntity<java.util.Map<String, Object>> debugLogin(@RequestBody LoginRequest request) {
+        var result = new java.util.LinkedHashMap<String, Object>();
+        result.put("email", request.getEmail());
+
+        var userOpt = userRepository.findByEmail(request.getEmail());
+        if (userOpt.isEmpty()) {
+            result.put("userFound", false);
+            return ResponseEntity.ok(result);
+        }
+
+        var user = userOpt.get();
+        result.put("userFound", true);
+        result.put("isActive", user.getIsActive());
+        result.put("isLocked", user.isLocked());
+        result.put("failedAttempts", user.getFailedLoginAttempts());
+        result.put("hashLength", user.getPasswordHash() != null ? user.getPasswordHash().length() : null);
+        result.put("hashPrefix", user.getPasswordHash() != null ? user.getPasswordHash().substring(0, Math.min(29, user.getPasswordHash().length())) : null);
+
+        result.put("passwordMatches", passwordEncoder.matches(request.getPassword(), user.getPasswordHash()));
+
+        // Check for invisible characters in hash
+        String hash = user.getPasswordHash();
+        if (hash != null) {
+            result.put("hashHasNonAscii", !hash.matches("\\A[\\x20-\\x7E]*\\z"));
+            result.put("hashTrimmedLength", hash.trim().length());
+        }
+
+        return ResponseEntity.ok(result);
     }
 
     private String getClientIp(HttpServletRequest request) {

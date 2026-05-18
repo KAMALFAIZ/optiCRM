@@ -53,6 +53,12 @@ public class AuthService {
                     "Compte temporairement bloqué. Veuillez réessayer dans 15 minutes.");
         }
 
+        log.debug("LOGIN attempt for {} | hash length={} | hash prefix={} | passwordEncoder.matches={}",
+                user.getEmail(),
+                user.getPasswordHash() != null ? user.getPasswordHash().length() : "null",
+                user.getPasswordHash() != null ? user.getPasswordHash().substring(0, Math.min(20, user.getPasswordHash().length())) : "null",
+                passwordEncoder.matches(request.getPassword(), user.getPasswordHash()));
+
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
