@@ -23,6 +23,8 @@ export default function LoginPage() {
   const brandName = publicInfo?.name || 'OptiCRM';
   const brandColor = publicInfo?.primaryColor || '#405189';
   const brandLogo = publicInfo?.logoUrl;
+  const slug = publicInfo?.slug;
+  const demoEmail = slug ? `admin@${slug}.ma` : 'admin@opticrm.com';
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
@@ -338,7 +340,7 @@ export default function LoginPage() {
               code
               style={{ fontSize: 12, fontFamily: 'Poppins', background: 'rgba(64,81,137,0.08)', color: '#405189' }}
             >
-              admin@opticrm.com
+              {demoEmail}
             </Text>
             <Text style={{ color: '#878a99', fontSize: 12, fontFamily: 'Poppins', display: 'block', marginTop: 4 }}>
               Mot de passe :{' '}
