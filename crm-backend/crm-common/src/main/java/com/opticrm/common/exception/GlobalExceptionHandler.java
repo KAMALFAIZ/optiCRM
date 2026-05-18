@@ -118,7 +118,7 @@ public class GlobalExceptionHandler {
 
         ApiError error = ApiError.builder()
                 .code("VALIDATION_ERROR")
-                .message("Validation failed")
+                .message("Erreur de validation")
                 .details(fieldErrors)
                 .build();
 
@@ -140,7 +140,7 @@ public class GlobalExceptionHandler {
 
         ApiError error = ApiError.builder()
                 .code("VALIDATION_ERROR")
-                .message("Validation failed")
+                .message("Erreur de validation")
                 .details(fieldErrors)
                 .build();
 
@@ -170,7 +170,7 @@ public class GlobalExceptionHandler {
         log.warn("Bad credentials attempt");
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("AUTH_INVALID_CREDENTIALS", "Invalid email or password"));
+                .body(ApiResponse.error("AUTH_INVALID_CREDENTIALS", "Email ou mot de passe incorrect"));
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -178,7 +178,7 @@ public class GlobalExceptionHandler {
         log.warn("Authentication error: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
-                .body(ApiResponse.error("AUTH_UNAUTHORIZED", "Authentication failed"));
+                .body(ApiResponse.error("AUTH_UNAUTHORIZED", "Authentification échouée"));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -186,7 +186,7 @@ public class GlobalExceptionHandler {
         log.warn("Access denied: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
-                .body(ApiResponse.error("AUTH_FORBIDDEN", "Access denied"));
+                .body(ApiResponse.error("AUTH_FORBIDDEN", "Accès refusé"));
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -207,7 +207,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleMessageNotReadable(HttpMessageNotReadableException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error("MALFORMED_REQUEST", "Request body is malformed or missing"));
+                .body(ApiResponse.error("MALFORMED_REQUEST", "Corps de la requête invalide ou manquant"));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -215,7 +215,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("MISSING_PARAMETER",
-                        String.format("Required parameter '%s' is missing", ex.getParameterName())));
+                        String.format("Paramètre requis '%s' manquant", ex.getParameterName())));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -223,13 +223,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("TYPE_MISMATCH",
-                        String.format("Parameter '%s' has invalid type", ex.getName())));
+                        String.format("Paramètre '%s' de type invalide", ex.getName())));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleNoResourceFound(NoResourceFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error("NOT_FOUND", "Resource not found"));
+                .body(ApiResponse.error("NOT_FOUND", "Ressource introuvable"));
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
@@ -237,7 +237,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error("ENDPOINT_NOT_FOUND",
-                        String.format("Endpoint %s %s not found", ex.getHttpMethod(), ex.getRequestURL())));
+                        String.format("Endpoint %s %s introuvable", ex.getHttpMethod(), ex.getRequestURL())));
     }
 
     @ExceptionHandler(Exception.class)

@@ -45,12 +45,12 @@ public class AuthService {
     @Transactional
     public LoginResponse login(LoginRequest request, String ipAddress, String userAgent) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+                .orElseThrow(() -> new BadCredentialsException("Email ou mot de passe incorrect"));
 
         // Check if account is locked
         if (user.isLocked()) {
             throw new BusinessException("AUTH_ACCOUNT_LOCKED",
-                    "Account is temporarily locked. Please try again later.");
+                    "Compte temporairement bloqué. Veuillez réessayer dans 15 minutes.");
         }
 
         try {
@@ -78,16 +78,16 @@ public class AuthService {
     @Transactional
     public TokenResponse refresh(RefreshTokenRequest request) {
         RefreshToken storedToken = refreshTokenRepository.findByToken(request.getRefreshToken())
-                .orElseThrow(() -> new UnauthorizedException("Invalid refresh token"));
+                .orElseThrow(() -> new UnauthorizedException("Jeton de rafraîchissement invalide"));
 
         if (!storedToken.isValid()) {
-            throw new UnauthorizedException("Refresh token is expired or revoked");
+            throw new UnauthorizedException("Session expirée, veuillez vous reconnecter");
         }
 
         User user = storedToken.getUser();
 
         if (!user.getIsActive()) {
-            throw new UnauthorizedException("User account is inactive");
+            throw new UnauthorizedException("Compte utilisateur inactif");
         }
 
         // Revoke old refresh token
@@ -123,7 +123,7 @@ public class AuthService {
 
     public UserResponse getCurrentUser(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("Utilisateur introuvable"));
 
         return mapToUserResponse(user);
     }
