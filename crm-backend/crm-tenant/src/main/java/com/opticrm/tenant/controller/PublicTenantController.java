@@ -90,7 +90,9 @@ public class PublicTenantController {
                     .body(Map.of("success", false, "error", "Ce sous-domaine est déjà pris"));
         }
         Tenant tenant = tenantService.createTenant(
-                req.getSlug(), req.getCompanyName(), req.getAdminEmail(), req.getPlanId());
+                req.getSlug(), req.getCompanyName(), req.getAdminEmail(), req.getPlanId(),
+                req.getPhone(), req.getAddress(), req.getCity(), req.getIce(),
+                req.getLogoUrl(), req.getPrimaryColor(), req.getCustomDomain(), req.getMaxUsers());
         try {
             tenant = provisioningService.provision(tenant.getId());
             dataSourceManager.register(tenant.getId(), tenant.getDbName());
@@ -160,5 +162,15 @@ public class PublicTenantController {
 
         @NotBlank
         private String planId;
+
+        // ── Champs enrichis ──
+        private String phone;
+        private String address;
+        private String city;
+        private String ice;
+        private String logoUrl;
+        private String primaryColor;
+        private String customDomain;
+        private Integer maxUsers;
     }
 }

@@ -59,7 +59,9 @@ public class TenantAdminController {
     public ResponseEntity<TenantDto> updateTenant(
             @PathVariable UUID id,
             @RequestBody @Valid UpdateRequest req) {
-        Tenant updated = tenantService.updateTenant(id, req.getName(), req.getAdminEmail(), req.getPlanId());
+        Tenant updated = tenantService.updateTenant(id, req.getSlug(), req.getName(), req.getAdminEmail(), req.getPlanId(),
+                req.getPhone(), req.getAddress(), req.getCity(), req.getIce(),
+                req.getLogoUrl(), req.getPrimaryColor(), req.getCustomDomain(), req.getMaxUsers());
         return ResponseEntity.ok(TenantDto.from(updated));
     }
 
@@ -95,9 +97,18 @@ public class TenantAdminController {
 
     @Data
     public static class UpdateRequest {
+        private String slug;
         @NotBlank private String name;
         @Email    private String adminEmail;
         private String planId;
+        private String phone;
+        private String address;
+        private String city;
+        private String ice;
+        private String logoUrl;
+        private String primaryColor;
+        private String customDomain;
+        private Integer maxUsers;
     }
 
     @Data
@@ -107,10 +118,20 @@ public class TenantAdminController {
         private String  name;
         private String  status;
         private String  planName;
+        private String  planId;
         private String  adminEmail;
+        private String  phone;
+        private String  address;
+        private String  city;
+        private String  ice;
+        private String  logoUrl;
+        private String  primaryColor;
+        private String  customDomain;
+        private Integer maxUsers;
         private boolean dbProvisioned;
         private String  dbName;
         private Instant dbProvisionedAt;
+        private Instant trialEndsAt;
         private Instant createdAt;
 
         static TenantDto from(Tenant t) {
@@ -120,10 +141,20 @@ public class TenantAdminController {
             dto.name            = t.getName();
             dto.status          = t.getStatus().name();
             dto.planName        = t.getPlan() != null ? t.getPlan().getName() : null;
+            dto.planId          = t.getPlan() != null ? t.getPlan().getId() : null;
             dto.adminEmail      = t.getAdminEmail();
+            dto.phone           = t.getPhone();
+            dto.address         = t.getAddress();
+            dto.city            = t.getCity();
+            dto.ice             = t.getIce();
+            dto.logoUrl         = t.getLogoUrl();
+            dto.primaryColor    = t.getPrimaryColor();
+            dto.customDomain    = t.getCustomDomain();
+            dto.maxUsers        = t.getMaxUsers();
             dto.dbProvisioned   = Boolean.TRUE.equals(t.getDbProvisioned());
             dto.dbName          = t.getDbName();
             dto.dbProvisionedAt = t.getDbProvisionedAt();
+            dto.trialEndsAt     = t.getTrialEndsAt();
             dto.createdAt       = t.getCreatedAt();
             return dto;
         }

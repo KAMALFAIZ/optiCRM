@@ -1,5 +1,6 @@
 package com.opticrm.tenant.service;
 
+import com.opticrm.tenant.context.TenantContext;
 import com.opticrm.tenant.entity.Tenant;
 import com.opticrm.tenant.exception.TenantNotFoundException;
 import com.opticrm.tenant.repository.TenantRepository;
@@ -50,27 +51,35 @@ public class DatabaseProvisioningService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Tenant provision(UUID tenantId) {
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new TenantNotFoundException(tenantId.toString()));
+        // Force system datasource — provisioning writes to opticrm.tenants, not the routing DB
+        UUID previous = TenantContext.get();
+        TenantContext.clear();
+        try {
+            Tenant tenant = tenantRepository.findById(tenantId)
+                    .orElseThrow(() -> new TenantNotFoundException(tenantId.toString()));
 
-        if (Boolean.TRUE.equals(tenant.getDbProvisioned())) {
-            log.info("Tenant {} already provisioned on {}", tenant.getSlug(), tenant.getDbName());
-            return tenant;
+            if (Boolean.TRUE.equals(tenant.getDbProvisioned())) {
+                log.info("Tenant {} already provisioned on {}", tenant.getSlug(), tenant.getDbName());
+                return tenant;
+            }
+
+            String dbName = buildDbName(tenant.getSlug());
+            log.info("Provisioning database '{}' for tenant '{}'", dbName, tenant.getSlug());
+
+            createDatabase(dbName);
+            runMigrations(dbName);
+
+            tenant.setDbName(dbName);
+            tenant.setDbProvisioned(true);
+            tenant.setDbProvisionedAt(Instant.now());
+            Tenant saved = tenantRepository.save(tenant);
+
+            log.info("Database '{}' provisioned successfully for tenant '{}'", dbName, tenant.getSlug());
+            return saved;
+        } finally {
+            if (previous != null) TenantContext.set(previous);
+            else TenantContext.clear();
         }
-
-        String dbName = buildDbName(tenant.getSlug());
-        log.info("Provisioning database '{}' for tenant '{}'", dbName, tenant.getSlug());
-
-        createDatabase(dbName);
-        runMigrations(dbName);
-
-        tenant.setDbName(dbName);
-        tenant.setDbProvisioned(true);
-        tenant.setDbProvisionedAt(Instant.now());
-        Tenant saved = tenantRepository.save(tenant);
-
-        log.info("Database '{}' provisioned successfully for tenant '{}'", dbName, tenant.getSlug());
-        return saved;
     }
 
     /** Construit l'URL JDBC pour une base donnée (remplace databaseName=). */

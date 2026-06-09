@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  App, Badge, Button, Card, Form, Input, Modal, Popconfirm,
-  Select, Space, Table, Tag, Typography, Tooltip,
+  App, Badge, Button, Card, Col, ColorPicker, Divider, Form, Input, InputNumber, Modal, Popconfirm,
+  Row, Select, Space, Table, Tag, Typography, Tooltip,
 } from 'antd';
 import {
   DatabaseOutlined, CheckCircleOutlined, CloseCircleOutlined,
   ReloadOutlined, SyncOutlined, PlusOutlined, UserOutlined,
   GlobalOutlined, MailOutlined, DeleteOutlined, EditOutlined,
+  PhoneOutlined, HomeOutlined, BankOutlined, TeamOutlined,
+  BgColorsOutlined, LinkOutlined, IdcardOutlined, EnvironmentOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import apiClient from '@/api/client';
@@ -21,10 +23,20 @@ interface TenantDto {
   name: string;
   status: 'TRIAL' | 'ACTIVE' | 'SUSPENDED' | 'CANCELLED';
   planName: string | null;
+  planId: string | null;
   adminEmail: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  ice: string | null;
+  logoUrl: string | null;
+  primaryColor: string | null;
+  customDomain: string | null;
+  maxUsers: number | null;
   dbProvisioned: boolean;
   dbName: string | null;
   dbProvisionedAt: string | null;
+  trialEndsAt: string | null;
   createdAt: string;
 }
 
@@ -41,10 +53,12 @@ const STATUS_COLOR: Record<string, string> = {
   CANCELLED: 'red',
 };
 
+const ICON_STYLE = { color: '#bfbfbf' };
+
 // ── Slugify helper ───────────────────────────────────────────────────────────
 function toSlug(name: string) {
   return name.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 50);
@@ -90,11 +104,24 @@ export default function TenantsAdminPage() {
   const handleCreate = async (values: any) => {
     setCreating(true);
     try {
+      // Convert ColorPicker value to hex string
+      const primaryColor = values.primaryColor
+        ? (typeof values.primaryColor === 'string' ? values.primaryColor : values.primaryColor.toHexString())
+        : undefined;
+
       const { data } = await apiClient.post('/public/tenants/register', {
-        slug:        values.slug,
-        companyName: values.companyName,
-        adminEmail:  values.adminEmail,
-        planId:      values.planId,
+        slug:         values.slug,
+        companyName:  values.companyName,
+        adminEmail:   values.adminEmail,
+        planId:       values.planId,
+        phone:        values.phone || undefined,
+        address:      values.address || undefined,
+        city:         values.city || undefined,
+        ice:          values.ice || undefined,
+        logoUrl:      values.logoUrl || undefined,
+        primaryColor: primaryColor,
+        customDomain: values.customDomain || undefined,
+        maxUsers:     values.maxUsers || undefined,
       });
       if (data.success === false) {
         const err = data.error;
@@ -168,9 +195,18 @@ export default function TenantsAdminPage() {
   const openEditModal = (tenant: TenantDto) => {
     setEditingTenant(tenant);
     editForm.setFieldsValue({
-      name:       tenant.name,
-      adminEmail: tenant.adminEmail || '',
-      planId:     undefined, // plan name only, not id — leave blank
+      slug:         tenant.slug || '',
+      name:         tenant.name,
+      adminEmail:   tenant.adminEmail || '',
+      planId:       tenant.planId || undefined,
+      phone:        tenant.phone || '',
+      address:      tenant.address || '',
+      city:         tenant.city || '',
+      ice:          tenant.ice || '',
+      logoUrl:      tenant.logoUrl || '',
+      primaryColor: tenant.primaryColor || '#405189',
+      customDomain: tenant.customDomain || '',
+      maxUsers:     tenant.maxUsers && tenant.maxUsers > 0 ? tenant.maxUsers : undefined,
     });
     setEditModalOpen(true);
   };
@@ -179,10 +215,23 @@ export default function TenantsAdminPage() {
     if (!editingTenant) return;
     setUpdating(true);
     try {
+      const primaryColor = values.primaryColor
+        ? (typeof values.primaryColor === 'string' ? values.primaryColor : values.primaryColor.toHexString())
+        : undefined;
+
       const { data } = await apiClient.put(`/superadmin/tenants/${editingTenant.id}`, {
-        name:       values.name,
-        adminEmail: values.adminEmail,
-        planId:     values.planId || null,
+        slug:         values.slug,
+        name:         values.name,
+        adminEmail:   values.adminEmail,
+        planId:       values.planId || null,
+        phone:        values.phone || null,
+        address:      values.address || null,
+        city:         values.city || null,
+        ice:          values.ice || null,
+        logoUrl:      values.logoUrl || null,
+        primaryColor: primaryColor,
+        customDomain: values.customDomain || null,
+        maxUsers:     values.maxUsers || null,
       });
       message.success(`Client '${data.name}' mis à jour`);
       setEditModalOpen(false);
@@ -197,6 +246,13 @@ export default function TenantsAdminPage() {
     }
   };
 
+  // ── Plan options ──────────────────────────────────────────────────────────
+
+  const planOptions = plans.map(p => ({
+    value: p.id,
+    label: `${p.name}${p.priceMonthly > 0 ? ` — ${p.priceMonthly} MAD/mois` : ' (Gratuit)'}`,
+  }));
+
   // ── Colonnes ──────────────────────────────────────────────────────────────
 
   const columns: ColumnsType<TenantDto> = [
@@ -207,6 +263,19 @@ export default function TenantsAdminPage() {
         <div>
           <div style={{ fontWeight: 600 }}>{r.name}</div>
           <Text type="secondary" style={{ fontSize: 12 }}>{r.slug}.opticrm.ma</Text>
+          {r.city && <div><Text type="secondary" style={{ fontSize: 11 }}><EnvironmentOutlined /> {r.city}</Text></div>}
+        </div>
+      ),
+    },
+    {
+      title: 'Contact',
+      key: 'contact',
+      width: 220,
+      render: (_, r) => (
+        <div>
+          {r.adminEmail && <div style={{ fontSize: 12 }}><MailOutlined style={{ marginRight: 4 }} />{r.adminEmail}</div>}
+          {r.phone && <div style={{ fontSize: 12 }}><PhoneOutlined style={{ marginRight: 4 }} />{r.phone}</div>}
+          {r.ice && <div><Text type="secondary" style={{ fontSize: 11 }}>ICE: {r.ice}</Text></div>}
         </div>
       ),
     },
@@ -244,12 +313,6 @@ export default function TenantsAdminPage() {
           <Text type="secondary" style={{ fontSize: 12 }}>Non provisionnée</Text>
         </Space>
       ),
-    },
-    {
-      title: 'Admin',
-      dataIndex: 'adminEmail',
-      width: 200,
-      render: (v) => v || <Text type="secondary">—</Text>,
     },
     {
       title: 'Inscription',
@@ -412,7 +475,7 @@ export default function TenantsAdminPage() {
         cancelText="Annuler"
         confirmLoading={updating}
         okButtonProps={{ style: { background: '#405189', borderColor: '#405189' } }}
-        width={480}
+        width={640}
       >
         <Form
           form={editForm}
@@ -420,33 +483,125 @@ export default function TenantsAdminPage() {
           onFinish={handleUpdate}
           style={{ marginTop: 16 }}
         >
-          <Form.Item
-            label="Nom de l'entreprise"
-            name="name"
-            rules={[{ required: true, message: 'Requis' }, { min: 2 }]}
-          >
-            <Input prefix={<UserOutlined style={{ color: '#bfbfbf' }} />} />
-          </Form.Item>
+          {/* ─ Informations générales ─ */}
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+            <BankOutlined /> Informations générales
+          </Divider>
 
           <Form.Item
-            label="Email administrateur"
-            name="adminEmail"
-            rules={[{ required: true, message: 'Requis' }, { type: 'email', message: 'Email invalide' }]}
+            label="Slug (sous-domaine)"
+            name="slug"
+            rules={[
+              { required: true, message: 'Requis' },
+              { pattern: /^[a-z0-9-]{3,50}$/, message: 'Minuscules, chiffres et tirets (3-50 car.)' },
+            ]}
+            extra="Identifiant unique : slug.opticrm.ma"
           >
-            <Input prefix={<MailOutlined style={{ color: '#bfbfbf' }} />} />
+            <Input prefix={<GlobalOutlined style={ICON_STYLE} />} placeholder="ex: acme" />
           </Form.Item>
 
-          <Form.Item
-            label="Plan d'abonnement"
-            name="planId"
-          >
-            <Select
-              placeholder="Choisir un plan (optionnel)"
-              allowClear
-              options={plans.map(p => ({
-                value: p.id,
-                label: `${p.name}${p.priceMonthly > 0 ? ` — ${p.priceMonthly} MAD/mois` : ' (Gratuit)'}`,
-              }))}
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Nom de l'entreprise"
+                name="name"
+                rules={[{ required: true, message: 'Requis' }, { min: 2 }]}
+              >
+                <Input prefix={<UserOutlined style={ICON_STYLE} />} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Email administrateur"
+                name="adminEmail"
+                rules={[{ required: true, message: 'Requis' }, { type: 'email', message: 'Email invalide' }]}
+              >
+                <Input prefix={<MailOutlined style={ICON_STYLE} />} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="Téléphone" name="phone">
+                <Input prefix={<PhoneOutlined style={ICON_STYLE} />} placeholder="+212 6XX-XXXXXX" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="ICE (Identifiant Commun de l'Entreprise)" name="ice">
+                <Input prefix={<IdcardOutlined style={ICON_STYLE} />} placeholder="000000000000000" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item label="Adresse" name="address">
+                <Input prefix={<HomeOutlined style={ICON_STYLE} />} placeholder="123 Rue Mohammed V" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="Ville" name="city">
+                <Input prefix={<EnvironmentOutlined style={ICON_STYLE} />} placeholder="Casablanca" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ─ Abonnement ─ */}
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+            <DatabaseOutlined /> Abonnement & limites
+          </Divider>
+
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item label="Plan d'abonnement" name="planId">
+                <Select
+                  placeholder="Choisir un plan (optionnel)"
+                  allowClear
+                  options={planOptions}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="Max utilisateurs"
+                name="maxUsers"
+                tooltip="Laisser vide = illimité"
+              >
+                <InputNumber
+                  min={1}
+                  max={10000}
+                  style={{ width: '100%' }}
+                  placeholder="Illimité"
+                  prefix={<TeamOutlined style={ICON_STYLE} />}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ─ Personnalisation ─ */}
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+            <BgColorsOutlined /> Personnalisation
+          </Divider>
+
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item label="URL du logo" name="logoUrl">
+                <Input prefix={<LinkOutlined style={ICON_STYLE} />} placeholder="https://acme.ma/logo.png" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="Couleur principale" name="primaryColor">
+                <ColorPicker showText format="hex" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item label="Domaine personnalisé" name="customDomain">
+            <Input
+              prefix={<GlobalOutlined style={ICON_STYLE} />}
+              placeholder="crm.acme.ma"
+              addonBefore="https://"
             />
           </Form.Item>
         </Form>
@@ -467,7 +622,7 @@ export default function TenantsAdminPage() {
         cancelText="Annuler"
         confirmLoading={creating}
         okButtonProps={{ style: { background: '#405189', borderColor: '#405189' } }}
-        width={480}
+        width={640}
       >
         <Form
           form={form}
@@ -475,63 +630,143 @@ export default function TenantsAdminPage() {
           onFinish={handleCreate}
           style={{ marginTop: 16 }}
         >
-          <Form.Item
-            label="Nom de l'entreprise"
-            name="companyName"
-            rules={[{ required: true, message: 'Requis' }, { min: 2 }]}
-          >
-            <Input
-              prefix={<UserOutlined style={{ color: '#bfbfbf' }} />}
-              placeholder="Acme SARL"
-              onChange={(e) => {
-                const slug = toSlug(e.target.value);
-                form.setFieldValue('slug', slug);
-              }}
-            />
+          {/* ─ Informations générales ─ */}
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+            <BankOutlined /> Informations générales
+          </Divider>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Nom de l'entreprise"
+                name="companyName"
+                rules={[{ required: true, message: 'Requis' }, { min: 2 }]}
+              >
+                <Input
+                  prefix={<UserOutlined style={ICON_STYLE} />}
+                  placeholder="Acme SARL"
+                  onChange={(e) => {
+                    const slug = toSlug(e.target.value);
+                    form.setFieldValue('slug', slug);
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Sous-domaine (slug)"
+                name="slug"
+                rules={[
+                  { required: true, message: 'Requis' },
+                  { pattern: /^[a-z0-9-]{3,50}$/, message: 'Minuscules, chiffres et tirets (3-50 car.)' },
+                ]}
+                extra={
+                  <Text type="secondary" style={{ fontSize: 11 }}>
+                    URL : <strong>slug.opticrm.ma</strong> — base : <strong>opticrm_slug</strong>
+                  </Text>
+                }
+              >
+                <Input
+                  prefix={<GlobalOutlined style={ICON_STYLE} />}
+                  placeholder="acme"
+                  addonAfter=".opticrm.ma"
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Email administrateur"
+                name="adminEmail"
+                rules={[{ required: true, message: 'Requis' }, { type: 'email', message: 'Email invalide' }]}
+              >
+                <Input
+                  prefix={<MailOutlined style={ICON_STYLE} />}
+                  placeholder="admin@acme.ma"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Téléphone" name="phone">
+                <Input prefix={<PhoneOutlined style={ICON_STYLE} />} placeholder="+212 6XX-XXXXXX" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item label="ICE (Identifiant Commun de l'Entreprise)" name="ice">
+                <Input prefix={<IdcardOutlined style={ICON_STYLE} />} placeholder="000000000000000" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Ville" name="city">
+                <Input prefix={<EnvironmentOutlined style={ICON_STYLE} />} placeholder="Casablanca" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item label="Adresse" name="address">
+            <Input prefix={<HomeOutlined style={ICON_STYLE} />} placeholder="123 Rue Mohammed V, Casablanca" />
           </Form.Item>
 
-          <Form.Item
-            label="Sous-domaine (slug)"
-            name="slug"
-            rules={[
-              { required: true, message: 'Requis' },
-              { pattern: /^[a-z0-9-]{3,50}$/, message: 'Minuscules, chiffres et tirets (3-50 caractères)' },
-            ]}
-            extra={
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                Accessible sur : <strong>acme.opticrm.ma</strong> — base : <strong>opticrm_acme</strong>
-              </Text>
-            }
-          >
-            <Input
-              prefix={<GlobalOutlined style={{ color: '#bfbfbf' }} />}
-              placeholder="acme"
-              addonAfter=".opticrm.ma"
-            />
-          </Form.Item>
+          {/* ─ Abonnement ─ */}
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+            <DatabaseOutlined /> Abonnement & limites
+          </Divider>
 
-          <Form.Item
-            label="Email administrateur"
-            name="adminEmail"
-            rules={[{ required: true, message: 'Requis' }, { type: 'email', message: 'Email invalide' }]}
-          >
-            <Input
-              prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
-              placeholder="admin@acme.ma"
-            />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                label="Plan d'abonnement"
+                name="planId"
+                rules={[{ required: true, message: 'Requis' }]}
+              >
+                <Select placeholder="Choisir un plan" options={planOptions} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                label="Max utilisateurs"
+                name="maxUsers"
+                tooltip="Laisser vide = illimité"
+              >
+                <InputNumber
+                  min={1}
+                  max={10000}
+                  style={{ width: '100%' }}
+                  placeholder="Illimité"
+                  prefix={<TeamOutlined style={ICON_STYLE} />}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            label="Plan d'abonnement"
-            name="planId"
-            rules={[{ required: true, message: 'Requis' }]}
-          >
-            <Select
-              placeholder="Choisir un plan"
-              options={plans.map(p => ({
-                value: p.id,
-                label: `${p.name}${p.priceMonthly > 0 ? ` — ${p.priceMonthly} MAD/mois` : ' (Gratuit)'}`,
-              }))}
+          {/* ─ Personnalisation ─ */}
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+            <BgColorsOutlined /> Personnalisation
+          </Divider>
+
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item label="URL du logo" name="logoUrl">
+                <Input prefix={<LinkOutlined style={ICON_STYLE} />} placeholder="https://acme.ma/logo.png" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item label="Couleur principale" name="primaryColor">
+                <ColorPicker showText format="hex" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item label="Domaine personnalisé" name="customDomain" tooltip="Optionnel — CNAME requis">
+            <Input
+              prefix={<GlobalOutlined style={ICON_STYLE} />}
+              placeholder="crm.acme.ma"
+              addonBefore="https://"
             />
           </Form.Item>
         </Form>

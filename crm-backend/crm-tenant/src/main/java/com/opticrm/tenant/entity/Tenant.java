@@ -80,6 +80,18 @@ public class Tenant {
     @Column(name = "admin_email", length = 255)
     private String adminEmail;
 
+    @Column(name = "phone", length = 30)
+    private String phone;
+
+    @Column(name = "address", length = 500)
+    private String address;
+
+    @Column(name = "city", length = 100)
+    private String city;
+
+    @Column(name = "ice", length = 30)
+    private String ice;
+
     // ── Database provisioning (SaaS database-per-tenant) ──────────────────
 
     /** Nom de la base SQL Server : opticrm_{slug} */
