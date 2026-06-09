@@ -7,12 +7,15 @@ import type { AuthState, LoginRequest, LoginResponse, TokenResponse, User } from
 const ACCESS_TOKEN_KEY = 'opticrm_access_token';
 const REFRESH_TOKEN_KEY = 'opticrm_refresh_token';
 
+const storedAccessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+
 const initialState: AuthState = {
   user: null,
-  accessToken: localStorage.getItem(ACCESS_TOKEN_KEY),
+  accessToken: storedAccessToken,
   refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
   isAuthenticated: false,
-  isLoading: true,
+  // Only show loading if we have a token to verify — otherwise the login button would be stuck
+  isLoading: !!storedAccessToken,
   error: null,
 };
 
@@ -40,8 +43,26 @@ export const checkAuth = createAsyncThunk<User, void>(
   'auth/checkAuth',
   async (_, { getState, rejectWithValue }) => {
     const state = getState() as RootState;
-    if (!state.auth.accessToken) {
-      return rejectWithValue('No token available');
+    const token = state.auth.accessToken;
+
+    // No token → skip the HTTP call entirely (no 401 in console)
+    if (!token) {
+      return rejectWithValue('NO_TOKEN');
+    }
+
+    // Quick JWT expiry check — reject without network call if expired
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        return rejectWithValue('TOKEN_EXPIRED');
+      }
+    } catch {
+      // Malformed token → clean up
+      localStorage.removeItem(ACCESS_TOKEN_KEY);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      return rejectWithValue('TOKEN_INVALID');
     }
 
     try {
@@ -142,6 +163,7 @@ const authSlice = createSlice({
         state.user = null;
         state.accessToken = null;
         state.refreshToken = null;
+        state.error = null; // Never show checkAuth errors on the login page
       })
 
       // Refresh Token

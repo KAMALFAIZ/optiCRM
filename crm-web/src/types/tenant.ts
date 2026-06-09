@@ -33,6 +33,7 @@ export interface TenantPublicInfo {
   logoUrl: string;
   primaryColor: string;
   status: string;
+  adminEmail?: string;
 }
 
 export interface TenantState {

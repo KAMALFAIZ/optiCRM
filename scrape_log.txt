@@ -282,3 +282,9 @@ Resumed from circuit index 65, 1042 rows loaded
   retry 2 via IP 194.204.212.11
   → 11 rows
   waiting 22s...
+Resumed from circuit index 71, 1146 rows loaded
+[72/104] Circuit 72: فاس الجنوبية
+(node:20784) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  → 17 rows
+  waiting 22s...

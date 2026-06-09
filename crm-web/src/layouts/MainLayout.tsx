@@ -256,10 +256,25 @@ export default function MainLayout() {
     setDrawerOpen(false);
   }, [location.pathname]);
 
-  // Filter sidebar menu items based on user permissions
+  // Is this the master/default tenant? Only it should see "Clients SaaS"
+  const isMasterTenant = tenantInfo?.slug === 'default'
+    || tenantInfo?.id === '00000000-0000-0000-0000-000000000001';
+
+  // Filter sidebar menu items based on user permissions + tenant context
   const filteredMenuItems = useMemo(
-    () => filterMenuItems(menuItems, canAccessRoute, canAccessGroup),
-    [canAccessRoute, canAccessGroup]
+    () => {
+      const byPermission = filterMenuItems(menuItems, canAccessRoute, canAccessGroup);
+      if (isMasterTenant) return byPermission;
+      // Non-master tenants: hide "Clients SaaS" (admin/tenants)
+      return (byPermission ?? []).map((item: any) => {
+        if (item?.children) {
+          const filtered = item.children.filter((c: any) => c?.key !== '/admin/tenants');
+          return filtered.length > 0 ? { ...item, children: filtered } : null;
+        }
+        return item;
+      }).filter(Boolean);
+    },
+    [canAccessRoute, canAccessGroup, isMasterTenant]
   );
 
   const sidebarBg = isDark ? '#1a1d21' : '#405189';

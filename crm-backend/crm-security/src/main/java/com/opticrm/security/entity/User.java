@@ -2,7 +2,6 @@ package com.opticrm.security.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.TenantId;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -32,8 +31,7 @@ public class User {
      * Tenant discriminator. User.email is unique per tenant (not globally).
      * The DB unique constraint is on (tenant_id, email) — see V72b migration.
      */
-    // @TenantId + @Column désactivés (colonne absente de la DB dev)
-    @Transient
+    @Column(name = "tenant_id", insertable = false, updatable = false)
     private UUID tenantId;
 
     @Column(name = "email", nullable = false, length = 255)

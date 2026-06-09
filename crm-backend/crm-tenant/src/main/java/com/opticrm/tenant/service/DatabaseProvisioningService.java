@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Instant;
@@ -85,23 +86,36 @@ public class DatabaseProvisioningService {
     }
 
     private void createDatabase(String dbName) {
+        validateDbName(dbName);
         String masterUrl = baseUrl.replaceAll("(?i)databaseName=[^;]+;?", "") + ";databaseName=master";
         try (Connection conn = DriverManager.getConnection(masterUrl, username, password);
-             Statement stmt = conn.createStatement()) {
-            stmt.execute(
-                "IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = N'" + dbName + "') " +
-                "CREATE DATABASE [" + dbName + "]"
-            );
+             PreparedStatement check = conn.prepareStatement(
+                     "SELECT COUNT(*) FROM sys.databases WHERE name = ?")) {
+            check.setString(1, dbName);
+            try (var rs = check.executeQuery()) {
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    // CREATE DATABASE does not support parameterized names — dbName is validated above
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.execute("CREATE DATABASE [" + dbName + "]");
+                    }
+                }
+            }
             log.debug("SQL Server database '{}' created (or already existed)", dbName);
         } catch (SQLException e) {
             throw new RuntimeException("Impossible de créer la base de données '" + dbName + "'", e);
         }
     }
 
+    private static void validateDbName(String dbName) {
+        if (dbName == null || !dbName.matches("^[a-z0-9_]{3,128}$")) {
+            throw new IllegalArgumentException("Nom de base de données invalide : " + dbName);
+        }
+    }
+
     private void runMigrations(String dbName) {
+        validateDbName(dbName);
         String tenantUrl = buildJdbcUrl(dbName);
-        // db/tenant-migration contains a single V1__complete_schema.sql (all 111 tables + FKs + indexes).
-        // Flyway baseline at V87 so future migrations (V88+) from db/migration continue normally.
         Flyway schema = Flyway.configure()
                 .dataSource(tenantUrl, username, password)
                 .locations("classpath:db/tenant-migration")
@@ -112,15 +126,15 @@ public class DatabaseProvisioningService {
         int schemaApplied = schema.migrate().migrationsExecuted;
         log.info("Tenant schema applied {} script(s) to '{}'", schemaApplied, dbName);
 
-        // Now baseline the full migration history at V87 so incremental migrations V88+ pick up
+        // Baseline at V79 (last existing migration) so future V80+ migrations apply normally
         Flyway baseline = Flyway.configure()
                 .dataSource(tenantUrl, username, password)
                 .locations("classpath:db/migration")
                 .baselineOnMigrate(true)
-                .baselineVersion("87")
+                .baselineVersion("79")
                 .outOfOrder(true)
                 .load();
         baseline.baseline();
-        log.info("Baseline set at V87 for '{}'", dbName);
+        log.info("Baseline set at V79 for '{}'", dbName);
     }
 }

@@ -40,7 +40,7 @@ echo.
 
 :: ── 3. Backend Spring Boot ──────────────────────────────────────────
 echo [3/4] Demarrage Backend Spring Boot (port 8081)...
-start "OptiCRM Backend" cmd /k "color 0B && title Backend Spring Boot && cd /d D:\kasoft-platform\OptiCRM\crm-backend && echo Compilation Maven en cours... && mvn spring-boot:run -pl crm-api -DskipTests"
+start "OptiCRM Backend" cmd /k "color 0B && title Backend Spring Boot && cd /d D:\kasoft-platform\OptiCRM\crm-backend && set DATABASE_URL=jdbc:sqlserver://kasoft.selfip.net;databaseName=opticrm;encrypt=false;trustServerCertificate=true;sendStringParametersAsUnicode=true&& set DATABASE_USERNAME=sa&& set DATABASE_PASSWORD=SQL@2019&& echo Compilation Maven en cours... && mvn spring-boot:run -pl crm-api -DskipTests"
 echo   [OK] Fenetre backend ouverte (attendre ~60s)
 echo.
 

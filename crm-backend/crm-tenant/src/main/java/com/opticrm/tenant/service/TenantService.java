@@ -1,6 +1,7 @@
 package com.opticrm.tenant.service;
 
 import com.opticrm.tenant.context.TenantContext;
+import com.opticrm.tenant.datasource.TenantDataSourceManager;
 import com.opticrm.tenant.entity.Tenant;
 import com.opticrm.tenant.entity.SubscriptionPlan;
 import com.opticrm.tenant.exception.TenantNotFoundException;
@@ -21,6 +22,7 @@ public class TenantService {
 
     private final TenantRepository tenantRepository;
     private final SubscriptionPlanRepository planRepository;
+    private final TenantDataSourceManager dataSourceManager;
 
     @Transactional(readOnly = true)
     public Tenant getCurrentTenant() {
@@ -64,7 +66,13 @@ public class TenantService {
         Tenant tenant = tenantRepository.findByIdWithPlan(tenantId)
                 .orElseThrow(() -> new TenantNotFoundException(tenantId.toString()));
         tenant.setStatus(status);
-        return tenantRepository.save(tenant);
+        Tenant saved = tenantRepository.save(tenant);
+
+        if (status == Tenant.TenantStatus.CANCELLED || status == Tenant.TenantStatus.SUSPENDED) {
+            dataSourceManager.deregister(tenantId);
+        }
+
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -82,5 +90,18 @@ public class TenantService {
         Tenant tenant = tenantRepository.findByIdWithPlan(tenantId)
                 .orElseThrow(() -> new TenantNotFoundException(tenantId.toString()));
         tenantRepository.delete(tenant);
+    }
+
+    @Transactional
+    public Tenant updateTenant(UUID tenantId, String name, String adminEmail, String planId) {
+        Tenant tenant = tenantRepository.findByIdWithPlan(tenantId)
+                .orElseThrow(() -> new TenantNotFoundException(tenantId.toString()));
+        if (name != null && !name.isBlank()) tenant.setName(name);
+        if (adminEmail != null && !adminEmail.isBlank()) tenant.setAdminEmail(adminEmail);
+        if (planId != null) {
+            SubscriptionPlan plan = planRepository.findById(planId).orElse(null);
+            tenant.setPlan(plan);
+        }
+        return tenantRepository.save(tenant);
     }
 }

@@ -127,6 +127,7 @@ public class AuthService {
         refreshTokenRepository.revokeAllByUserId(userId, Instant.now());
     }
 
+    @Transactional(readOnly = true)
     public UserResponse getCurrentUser(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UnauthorizedException("Utilisateur introuvable"));

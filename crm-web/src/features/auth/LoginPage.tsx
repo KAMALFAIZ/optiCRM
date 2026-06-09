@@ -23,8 +23,13 @@ export default function LoginPage() {
   const brandName = publicInfo?.name || 'OptiCRM';
   const brandColor = publicInfo?.primaryColor || '#405189';
   const brandLogo = publicInfo?.logoUrl;
-  const slug = publicInfo?.slug;
-  const demoEmail = slug ? `admin@${slug}.ma` : 'admin@opticrm.com';
+
+  // Clean stale auth tokens on login page mount — radical cleanup
+  useEffect(() => {
+    localStorage.removeItem('opticrm_access_token');
+    localStorage.removeItem('opticrm_refresh_token');
+    dispatch(clearError());
+  }, [dispatch]);
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
@@ -323,32 +328,6 @@ export default function LoginPage() {
             </Form.Item>
           </Form>
 
-          {/* Demo account */}
-          <div
-            style={{
-              background: '#f8f9ff',
-              border: '1px solid #e8ebf5',
-              borderRadius: 10,
-              padding: '16px 20px',
-              textAlign: 'center',
-            }}
-          >
-            <Text style={{ color: '#878a99', fontSize: 12, fontFamily: 'Poppins', display: 'block', marginBottom: 6 }}>
-              Compte de démonstration
-            </Text>
-            <Text
-              code
-              style={{ fontSize: 12, fontFamily: 'Poppins', background: 'rgba(64,81,137,0.08)', color: '#405189' }}
-            >
-              {demoEmail}
-            </Text>
-            <Text style={{ color: '#878a99', fontSize: 12, fontFamily: 'Poppins', display: 'block', marginTop: 4 }}>
-              Mot de passe :{' '}
-              <Text code style={{ fontSize: 12, background: 'rgba(64,81,137,0.08)', color: '#405189' }}>
-                Admin123!
-              </Text>
-            </Text>
-          </div>
         </div>
       </div>
     </div>

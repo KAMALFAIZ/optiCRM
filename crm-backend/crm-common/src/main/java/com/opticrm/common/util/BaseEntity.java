@@ -3,7 +3,6 @@ package com.opticrm.common.util;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.TenantId;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,8 +24,7 @@ public abstract class BaseEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    // @TenantId + @Column désactivés (colonne absente de la DB dev)
-    @Transient
+    @Column(name = "tenant_id", insertable = false, updatable = false)
     private UUID tenantId;
 
     @CreatedDate

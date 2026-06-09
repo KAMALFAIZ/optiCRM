@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRoutes, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Spin } from 'antd';
+import { Result, Spin, Button } from 'antd';
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { checkAuth, selectAuthLoading } from '@/features/auth/authSlice';
@@ -17,19 +17,36 @@ function App() {
   const [searchParams] = useSearchParams();
   const [setupChecked, setSetupChecked] = useState(false);
   const [tenantResolved, setTenantResolved] = useState(false);
+  const [tenantError, setTenantError] = useState<string | null>(null);
   const [authTimedOut, setAuthTimedOut] = useState(false);
 
-  // Step 1: Resolve tenant from ?client= param or localStorage
+  // Step 1: Resolve tenant from ?client= param, localStorage, or subdomain
   useEffect(() => {
     const clientSlug = searchParams.get('client');
     const savedSlug = localStorage.getItem(TENANT_SLUG_KEY);
-    const slug = clientSlug || savedSlug;
 
-    if (slug) {
-      dispatch(resolveSlug(slug)).finally(() => setTenantResolved(true));
-    } else {
-      setTenantResolved(true);
+    // Detect slug from subdomain: odyssee.opticrm.ma → "odyssee"
+    let subdomainSlug: string | null = null;
+    const hostname = window.location.hostname; // e.g. "odyssee.opticrm.ma"
+    const parts = hostname.split('.');
+    if (parts.length >= 3) {
+      const candidate = parts[0];
+      // Ignore generic subdomains
+      if (!['www', 'app', 'localhost', 'opticrm'].includes(candidate)) {
+        subdomainSlug = candidate;
+      }
     }
+
+    // Priority: ?client= > localStorage > subdomain > "default" (base maître)
+    const slug = clientSlug || savedSlug || subdomainSlug || 'default';
+
+    dispatch(resolveSlug(slug))
+      .unwrap()
+      .catch(() => {
+        // "default" slug failing is not an error — it means the master DB works via backend fallback
+        if (slug !== 'default') setTenantError(slug);
+      })
+      .finally(() => setTenantResolved(true));
   }, []);
 
   // Step 2: Check on-premise setup status
@@ -50,11 +67,35 @@ function App() {
       .finally(() => setSetupChecked(true));
   }, [tenantResolved]);
 
-  // Step 3: Auth check (runs after tenant is resolved so X-Tenant-ID is available)
+  // Step 3: Auth check — validate JWT client-side first, skip entirely if expired/invalid
   useEffect(() => {
     if (!tenantResolved) return;
-    dispatch(checkAuth());
-    const timeout = setTimeout(() => setAuthTimedOut(true), 8000);
+
+    const token = localStorage.getItem('opticrm_access_token');
+    let hasValidToken = false;
+
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.exp && payload.exp * 1000 > Date.now()) {
+          hasValidToken = true;
+        }
+      } catch {
+        // Malformed token — treat as invalid
+      }
+
+      if (!hasValidToken) {
+        // Expired or malformed token — clean up silently, no HTTP call needed
+        localStorage.removeItem('opticrm_access_token');
+        localStorage.removeItem('opticrm_refresh_token');
+      }
+    }
+
+    if (hasValidToken) {
+      dispatch(checkAuth());
+    }
+
+    const timeout = setTimeout(() => setAuthTimedOut(true), hasValidToken ? 8000 : 0);
     return () => clearTimeout(timeout);
   }, [dispatch, tenantResolved]);
 
@@ -64,6 +105,23 @@ function App() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Spin size="large" tip="Chargement..."><div /></Spin>
+      </div>
+    );
+  }
+
+  if (tenantError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Result
+          status="404"
+          title="Espace client introuvable"
+          subTitle={`Le client « ${tenantError} » n'existe pas ou a été désactivé.`}
+          extra={
+            <Button type="primary" onClick={() => { localStorage.removeItem(TENANT_SLUG_KEY); window.location.href = '/'; }}>
+              Retour à l'accueil
+            </Button>
+          }
+        />
       </div>
     );
   }

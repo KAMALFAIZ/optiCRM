@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>OptiCRM - Architecture Database-per-Tenant</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<style>
+  body {
+    background: #0f172a;
+    margin: 0;
+    padding: 20px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #e2e8f0;
+  }
+  h1 {
+    text-align: center;
+    color: #60a5fa;
+    font-size: 28px;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+  }
+  h2 {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 0;
+    margin-bottom: 25px;
+  }
+  .mermaid {
+    display: flex;
+    justify-content: center;
+  }
+  .mermaid svg {
+    max-width: 100%;
+  }
+</style>
+</head>
+<body>
+<h1>OptiCRM — Architecture Database-per-Tenant</h1>
+<h2>Base Maitre (systeme) + Bases Enfants (1 par client) + Routing dynamique</h2>
+<div class="mermaid">
+graph TB
+    subgraph CLIENTS["&nbsp;&nbsp;CLIENTS&nbsp;&nbsp;"]
+        direction LR
+        WEB["🖥️ React Web<br/>localhost:3009"]
+        MOB["📱 React Native<br/>Mobile App"]
+    end
+
+    subgraph BACKEND["&nbsp;&nbsp;⚙️ SPRING BOOT — port 8081&nbsp;&nbsp;"]
+        direction TB
+        subgraph FILTERS["&nbsp;&nbsp;Chaîne de Filtres HTTP&nbsp;&nbsp;"]
+            TRF["🔍 TenantResolutionFilter<br/><i>HIGHEST_PRECEDENCE</i><br/>X-Tenant-ID → TenantContext"]
+            JWT["🔐 JwtAuthenticationFilter<br/>JWT claim tenantId<br/>→ override TenantContext"]
+            TRF --> JWT
+        end
+        TC["📌 TenantContext<br/><b>ThreadLocal&lt;UUID&gt;</b>"]
+        subgraph ROUTING["&nbsp;&nbsp;🔀 Routing DataSource&nbsp;&nbsp;"]
+            TRS["TenantRoutingDataSource<br/><i>extends AbstractDataSource</i>"]
+            TDM["TenantDataSourceManager<br/>ConcurrentHashMap&lt;UUID, DataSource&gt;<br/><b>HikariCP — 5 conn/tenant</b>"]
+        end
+        JWT --> TC
+        TC --> TRS
+        TRS --> TDM
+    end
+
+    subgraph SQLSERVER["&nbsp;&nbsp;🗄️ SQL SERVER — kasoft.selfip.net:1433&nbsp;&nbsp;"]
+        direction TB
+        subgraph MASTER["&nbsp;&nbsp;📋 BASE MAÎTRE (système)&nbsp;&nbsp;<br/>&nbsp;&nbsp;Tables partagées — non répliquées&nbsp;&nbsp;"]
+            T1["<b>tenants</b><br/>id · slug · name · status<br/>db_name · db_provisioned<br/>plan_id · admin_email"]
+            T2["<b>subscription_plans</b><br/>id · name · max_users · price"]
+            T3["<b>license_keys</b><br/>key · tenant_id · expires_at"]
+            FW["<b>flyway_schema_history</b><br/>V70 baseline → V79"]
+        end
+
+        subgraph ENFANT1["&nbsp;&nbsp;👷 BASE ENFANT — Odyssée&nbsp;&nbsp;<br/>&nbsp;&nbsp;<code>opticrm_odyssee</code>&nbsp;&nbsp;"]
+            E1U["<b>users</b> — 20 rows<br/>tenant_id = <code>...0002</code><br/>admin@odyssee.ma<br/>y.chemcham@odyssee.co.ma"]
+            E1R["<b>roles</b> · <b>teams</b> · <b>territories</b>"]
+            E1B["<b>~95 tables métier</b><br/>accounts · contacts · leads<br/>opportunities · quotes · invoices<br/>products · chantiers · visits<br/>workflows · stock · SAV..."]
+            E1I["<b>Indexes tenant_id</b><br/>idx_users_email_tenant (UNIQUE)<br/>idx_accounts_tenant<br/>idx_leads_tenant ..."]
+        end
+
+        subgraph ENFANT2["&nbsp;&nbsp;🏢 BASE ENFANT — Client B&nbsp;&nbsp;<br/>&nbsp;&nbsp;<code>opticrm_clientb</code>&nbsp;&nbsp;"]
+            E2U["<b>users</b><br/>tenant_id = <code>UUID-B</code>"]
+            E2B["<b>~95 tables métier</b><br/>(même schéma)<br/>Données 100% isolées"]
+        end
+
+        subgraph ENFANT3["&nbsp;&nbsp;🏗️ BASE ENFANT — Client C&nbsp;&nbsp;<br/>&nbsp;&nbsp;<code>opticrm_clientc</code>&nbsp;&nbsp;"]
+            E3U["<b>users</b><br/>tenant_id = <code>UUID-C</code>"]
+            E3B["<b>~95 tables métier</b><br/>(même schéma)<br/>Données 100% isolées"]
+        end
+    end
+
+    subgraph PROV["&nbsp;&nbsp;🔧 PROVISIONING — Nouveau Tenant&nbsp;&nbsp;"]
+        direction LR
+        P1["1️⃣ INSERT INTO<br/><b>tenants</b><br/>slug · db_name"] --> P2["2️⃣ CREATE DATABASE<br/><code>opticrm_{slug}</code>"] --> P3["3️⃣ Flyway migrate<br/><code>db/tenant-migration/</code><br/>V1__complete_schema.sql"] --> P4["4️⃣ DataSourceManager<br/><b>.register(id, db)</b><br/>Pool HikariCP créé"]
+    end
+
+    WEB -->|"?client=odyssee<br/>→ resolveSlug()<br/>→ X-Tenant-ID"| TRF
+    MOB -->|"X-Tenant-ID<br/>header"| TRF
+
+    TDM -->|"tenant<br/>...0002"| ENFANT1
+    TDM -->|"tenant<br/>UUID-B"| ENFANT2
+    TDM -->|"tenant<br/>UUID-C"| ENFANT3
+    TDM -.->|"fallback<br/>null"| MASTER
+
+    style CLIENTS fill:#1e3a5f,stroke:#60a5fa,color:#e2e8f0
+    style BACKEND fill:#1a1a2e,stroke:#4a5568,color:#e2e8f0
+    style FILTERS fill:#2d1b69,stroke:#a78bfa,color:#e2e8f0
+    style ROUTING fill:#1e3a5f,stroke:#60a5fa,color:#e2e8f0
+    style SQLSERVER fill:#111827,stroke:#6b7280,color:#e2e8f0
+    style MASTER fill:#1e3a5f,stroke:#60a5fa,color:#e2e8f0
+    style ENFANT1 fill:#14532d,stroke:#4ade80,color:#e2e8f0
+    style ENFANT2 fill:#713f12,stroke:#facc15,color:#e2e8f0
+    style ENFANT3 fill:#713f12,stroke:#facc15,color:#e2e8f0
+    style PROV fill:#7f1d1d,stroke:#f87171,color:#e2e8f0
+</div>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    flowchart: {
+      curve: 'basis',
+      padding: 20,
+      nodeSpacing: 30,
+      rankSpacing: 40
+    },
+    themeVariables: {
+      darkMode: true,
+      background: '#0f172a',
+      primaryColor: '#1e3a5f',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#60a5fa',
+      lineColor: '#60a5fa',
+      secondaryColor: '#14532d',
+      tertiaryColor: '#713f12',
+      fontFamily: 'Segoe UI, system-ui, sans-serif',
+      fontSize: '14px'
+    }
+  });
+</script>
+</body>
+</html>

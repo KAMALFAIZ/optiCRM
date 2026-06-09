@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * Super-admin endpoints pour la gestion des tenants SaaS.
@@ -52,6 +55,14 @@ public class TenantAdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<TenantDto> updateTenant(
+            @PathVariable UUID id,
+            @RequestBody @Valid UpdateRequest req) {
+        Tenant updated = tenantService.updateTenant(id, req.getName(), req.getAdminEmail(), req.getPlanId());
+        return ResponseEntity.ok(TenantDto.from(updated));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTenant(@PathVariable UUID id) {
         tenantService.deleteTenant(id);
@@ -81,6 +92,13 @@ public class TenantAdminController {
     }
 
     // ── DTO ─────────────────────────────────────────────────────────────────
+
+    @Data
+    public static class UpdateRequest {
+        @NotBlank private String name;
+        @Email    private String adminEmail;
+        private String planId;
+    }
 
     @Data
     public static class TenantDto {

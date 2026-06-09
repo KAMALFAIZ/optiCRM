@@ -21,7 +21,7 @@ IF NOT EXISTS (SELECT 1 FROM tenants WHERE slug = 'odyssee')
 
 -- 2. Créer l'utilisateur admin Odyssée (password: Admin123!)
 IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@odyssee.ma')
-    INSERT INTO users (id, email, password_hash, first_name, last_name, role_id, is_active, tenant_id)
+    INSERT INTO users (id, email, password_hash, first_name, last_name, role_id, is_active)
     SELECT
         NEWID(),
         'admin@odyssee.ma',
@@ -29,7 +29,6 @@ IF NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@odyssee.ma')
         'Admin',
         'Odyssée',
         r.id,
-        1,
-        '00000000-0000-0000-0000-000000000002'
+        1
     FROM roles r WHERE r.name = 'SUPER_ADMIN';
 GO

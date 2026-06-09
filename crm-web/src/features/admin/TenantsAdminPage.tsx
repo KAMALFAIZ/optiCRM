@@ -6,7 +6,7 @@ import {
 import {
   DatabaseOutlined, CheckCircleOutlined, CloseCircleOutlined,
   ReloadOutlined, SyncOutlined, PlusOutlined, UserOutlined,
-  GlobalOutlined, MailOutlined, DeleteOutlined,
+  GlobalOutlined, MailOutlined, DeleteOutlined, EditOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import apiClient from '@/api/client';
@@ -58,10 +58,14 @@ export default function TenantsAdminPage() {
   const [plans, setPlans]               = useState<Plan[]>([]);
   const [loading, setLoading]           = useState(true);
   const [modalOpen, setModalOpen]       = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingTenant, setEditingTenant] = useState<TenantDto | null>(null);
   const [creating, setCreating]         = useState(false);
+  const [updating, setUpdating]         = useState(false);
   const [provisioning, setProvisioning] = useState<Set<string>>(new Set());
   const [deleting, setDeleting]         = useState<Set<string>>(new Set());
   const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -161,6 +165,38 @@ export default function TenantsAdminPage() {
     }
   };
 
+  const openEditModal = (tenant: TenantDto) => {
+    setEditingTenant(tenant);
+    editForm.setFieldsValue({
+      name:       tenant.name,
+      adminEmail: tenant.adminEmail || '',
+      planId:     undefined, // plan name only, not id — leave blank
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleUpdate = async (values: any) => {
+    if (!editingTenant) return;
+    setUpdating(true);
+    try {
+      const { data } = await apiClient.put(`/superadmin/tenants/${editingTenant.id}`, {
+        name:       values.name,
+        adminEmail: values.adminEmail,
+        planId:     values.planId || null,
+      });
+      message.success(`Client '${data.name}' mis à jour`);
+      setEditModalOpen(false);
+      setEditingTenant(null);
+      editForm.resetFields();
+      await load();
+    } catch (e: any) {
+      const err = e?.response?.data?.error;
+      message.error(typeof err === 'string' ? err : err?.message || 'Erreur réseau');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
   // ── Colonnes ──────────────────────────────────────────────────────────────
 
   const columns: ColumnsType<TenantDto> = [
@@ -224,9 +260,18 @@ export default function TenantsAdminPage() {
     {
       title: 'Actions',
       key: 'actions',
-      width: 210,
+      width: 260,
       render: (_, r) => (
         <Space size={8}>
+          {/* Bouton Modifier */}
+          <Tooltip title="Modifier ce client">
+            <Button
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => openEditModal(r)}
+            />
+          </Tooltip>
+
           <Popconfirm
             title={r.dbProvisioned ? `Re-migrer '${r.dbName}' ?` : `Créer 'opticrm_${r.slug}' ?`}
             onConfirm={() => handleProvision(r.id, r.slug)}
@@ -351,6 +396,61 @@ export default function TenantsAdminPage() {
           rowClassName={(r) => !r.dbProvisioned ? 'ant-table-row-warning' : ''}
         />
       </Card>
+
+      {/* ── Modal Modifier client ────────────────────────────────────────── */}
+      <Modal
+        title={
+          <Space>
+            <EditOutlined style={{ color: '#405189' }} />
+            <span>Modifier le client — {editingTenant?.name}</span>
+          </Space>
+        }
+        open={editModalOpen}
+        onCancel={() => { setEditModalOpen(false); editForm.resetFields(); }}
+        onOk={() => editForm.submit()}
+        okText="Enregistrer"
+        cancelText="Annuler"
+        confirmLoading={updating}
+        okButtonProps={{ style: { background: '#405189', borderColor: '#405189' } }}
+        width={480}
+      >
+        <Form
+          form={editForm}
+          layout="vertical"
+          onFinish={handleUpdate}
+          style={{ marginTop: 16 }}
+        >
+          <Form.Item
+            label="Nom de l'entreprise"
+            name="name"
+            rules={[{ required: true, message: 'Requis' }, { min: 2 }]}
+          >
+            <Input prefix={<UserOutlined style={{ color: '#bfbfbf' }} />} />
+          </Form.Item>
+
+          <Form.Item
+            label="Email administrateur"
+            name="adminEmail"
+            rules={[{ required: true, message: 'Requis' }, { type: 'email', message: 'Email invalide' }]}
+          >
+            <Input prefix={<MailOutlined style={{ color: '#bfbfbf' }} />} />
+          </Form.Item>
+
+          <Form.Item
+            label="Plan d'abonnement"
+            name="planId"
+          >
+            <Select
+              placeholder="Choisir un plan (optionnel)"
+              allowClear
+              options={plans.map(p => ({
+                value: p.id,
+                label: `${p.name}${p.priceMonthly > 0 ? ` — ${p.priceMonthly} MAD/mois` : ' (Gratuit)'}`,
+              }))}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
 
       {/* ── Modal Nouveau client ────────────────────────────────────────── */}
       <Modal

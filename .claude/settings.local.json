@@ -1371,7 +1371,24 @@
       "Bash(DATABASE_URL=\"jdbc:sqlserver://kasoft.selfip.net;databaseName=opticrm_odyssee;encrypt=false;trustServerCertificate=true;sendStringParametersAsUnicode=true\" java -Duser.timezone=UTC -Dserver.port=8081 -Dspring.flyway.locations=filesystem:crm-api/src/main/resources/db/migration -Dspring.flyway.validate-on-migrate=false -jar crm-api/target/crm-api-1.0.0-SNAPSHOT.jar)",
       "Bash(echo \"Backend starting, PID: $!\")",
       "Bash(cat /tmp/backend.log 2>/dev/null | grep -i \"datasource\\\\|database\\\\|connect\\\\|opticrm\\\\|sqlserver\\\\|hikari\" | head -20)",
-      "Bash(echo \"Backend PID: $!\")"
+      "Bash(echo \"Backend PID: $!\")",
+      "Bash(taskkill //F //IM java.exe)",
+      "Bash(nohup java -Duser.timezone=UTC -Dserver.port=8081 '-Dspring.datasource.url=jdbc:sqlserver://kasoft.selfip.net;databaseName=opticrm_odyssee;encrypt=false;trustServerCertificate=true;sendStringParametersAsUnicode=true' -Dspring.datasource.username=sa -Dspring.datasource.password=SQL@2019 -Dspring.flyway.locations=filesystem:crm-api/src/main/resources/db/migration -Dspring.flyway.validate-on-migrate=false '-Dspring.flyway.ignore-migration-patterns=*:failed' -jar crm-api/target/crm-api-1.0.0-SNAPSHOT.jar)",
+      "PowerShell(Stop-Process -Force -ErrorAction SilentlyContinue)",
+      "Bash(Get-ChildItem -Path \"D:\\\\kasoft-platform\\\\OptiCRM\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(where python *)",
+      "Bash(where python3 *)",
+      "PowerShell([System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }; try { $body = '{\"email\":\"admin@odyssee.ma\",\"password\":\"Admin123!\"}'; $response = Invoke-RestMethod -Uri \"https://kasoft.selfip.net:50231/api/v1/auth/login\" -Method POST -Body $body -ContentType \"application/json\" -ErrorAction Stop; $response | ConvertTo-Json -Depth 5 } catch { $_.Exception.Message; if \\($_.Exception.Response\\) { $reader = [System.IO.StreamReader]::new\\($_.Exception.Response.GetResponseStream\\(\\)\\); $reader.ReadToEnd\\(\\) } })",
+      "Bash(grep -E \"\\\\.\\(tsx?|ts\\)$\")",
+      "Bash(Get-ChildItem -Path \"D:\\\\kasoft-platform\" -Directory)",
+      "Bash(git -C D:/kasoft-platform/OptiCRM branch)",
+      "Bash(xargs git -C D:/kasoft-platform/OptiCRM branch -D)",
+      "Bash('#buttonRec')",
+      "Bash(pkill -f scrape_communales_2021)",
+      "Bash(node scrape_communales_2021.js)",
+      "PowerShell(node D:\\\\kasoft-platform\\\\OptiCRM\\\\probe_api.js)",
+      "PowerShell(\\(Get-Content D:\\\\kasoft-platform\\\\OptiCRM\\\\elections_2016.csv | Measure-Object -Line\\).Lines)"
     ]
   }
 }

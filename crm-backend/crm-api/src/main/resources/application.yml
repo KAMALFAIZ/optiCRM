@@ -31,8 +31,7 @@ spring:
           batch_versioned_data: true
         order_inserts: true
         order_updates: true
-        # Multi-tenancy discriminator (Hibernate 6): filtre automatique par tenant_id
-        multiTenancy: DISCRIMINATOR
+        # Database-per-tenant: routing is handled by TenantRoutingDataSource, not Hibernate discriminator
     open-in-view: false
 
   flyway:
@@ -88,7 +87,7 @@ google:
 
 # JWT Configuration
 jwt:
-  secret: ${JWT_SECRET:}
+  secret: ${JWT_SECRET:votre-cle-secrete-super-securisee-pour-le-developpement-local-opticrm-2026-tres-longue}
   access-token-expiration: 28800000  # 8 heures
   refresh-token-expiration: 604800000  # 7 days
   issuer: opticrm
