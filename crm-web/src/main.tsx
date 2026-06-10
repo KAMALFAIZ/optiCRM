@@ -57,64 +57,74 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
           ? antTheme.darkAlgorithm
           : antTheme.defaultAlgorithm,
         token: {
-          // Velzon brand colors
-          colorPrimary: '#405189',
-          colorSuccess: '#0ab39c',
-          colorWarning: '#f7b84b',
-          colorError: '#f06548',
-          colorInfo: '#299cdb',
+          // Indigo Pro brand colors
+          colorPrimary: '#4F46E5',
+          colorSuccess: '#10B981',
+          colorWarning: '#F59E0B',
+          colorError: '#EF4444',
+          colorInfo: '#0EA5E9',
 
-          // Typography
-          fontFamily: "'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          // Typography — Inter avec chiffres tabulaires pour les montants
+          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
           fontSize: 14,
 
-          // Borders
-          borderRadius: 6,
-          borderRadiusSM: 4,
-          borderRadiusLG: 8,
+          // Borders — radius plus généreux, look moderne
+          borderRadius: 10,
+          borderRadiusSM: 6,
+          borderRadiusLG: 12,
 
-          // Layout
-          colorBgLayout: isDark ? '#111316' : '#f3f6f9',
-          colorBgContainer: isDark ? '#1d2228' : '#ffffff',
-          colorBorder: isDark ? '#2a2f34' : '#e9ebec',
-          colorBorderSecondary: isDark ? '#2a2f34' : '#e9ebec',
+          // Layout — échelle Slate
+          colorBgLayout: isDark ? '#0F172A' : '#F8FAFC',
+          colorBgContainer: isDark ? '#1E293B' : '#ffffff',
+          colorBorder: isDark ? '#334155' : '#E2E8F0',
+          colorBorderSecondary: isDark ? '#334155' : '#E2E8F0',
 
-          // Text
-          colorText: isDark ? '#adb5bd' : '#495057',
-          colorTextSecondary: isDark ? '#6d7080' : '#878a99',
-          colorTextHeading: isDark ? '#e9ecef' : '#212529',
+          // Text — Slate
+          colorText: isDark ? '#CBD5E1' : '#334155',
+          colorTextSecondary: isDark ? '#94A3B8' : '#64748B',
+          colorTextHeading: isDark ? '#F1F5F9' : '#0F172A',
 
-          // Shadow
-          boxShadow: '0 1px 3px rgba(56, 65, 74, 0.1)',
-          boxShadowSecondary: '0 4px 12px rgba(56, 65, 74, 0.15)',
+          // Shadow — teintée slate, subtile
+          boxShadow: '0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08)',
+          boxShadowSecondary: '0 4px 16px rgba(15, 23, 42, 0.12)',
         },
         components: {
           Menu: {
-            itemBorderRadius: 4,
+            itemBorderRadius: 8,
           },
           Card: {
-            borderRadius: 6,
+            borderRadius: 12,
             paddingLG: cardPaddingLG,
           },
           Button: {
-            borderRadius: 6,
+            borderRadius: 8,
             fontWeight: 500,
             controlHeight,
-            paddingContentHorizontal: 14,
+            paddingContentHorizontal: 16,
+            primaryShadow: '0 1px 2px rgba(79, 70, 229, 0.25)',
           },
           Table: {
-            borderRadius: 6,
+            borderRadius: 10,
             cellPaddingBlock,
-            cellPaddingInline: 10,
+            cellPaddingInline: 12,
+            headerBg: isDark ? '#1E293B' : '#F8FAFC',
           },
           Form: {
             itemMarginBottom: formItemMargin,
           },
           Select: {
             controlHeight,
+            borderRadius: 8,
           },
           Input: {
             controlHeight,
+            borderRadius: 8,
+          },
+          Tag: {
+            borderRadiusSM: 6,
+          },
+          Modal: {
+            borderRadiusLG: 14,
           },
         },
       }}

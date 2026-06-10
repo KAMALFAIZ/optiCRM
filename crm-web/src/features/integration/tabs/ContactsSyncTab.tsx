@@ -81,7 +81,7 @@ const extraColumns: ColumnsType<SageSyncItemDto> = [
     dataIndex: 'crmName',
     ellipsis: true,
     render: (v: string | null) => v
-      ? <Text style={{ color: '#405189' }}>{v}</Text>
+      ? <Text style={{ color: '#4F46E5' }}>{v}</Text>
       : <Text type="secondary">Nouveau</Text>,
   },
 ];
@@ -200,7 +200,7 @@ export default function ContactsSyncTab() {
           size="small"
           title={
             <Space>
-              <UserOutlined style={{ color: '#405189' }} />
+              <UserOutlined style={{ color: '#4F46E5' }} />
               <span>Import Contacts Sage 100</span>
             </Space>
           }
@@ -297,7 +297,7 @@ export default function ContactsSyncTab() {
               loading={loading}
               onClick={handlePreview}
               disabled={!pastedData.trim()}
-              style={{ background: '#405189', borderColor: '#405189' }}
+              style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
             >
               Prévisualiser le matching
             </Button>
@@ -311,7 +311,7 @@ export default function ContactsSyncTab() {
           size="small"
           title={
             <Space>
-              <InfoCircleOutlined style={{ color: '#405189' }} />
+              <InfoCircleOutlined style={{ color: '#4F46E5' }} />
               <span>Prévisualisation — {request.totalItems} ligne(s)</span>
               {request.label && <Tag>{request.label}</Tag>}
             </Space>
@@ -328,7 +328,7 @@ export default function ContactsSyncTab() {
                   icon={<CheckCircleOutlined />}
                   loading={applying}
                   onClick={handleApply}
-                  style={{ background: '#405189', borderColor: '#405189' }}
+                  style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
                 >
                   Appliquer la synchronisation
                 </Button>

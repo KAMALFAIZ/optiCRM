@@ -683,7 +683,7 @@ const AccountDetailPage: React.FC = () => {
                   editingCustomFields ? (
                     <Space size={4}>
                       <Button size="small" type="primary" onClick={saveCustomFields} loading={savingCustomFields}
-                        style={{ background: '#405189', borderColor: '#405189' }}>
+                        style={{ background: '#4F46E5', borderColor: '#4F46E5' }}>
                         Enregistrer
                       </Button>
                       <Button size="small" onClick={cancelEditCustomFields}>Annuler</Button>

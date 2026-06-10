@@ -149,7 +149,7 @@ export default function IntegrationSagePage() {
       {/* ── En-tête ── */}
       <div className="mb-6">
         <Space align="center" className="mb-2">
-          <ApiOutlined style={{ fontSize: 28, color: '#405189' }} />
+          <ApiOutlined style={{ fontSize: 28, color: '#4F46E5' }} />
           <Title level={3} className="!mb-0">
             Intégration Sage 100
           </Title>

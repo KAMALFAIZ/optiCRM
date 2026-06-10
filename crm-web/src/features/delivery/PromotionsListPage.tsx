@@ -201,7 +201,7 @@ export default function PromotionsListPage() {
       <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
         <Col>
           <Space align="center">
-            <GiftOutlined style={{ fontSize: 22, color: '#405189' }} />
+            <GiftOutlined style={{ fontSize: 22, color: '#4F46E5' }} />
             <Title level={4} style={{ margin: 0 }}>Promotions / Gratuités</Title>
           </Space>
           <Text type="secondary" style={{ display: 'block', marginTop: 2 }}>

@@ -27,7 +27,7 @@ export default function LoginPage() {
   const [pwError, setPwError] = useState<string | null>(null);
 
   const brandName = publicInfo?.name || 'OptiCRM';
-  const brandColor = publicInfo?.primaryColor || '#405189';
+  const brandColor = publicInfo?.primaryColor || '#4F46E5';
   const brandLogo = publicInfo?.logoUrl;
 
   // Clean stale auth tokens on login page mount — radical cleanup
@@ -80,7 +80,7 @@ export default function LoginPage() {
         minHeight: '100vh',
         display: 'flex',
         background: `linear-gradient(135deg, ${brandColor} 0%, ${brandColor}cc 50%, ${brandColor}88 100%)`,
-        fontFamily: 'Poppins, sans-serif',
+        fontFamily: 'Inter, sans-serif',
       }}
     >
       {/* Left panel — branding */}
@@ -152,7 +152,7 @@ export default function LoginPage() {
               fontSize: 40,
               fontWeight: 700,
               margin: '0 0 16px',
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'Inter, sans-serif',
               letterSpacing: '-0.5px',
             }}
           >
@@ -165,7 +165,7 @@ export default function LoginPage() {
               maxWidth: 360,
               lineHeight: 1.7,
               margin: 0,
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: 'Inter, sans-serif',
             }}
           >
             Gérez vos relations clients, vos ventes et votre équipe terrain depuis une seule plateforme.
@@ -188,7 +188,7 @@ export default function LoginPage() {
                   marginBottom: 16,
                   color: 'rgba(255,255,255,0.8)',
                   fontSize: 14,
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: 'Inter, sans-serif',
                 }}
               >
                 <div
@@ -196,7 +196,7 @@ export default function LoginPage() {
                     width: 20,
                     height: 20,
                     borderRadius: '50%',
-                    background: '#0ab39c',
+                    background: '#10B981',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -258,13 +258,13 @@ export default function LoginPage() {
               style={{
                 margin: 0,
                 color: '#212529',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: 'Inter, sans-serif',
                 fontWeight: 600,
               }}
             >
               Bienvenue !
             </Title>
-            <Text style={{ color: '#878a99', fontFamily: 'Poppins, sans-serif', fontSize: 14 }}>
+            <Text style={{ color: '#878a99', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>
               Connectez-vous pour accéder à votre espace
             </Text>
           </div>
@@ -291,11 +291,11 @@ export default function LoginPage() {
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <KeyOutlined style={{ color: brandColor }} />
-                <span style={{ fontFamily: 'Poppins', fontWeight: 600 }}>Créer votre mot de passe</span>
+                <span style={{ fontFamily: 'Inter', fontWeight: 600 }}>Créer votre mot de passe</span>
               </div>
             }
           >
-            <p style={{ color: '#878a99', fontFamily: 'Poppins', fontSize: 13, marginBottom: 20 }}>
+            <p style={{ color: '#878a99', fontFamily: 'Inter', fontSize: 13, marginBottom: 20 }}>
               Bienvenue ! Pour sécuriser votre compte, veuillez définir un mot de passe personnel avant de continuer.
             </p>
             {pwError && (
@@ -315,7 +315,7 @@ export default function LoginPage() {
               size="large"
             >
               <Form.Item
-                label={<span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500 }}>Nouveau mot de passe</span>}
+                label={<span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500 }}>Nouveau mot de passe</span>}
                 name="newPassword"
                 rules={[
                   { required: true, message: 'Requis' },
@@ -325,18 +325,18 @@ export default function LoginPage() {
                 <Input.Password
                   prefix={<LockOutlined style={{ color: '#878a99' }} />}
                   placeholder="Minimum 8 caractères"
-                  style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                  style={{ borderRadius: 8, fontFamily: 'Inter' }}
                 />
               </Form.Item>
               <Form.Item
-                label={<span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500 }}>Confirmer le mot de passe</span>}
+                label={<span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500 }}>Confirmer le mot de passe</span>}
                 name="confirmPassword"
                 rules={[{ required: true, message: 'Requis' }]}
               >
                 <Input.Password
                   prefix={<LockOutlined style={{ color: '#878a99' }} />}
                   placeholder="Répétez le mot de passe"
-                  style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                  style={{ borderRadius: 8, fontFamily: 'Inter' }}
                 />
               </Form.Item>
               <Form.Item style={{ marginBottom: 0 }}>
@@ -348,7 +348,7 @@ export default function LoginPage() {
                   style={{
                     height: 46,
                     borderRadius: 8,
-                    fontFamily: 'Poppins',
+                    fontFamily: 'Inter',
                     fontWeight: 600,
                     fontSize: 15,
                     background: brandColor,
@@ -369,7 +369,7 @@ export default function LoginPage() {
             size="large"
           >
             <Form.Item
-              label={<span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500, color: '#495057' }}>Email</span>}
+              label={<span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500, color: '#495057' }}>Email</span>}
               name="email"
               rules={[
                 { required: true, message: 'Veuillez entrer votre email' },
@@ -380,12 +380,12 @@ export default function LoginPage() {
                 prefix={<UserOutlined style={{ color: '#878a99' }} />}
                 placeholder="email@exemple.com"
                 autoComplete="email"
-                style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                style={{ borderRadius: 8, fontFamily: 'Inter' }}
               />
             </Form.Item>
 
             <Form.Item
-              label={<span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500, color: '#495057' }}>Mot de passe</span>}
+              label={<span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500, color: '#495057' }}>Mot de passe</span>}
               name="password"
               rules={[{ required: true, message: 'Veuillez entrer votre mot de passe' }]}
             >
@@ -393,20 +393,20 @@ export default function LoginPage() {
                 prefix={<LockOutlined style={{ color: '#878a99' }} />}
                 placeholder="Mot de passe"
                 autoComplete="current-password"
-                style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                style={{ borderRadius: 8, fontFamily: 'Inter' }}
               />
             </Form.Item>
 
             <Form.Item style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Form.Item name="rememberMe" valuePropName="checked" noStyle>
-                  <Checkbox style={{ fontFamily: 'Poppins', fontSize: 13, color: '#495057' }}>
+                  <Checkbox style={{ fontFamily: 'Inter', fontSize: 13, color: '#495057' }}>
                     Se souvenir de moi
                   </Checkbox>
                 </Form.Item>
                 <Link
                   to="/forgot-password"
-                  style={{ color: brandColor, fontFamily: 'Poppins', fontSize: 13 }}
+                  style={{ color: brandColor, fontFamily: 'Inter', fontSize: 13 }}
                 >
                   Mot de passe oublié ?
                 </Link>
@@ -422,7 +422,7 @@ export default function LoginPage() {
                 style={{
                   height: 46,
                   borderRadius: 8,
-                  fontFamily: 'Poppins',
+                  fontFamily: 'Inter',
                   fontWeight: 600,
                   fontSize: 15,
                   background: brandColor,

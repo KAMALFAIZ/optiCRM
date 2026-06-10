@@ -84,13 +84,13 @@ export default function ConflictResolutionModal({ open, onClose }: Props) {
             title: 'Vos modifications',
             dataIndex: 'local',
             key: 'local',
-            render: (v: string) => <Text style={{ color: '#0ab39c' }}>{v}</Text>,
+            render: (v: string) => <Text style={{ color: '#10B981' }}>{v}</Text>,
           },
           {
             title: 'Version serveur',
             dataIndex: 'server',
             key: 'server',
-            render: (v: string) => <Text style={{ color: '#405189' }}>{v}</Text>,
+            render: (v: string) => <Text style={{ color: '#4F46E5' }}>{v}</Text>,
           },
         ]}
       />

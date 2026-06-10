@@ -222,7 +222,7 @@ export default function TenantsAdminPage() {
       city:         tenant.city || '',
       ice:          tenant.ice || '',
       logoUrl:      tenant.logoUrl || '',
-      primaryColor: tenant.primaryColor || '#405189',
+      primaryColor: tenant.primaryColor || '#4F46E5',
       customDomain: tenant.customDomain || '',
       maxUsers:     tenant.maxUsers && tenant.maxUsers > 0 ? tenant.maxUsers : undefined,
     });
@@ -375,7 +375,7 @@ export default function TenantsAdminPage() {
               size="small"
               icon={provisioning.has(r.id) ? <SyncOutlined spin /> : <DatabaseOutlined />}
               loading={provisioning.has(r.id)}
-              style={!r.dbProvisioned ? { background: '#405189', borderColor: '#405189' } : {}}
+              style={!r.dbProvisioned ? { background: '#4F46E5', borderColor: '#4F46E5' } : {}}
             >
               {r.dbProvisioned ? 'Re-migrer' : 'Créer la base'}
             </Button>
@@ -438,7 +438,7 @@ export default function TenantsAdminPage() {
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => { form.resetFields(); setModalOpen(true); }}
-            style={{ background: '#405189', borderColor: '#405189' }}
+            style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
           >
             Nouveau client
           </Button>
@@ -448,7 +448,7 @@ export default function TenantsAdminPage() {
       {/* Stats */}
       <div style={{ display: 'flex', gap: 16, marginBottom: 20 }}>
         <Card size="small" style={{ flex: 1, textAlign: 'center' }}>
-          <div style={{ fontSize: 28, fontWeight: 700, color: '#405189' }}>{tenants.length}</div>
+          <div style={{ fontSize: 28, fontWeight: 700, color: '#4F46E5' }}>{tenants.length}</div>
           <Text type="secondary">Total clients</Text>
         </Card>
         <Card size="small" style={{ flex: 1, textAlign: 'center' }}>
@@ -473,7 +473,7 @@ export default function TenantsAdminPage() {
         style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
         title={
           <Space>
-            <DatabaseOutlined style={{ color: '#405189' }} />
+            <DatabaseOutlined style={{ color: '#4F46E5' }} />
             <span>Liste des tenants</span>
             <Badge count={pending} style={{ backgroundColor: '#ff4d4f' }} title="Sans base provisionnée" />
           </Space>
@@ -494,7 +494,7 @@ export default function TenantsAdminPage() {
       <Modal
         title={
           <Space>
-            <EditOutlined style={{ color: '#405189' }} />
+            <EditOutlined style={{ color: '#4F46E5' }} />
             <span>Modifier le client — {editingTenant?.name}</span>
           </Space>
         }
@@ -504,7 +504,7 @@ export default function TenantsAdminPage() {
         okText="Enregistrer"
         cancelText="Annuler"
         confirmLoading={updating}
-        okButtonProps={{ style: { background: '#405189', borderColor: '#405189' } }}
+        okButtonProps={{ style: { background: '#4F46E5', borderColor: '#4F46E5' } }}
         width={640}
       >
         <Form
@@ -647,7 +647,7 @@ export default function TenantsAdminPage() {
       <Modal
         title={
           <Space>
-            <PlusOutlined style={{ color: '#405189' }} />
+            <PlusOutlined style={{ color: '#4F46E5' }} />
             <span>Nouveau client SaaS</span>
           </Space>
         }
@@ -657,7 +657,7 @@ export default function TenantsAdminPage() {
         okText="Créer le client"
         cancelText="Annuler"
         confirmLoading={creating}
-        okButtonProps={{ style: { background: '#405189', borderColor: '#405189' } }}
+        okButtonProps={{ style: { background: '#4F46E5', borderColor: '#4F46E5' } }}
         width={640}
       >
         <Form
@@ -667,7 +667,7 @@ export default function TenantsAdminPage() {
           style={{ marginTop: 16 }}
         >
           {/* ─ Informations générales ─ */}
-          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#4F46E5' }}>
             <BankOutlined /> Informations générales
           </Divider>
 
@@ -749,7 +749,7 @@ export default function TenantsAdminPage() {
           </Form.Item>
 
           {/* ─ Abonnement ─ */}
-          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#4F46E5' }}>
             <DatabaseOutlined /> Abonnement & limites
           </Divider>
 
@@ -781,7 +781,7 @@ export default function TenantsAdminPage() {
           </Row>
 
           {/* ─ Personnalisation ─ */}
-          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
+          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#4F46E5' }}>
             <BgColorsOutlined /> Personnalisation
           </Divider>
 
@@ -812,7 +812,7 @@ export default function TenantsAdminPage() {
       <Modal
         title={
           <Space>
-            <KeyOutlined style={{ color: '#405189' }} />
+            <KeyOutlined style={{ color: '#4F46E5' }} />
             <span>Lien de première connexion</span>
           </Space>
         }
@@ -820,7 +820,7 @@ export default function TenantsAdminPage() {
         onCancel={() => setAccessLink(null)}
         footer={
           <Button type="primary" onClick={() => setAccessLink(null)}
-            style={{ background: '#405189', borderColor: '#405189' }}>
+            style={{ background: '#4F46E5', borderColor: '#4F46E5' }}>
             Fermer
           </Button>
         }

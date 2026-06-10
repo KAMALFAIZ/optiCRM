@@ -75,7 +75,7 @@ const extraColumns: ColumnsType<SageSyncItemDto> = [
     dataIndex: 'crmName',
     ellipsis: true,
     render: (v: string | null) => v
-      ? <Text style={{ color: '#405189' }}>{v}</Text>
+      ? <Text style={{ color: '#4F46E5' }}>{v}</Text>
       : <Text type="danger">Introuvable</Text>,
   },
 ];
@@ -161,7 +161,7 @@ export default function CaSyncTab() {
           size="small"
           title={
             <Space>
-              <LineChartOutlined style={{ color: '#405189' }} />
+              <LineChartOutlined style={{ color: '#4F46E5' }} />
               <span>Import CA Sage 100</span>
             </Space>
           }
@@ -236,7 +236,7 @@ export default function CaSyncTab() {
               loading={loading}
               onClick={handlePreview}
               disabled={!pastedData.trim()}
-              style={{ background: '#405189', borderColor: '#405189' }}
+              style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
             >
               Prévisualiser le matching
             </Button>
@@ -250,7 +250,7 @@ export default function CaSyncTab() {
           size="small"
           title={
             <Space>
-              <InfoCircleOutlined style={{ color: '#405189' }} />
+              <InfoCircleOutlined style={{ color: '#4F46E5' }} />
               <span>Prévisualisation — {request.totalItems} ligne(s)</span>
               {request.label && <Tag>{request.label}</Tag>}
               {request.periodYear && (
@@ -272,7 +272,7 @@ export default function CaSyncTab() {
                   icon={<CheckCircleOutlined />}
                   loading={applying}
                   onClick={handleApply}
-                  style={{ background: '#405189', borderColor: '#405189' }}
+                  style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
                 >
                   Appliquer la synchronisation
                 </Button>

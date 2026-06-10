@@ -323,7 +323,7 @@ export default function AccountsSyncTab() {
           size="small"
           title={
             <Space>
-              <BankOutlined style={{ color: '#405189' }} />
+              <BankOutlined style={{ color: '#4F46E5' }} />
               <span>Import Comptes clients Sage 100</span>
             </Space>
           }
@@ -422,7 +422,7 @@ export default function AccountsSyncTab() {
               loading={loading}
               onClick={handlePreview}
               disabled={!pastedData.trim()}
-              style={{ background: '#405189', borderColor: '#405189' }}
+              style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
             >
               Prévisualiser le matching
             </Button>
@@ -436,7 +436,7 @@ export default function AccountsSyncTab() {
           size="small"
           title={
             <Space>
-              <InfoCircleOutlined style={{ color: '#405189' }} />
+              <InfoCircleOutlined style={{ color: '#4F46E5' }} />
               <span>Prévisualisation — {request.totalItems} ligne(s)</span>
               {request.label && <Tag>{request.label}</Tag>}
             </Space>
@@ -453,7 +453,7 @@ export default function AccountsSyncTab() {
                   icon={<CheckCircleOutlined />}
                   loading={applying}
                   onClick={handleApply}
-                  style={{ background: '#405189', borderColor: '#405189' }}
+                  style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
                 >
                   Appliquer la synchronisation
                 </Button>

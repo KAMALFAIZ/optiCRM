@@ -292,7 +292,7 @@ const AgedBalancePage: React.FC = () => {
       {/* En-tête */}
       <div style={{ marginBottom: 24 }}>
         <Title level={3} style={{ marginBottom: 4 }}>
-          <ClockCircleOutlined style={{ marginRight: 10, color: '#405189' }} />
+          <ClockCircleOutlined style={{ marginRight: 10, color: '#4F46E5' }} />
           Balance Âgée
         </Title>
         <Text type="secondary">
@@ -307,7 +307,7 @@ const AgedBalancePage: React.FC = () => {
             <Statistic
               title="Total dû"
               value={formatMAD(stats.totalDue)}
-              valueStyle={{ color: '#405189', fontWeight: 700, fontSize: 20 }}
+              valueStyle={{ color: '#4F46E5', fontWeight: 700, fontSize: 20 }}
             />
           </Card>
         </Col>
@@ -392,8 +392,8 @@ const AgedBalancePage: React.FC = () => {
           {isCommercial ? (
             // Commercial : vue restreinte, pas de filtre
             <>
-              <UserOutlined style={{ color: '#405189' }} />
-              <Text strong style={{ color: '#405189' }}>
+              <UserOutlined style={{ color: '#4F46E5' }} />
+              <Text strong style={{ color: '#4F46E5' }}>
                 Vos créances — {currentUser?.firstName} {currentUser?.lastName}
               </Text>
             </>

@@ -31,9 +31,9 @@ export default function ForgotPasswordPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #405189 0%, #2e3b6e 50%, #1a2340 100%)',
+        background: 'linear-gradient(135deg, #4F46E5 0%, #2e3b6e 50%, #1a2340 100%)',
         padding: '24px',
-        fontFamily: 'Poppins, sans-serif',
+        fontFamily: 'Inter, sans-serif',
       }}
     >
       <div
@@ -53,7 +53,7 @@ export default function ForgotPasswordPage() {
               width: 56,
               height: 56,
               borderRadius: 14,
-              background: '#405189',
+              background: '#4F46E5',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -70,11 +70,11 @@ export default function ForgotPasswordPage() {
             <>
               <Title
                 level={4}
-                style={{ margin: 0, color: '#212529', fontFamily: 'Poppins', fontWeight: 600 }}
+                style={{ margin: 0, color: '#212529', fontFamily: 'Inter', fontWeight: 600 }}
               >
                 Mot de passe oublié ?
               </Title>
-              <Text style={{ color: '#878a99', fontSize: 13, fontFamily: 'Poppins' }}>
+              <Text style={{ color: '#878a99', fontSize: 13, fontFamily: 'Inter' }}>
                 Entrez votre email pour recevoir un lien de réinitialisation
               </Text>
             </>
@@ -86,14 +86,14 @@ export default function ForgotPasswordPage() {
             status="success"
             title="Email envoyé !"
             subTitle={
-              <span style={{ fontFamily: 'Poppins', fontSize: 13, color: '#495057' }}>
+              <span style={{ fontFamily: 'Inter', fontSize: 13, color: '#495057' }}>
                 Si un compte est associé à cette adresse, vous recevrez un email avec les
                 instructions pour réinitialiser votre mot de passe.
               </span>
             }
             extra={
               <Link to="/login">
-                <Button type="primary" style={{ background: '#405189', borderColor: '#405189' }}>
+                <Button type="primary" style={{ background: '#4F46E5', borderColor: '#4F46E5' }}>
                   Retour à la connexion
                 </Button>
               </Link>
@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
             <Form name="forgot-password" onFinish={onFinish} layout="vertical" size="large">
               <Form.Item
                 label={
-                  <span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500, color: '#495057' }}>
+                  <span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500, color: '#495057' }}>
                     Adresse email
                   </span>
                 }
@@ -129,7 +129,7 @@ export default function ForgotPasswordPage() {
                   prefix={<MailOutlined style={{ color: '#878a99' }} />}
                   placeholder="email@exemple.com"
                   autoComplete="email"
-                  style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                  style={{ borderRadius: 8, fontFamily: 'Inter' }}
                 />
               </Form.Item>
 
@@ -142,10 +142,10 @@ export default function ForgotPasswordPage() {
                   style={{
                     height: 46,
                     borderRadius: 8,
-                    fontFamily: 'Poppins',
+                    fontFamily: 'Inter',
                     fontWeight: 600,
                     fontSize: 15,
-                    background: '#405189',
+                    background: '#4F46E5',
                     border: 'none',
                   }}
                 >
@@ -157,7 +157,7 @@ export default function ForgotPasswordPage() {
             <div style={{ textAlign: 'center' }}>
               <Link
                 to="/login"
-                style={{ color: '#405189', fontFamily: 'Poppins', fontSize: 13 }}
+                style={{ color: '#4F46E5', fontFamily: 'Inter', fontSize: 13 }}
               >
                 <ArrowLeftOutlined style={{ marginRight: 6 }} />
                 Retour à la connexion

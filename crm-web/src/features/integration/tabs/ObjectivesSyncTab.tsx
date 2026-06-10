@@ -165,7 +165,7 @@ export default function ObjectivesSyncTab() {
           size="small"
           title={
             <Space>
-              <AimOutlined style={{ color: '#405189' }} />
+              <AimOutlined style={{ color: '#4F46E5' }} />
               <span>Import Objectifs commerciaux</span>
             </Space>
           }
@@ -240,7 +240,7 @@ export default function ObjectivesSyncTab() {
               loading={loading}
               onClick={handlePreview}
               disabled={!pastedData.trim()}
-              style={{ background: '#405189', borderColor: '#405189' }}
+              style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
             >
               Prévisualiser le matching
             </Button>
@@ -254,7 +254,7 @@ export default function ObjectivesSyncTab() {
           size="small"
           title={
             <Space>
-              <InfoCircleOutlined style={{ color: '#405189' }} />
+              <InfoCircleOutlined style={{ color: '#4F46E5' }} />
               <span>Prévisualisation — {request.totalItems} ligne(s)</span>
               {request.label && <Tag>{request.label}</Tag>}
               {request.periodYear && (
@@ -276,7 +276,7 @@ export default function ObjectivesSyncTab() {
                   icon={<CheckCircleOutlined />}
                   loading={applying}
                   onClick={handleApply}
-                  style={{ background: '#405189', borderColor: '#405189' }}
+                  style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
                 >
                   Appliquer la synchronisation
                 </Button>

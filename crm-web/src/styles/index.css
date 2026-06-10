@@ -13,96 +13,96 @@
    VELZON THEME - CSS DESIGN TOKENS
    ============================================= */
 :root {
-  /* Brand Colors */
-  --vz-primary: #405189;
-  --vz-secondary: #3577f1;
-  --vz-success: #0ab39c;
-  --vz-info: #299cdb;
-  --vz-warning: #f7b84b;
-  --vz-danger: #f06548;
-  --vz-light: #f3f6f9;
-  --vz-dark: #212529;
+  /* Brand Colors — Indigo Pro */
+  --vz-primary: #4F46E5;
+  --vz-secondary: #6366F1;
+  --vz-success: #10B981;
+  --vz-info: #0EA5E9;
+  --vz-warning: #F59E0B;
+  --vz-danger: #EF4444;
+  --vz-light: #F8FAFC;
+  --vz-dark: #0F172A;
 
   /* Layout */
   --vz-sidebar-width: 250px;
   --vz-sidebar-collapsed-width: 70px;
   --vz-header-height: 70px;
 
-  /* Sidebar (dark purple) */
-  --vz-sidebar-bg: #405189;
-  --vz-sidebar-text: rgba(255, 255, 255, 0.65);
+  /* Sidebar — indigo profond (signature de marque) */
+  --vz-sidebar-bg: #1E1B4B;
+  --vz-sidebar-text: #A5B4FC;
   --vz-sidebar-text-active: #ffffff;
-  --vz-sidebar-item-active-bg: rgba(255, 255, 255, 0.15);
-  --vz-sidebar-item-hover-bg: rgba(255, 255, 255, 0.08);
-  --vz-sidebar-sub-bg: rgba(0, 0, 0, 0.2);
-  --vz-sidebar-border: rgba(255, 255, 255, 0.1);
+  --vz-sidebar-item-active-bg: #4F46E5;
+  --vz-sidebar-item-hover-bg: rgba(99, 102, 241, 0.18);
+  --vz-sidebar-sub-bg: rgba(0, 0, 0, 0.25);
+  --vz-sidebar-border: rgba(165, 180, 252, 0.12);
 
   /* Header */
   --vz-header-bg: #ffffff;
-  --vz-header-border: #e9ebec;
-  --vz-header-item-color: #495057;
+  --vz-header-border: #E2E8F0;
+  --vz-header-item-color: #334155;
 
-  /* Body / Content */
-  --vz-body-bg: #f3f6f9;
+  /* Body / Content — échelle Slate */
+  --vz-body-bg: #F8FAFC;
   --vz-card-bg: #ffffff;
-  --vz-border-color: #e9ebec;
-  --vz-border-radius: 8px;
+  --vz-border-color: #E2E8F0;
+  --vz-border-radius: 10px;
 
-  /* Text */
-  --vz-text: #495057;
-  --vz-text-muted: #878a99;
-  --vz-heading: #212529;
+  /* Text — Slate */
+  --vz-text: #334155;
+  --vz-text-muted: #64748B;
+  --vz-heading: #0F172A;
 
-  /* Shadows */
-  --vz-card-shadow: 0 1px 3px rgba(56, 65, 74, 0.1);
-  --vz-header-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  /* Shadows — teintées slate */
+  --vz-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
+  --vz-header-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 
   /* Legacy compat */
-  --primary-color: #405189;
-  --success-color: #0ab39c;
-  --warning-color: #f7b84b;
-  --error-color: #f06548;
+  --primary-color: #4F46E5;
+  --success-color: #10B981;
+  --warning-color: #F59E0B;
+  --error-color: #EF4444;
   --font-size-base: 14px;
-  --heading-color: #212529;
-  --text-color: #495057;
-  --text-color-secondary: #878a99;
-  --disabled-color: rgba(0, 0, 0, 0.25);
-  --border-radius-base: 8px;
-  --border-color-base: #e9ebec;
-  --box-shadow-base: 0 1px 3px rgba(56, 65, 74, 0.1);
+  --heading-color: #0F172A;
+  --text-color: #334155;
+  --text-color-secondary: #64748B;
+  --disabled-color: rgba(15, 23, 42, 0.25);
+  --border-radius-base: 10px;
+  --border-color-base: #E2E8F0;
+  --box-shadow-base: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
 /* =============================================
    DARK MODE TOKENS
    ============================================= */
 [data-theme="dark"] {
-  --vz-sidebar-bg: #1a1d21;
-  --vz-sidebar-text: rgba(255, 255, 255, 0.55);
+  --vz-sidebar-bg: #0F172A;
+  --vz-sidebar-text: #94A3B8;
   --vz-sidebar-text-active: #ffffff;
-  --vz-sidebar-item-active-bg: rgba(64, 81, 137, 0.6);
-  --vz-sidebar-item-hover-bg: rgba(255, 255, 255, 0.06);
+  --vz-sidebar-item-active-bg: #4F46E5;
+  --vz-sidebar-item-hover-bg: rgba(99, 102, 241, 0.15);
   --vz-sidebar-sub-bg: rgba(0, 0, 0, 0.3);
-  --vz-sidebar-border: rgba(255, 255, 255, 0.07);
+  --vz-sidebar-border: rgba(148, 163, 184, 0.1);
 
-  --vz-header-bg: #262b30;
-  --vz-header-border: #2a2f34;
-  --vz-header-item-color: #b9c0c7;
+  --vz-header-bg: #1E293B;
+  --vz-header-border: #334155;
+  --vz-header-item-color: #CBD5E1;
 
-  --vz-body-bg: #111316;
-  --vz-card-bg: #1d2228;
-  --vz-border-color: #2a2f34;
+  --vz-body-bg: #0F172A;
+  --vz-card-bg: #1E293B;
+  --vz-border-color: #334155;
 
-  --vz-text: #adb5bd;
-  --vz-text-muted: #6d7080;
-  --vz-heading: #e9ecef;
+  --vz-text: #CBD5E1;
+  --vz-text-muted: #94A3B8;
+  --vz-heading: #F1F5F9;
 
   --vz-card-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
   --vz-header-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 
-  --heading-color: rgba(255, 255, 255, 0.85);
-  --text-color: #adb5bd;
-  --text-color-secondary: #6d7080;
-  --border-color-base: #2a2f34;
+  --heading-color: #F1F5F9;
+  --text-color: #CBD5E1;
+  --text-color-secondary: #94A3B8;
+  --border-color-base: #334155;
 }
 
 /* =============================================
@@ -121,7 +121,7 @@ body,
 }
 
 body {
-  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: var(--font-size-base);
   font-weight: 400;
   color: var(--vz-text);
@@ -173,7 +173,7 @@ body {
 /* Menu container inside sidebar */
 .velzon-sider .ant-menu {
   background: transparent !important;
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-size: 13px !important;
 }
 
@@ -253,7 +253,7 @@ body {
   border-radius: var(--vz-border-radius) !important;
   box-shadow: var(--vz-card-shadow) !important;
   border: 1px solid var(--vz-border-color) !important;
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
 }
 
 [data-theme="dark"] .ant-card {
@@ -342,7 +342,7 @@ body {
    ============================================= */
 .ant-btn {
   border-radius: 6px !important;
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   font-weight: 500 !important;
 }
 
@@ -354,7 +354,7 @@ body {
 .ant-picker,
 .ant-input-affix-wrapper {
   border-radius: 6px !important;
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
 }
 
 /* =============================================
@@ -363,7 +363,7 @@ body {
 .ant-typography,
 h1, h2, h3, h4, h5, h6,
 .ant-card-head-title {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
 }
 
 /* =============================================
@@ -425,7 +425,7 @@ h1, h2, h3, h4, h5, h6,
   margin-bottom: 12px;
   padding: 8px;
   border-radius: 6px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .kanban-card {
@@ -458,13 +458,13 @@ h1, h2, h3, h4, h5, h6,
   font-size: 28px;
   font-weight: 600;
   color: var(--vz-heading);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .stat-card .stat-label {
   color: var(--vz-text-muted);
   margin-top: 4px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* =============================================

@@ -384,7 +384,7 @@ export default function SalesTrackingPage() {
       align: 'right',
       width: 130,
       render: (v, r) => (
-        <Text strong style={{ color: '#405189' }}>
+        <Text strong style={{ color: '#4F46E5' }}>
           {formatMAD(v ?? (r.qty * r.unitPrice))}
         </Text>
       ),
@@ -425,7 +425,7 @@ export default function SalesTrackingPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <LineChartOutlined style={{ fontSize: 16, color: '#405189' }} />
+          <LineChartOutlined style={{ fontSize: 16, color: '#4F46E5' }} />
           <Title level={5} style={{ margin: 0 }}>Suivi des Ventes & KPIs</Title>
         </div>
         <Button type="primary" size="small" icon={<PlusOutlined />} onClick={openCreateSale}>
@@ -463,12 +463,12 @@ export default function SalesTrackingPage() {
       {/* KPI Cards */}
       <Row gutter={8} style={{ marginBottom: 10 }}>
         <Col xs={24} sm={12} md={6}>
-          <Card size="small" style={{ borderRadius: 8, borderLeft: '4px solid #405189' }}>
+          <Card size="small" style={{ borderRadius: 8, borderLeft: '4px solid #4F46E5' }}>
             <Statistic
               title={<span style={{ fontSize: 12 }}>CA Réalisé</span>}
               value={globalKpis.totalActualAmt}
               formatter={v => Number(v).toLocaleString('fr-MA')}
-              valueStyle={{ color: '#405189', fontSize: 16 }}
+              valueStyle={{ color: '#4F46E5', fontSize: 16 }}
             />
             <Text type="secondary" style={{ fontSize: 11 }}>
               Obj: {formatMAD(globalKpis.totalTargetAmt)}
@@ -642,7 +642,7 @@ export default function SalesTrackingPage() {
                         </Table.Summary.Cell>
                         <Table.Summary.Cell index={2} />
                         <Table.Summary.Cell index={3} align="right">
-                          <Text strong style={{ color: '#405189' }}>{formatMAD(totalAmt)}</Text>
+                          <Text strong style={{ color: '#4F46E5' }}>{formatMAD(totalAmt)}</Text>
                         </Table.Summary.Cell>
                         <Table.Summary.Cell index={4} colSpan={2} />
                       </Table.Summary.Row>

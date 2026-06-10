@@ -291,7 +291,7 @@ export default function MainLayout() {
     [canAccessRoute, canAccessGroup, isMasterTenant]
   );
 
-  const sidebarBg = isDark ? '#1a1d21' : '#405189';
+  const sidebarBg = isDark ? '#0F172A' : '#1E1B4B';
   const sidebarWidth = 250;
   const sidebarCollapsed = 70;
   const headerHeight = 70;
@@ -313,8 +313,8 @@ export default function MainLayout() {
       disabled: true,
       label: (
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 0' }}>
-          <DatabaseOutlined style={{ color: '#405189', fontSize: 13 }} />
-          <span style={{ fontSize: 12, color: '#405189', fontWeight: 600, textTransform: 'capitalize' }}>
+          <DatabaseOutlined style={{ color: '#4F46E5', fontSize: 13 }} />
+          <span style={{ fontSize: 12, color: '#4F46E5', fontWeight: 600, textTransform: 'capitalize' }}>
             {tenantName}
           </span>
         </div>
@@ -343,7 +343,7 @@ export default function MainLayout() {
           <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{
               width: 6, height: 6, borderRadius: '50%',
-              background: density === d ? '#0ab39c' : 'transparent',
+              background: density === d ? '#10B981' : 'transparent',
               border: density === d ? 'none' : '1px solid #ced4da',
             }} />
             {d === 'compact' ? 'Compacte' : d === 'default' ? 'Normale' : 'Confortable'}
@@ -378,20 +378,20 @@ export default function MainLayout() {
         }}
       >
         {(!isMobile && collapsed) ? (
-          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: '#fff', fontFamily: 'Poppins, sans-serif' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: '#fff', fontFamily: 'Inter, sans-serif' }}>
             O
           </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: '#fff', fontFamily: 'Poppins, sans-serif', flexShrink: 0 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: '#fff', fontFamily: 'Inter, sans-serif', flexShrink: 0 }}>
               O
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.2 }}>
-              <span style={{ color: '#fff', fontSize: 18, fontWeight: 700, fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.3px' }}>
+              <span style={{ color: '#fff', fontSize: 18, fontWeight: 700, fontFamily: 'Inter, sans-serif', letterSpacing: '-0.3px' }}>
                 OptiCRM
               </span>
               {tenantName && (
-                <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 10, fontFamily: 'Poppins, sans-serif', textTransform: 'capitalize', letterSpacing: 0.5 }}>
+                <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: 10, fontFamily: 'Inter, sans-serif', textTransform: 'capitalize', letterSpacing: 0.5 }}>
                   {tenantName}
                 </span>
               )}
@@ -528,7 +528,7 @@ export default function MainLayout() {
               }}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(255,255,255,0.08)' : '#ffffff';
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#405189';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#4F46E5';
               }}
               onMouseLeave={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(255,255,255,0.04)' : '#f8f9fa';
@@ -610,7 +610,7 @@ export default function MainLayout() {
                   src={user?.avatarUrl}
                   icon={!user?.avatarUrl ? <UserOutlined /> : undefined}
                   style={{
-                    background: '#405189',
+                    background: '#4F46E5',
                     fontSize: 13,
                   }}
                 >
@@ -626,7 +626,7 @@ export default function MainLayout() {
                       fontSize: 13,
                       fontWeight: 500,
                       color: isDark ? '#e9ecef' : '#212529',
-                      fontFamily: 'Poppins, sans-serif',
+                      fontFamily: 'Inter, sans-serif',
                       whiteSpace: 'nowrap',
                     }}
                   >
@@ -636,7 +636,7 @@ export default function MainLayout() {
                     style={{
                       fontSize: 11,
                       color: isDark ? '#6d7080' : '#878a99',
-                      fontFamily: 'Poppins, sans-serif',
+                      fontFamily: 'Inter, sans-serif',
                     }}
                   >
                     {user?.role?.name ?? 'Admin'}

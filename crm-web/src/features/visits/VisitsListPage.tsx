@@ -357,7 +357,7 @@ export default function VisitsListPage() {
                   }))}
                   optionRender={(opt) => (
                     <Space size={8}>
-                      <Avatar size={20} icon={<UserOutlined />} style={{ backgroundColor: '#405189' }} />
+                      <Avatar size={20} icon={<UserOutlined />} style={{ backgroundColor: '#4F46E5' }} />
                       <span>{opt.label}</span>
                     </Space>
                   )}
@@ -407,7 +407,7 @@ export default function VisitsListPage() {
             {isCommercial && (
               <Col span={6}>
                 <Space size={6} style={{ fontSize: 12, color: '#595959', paddingLeft: 4 }}>
-                  <Avatar size={18} icon={<UserOutlined />} style={{ backgroundColor: '#405189' }} />
+                  <Avatar size={18} icon={<UserOutlined />} style={{ backgroundColor: '#4F46E5' }} />
                   <span>{currentUser?.firstName} {currentUser?.lastName}</span>
                 </Space>
               </Col>

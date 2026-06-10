@@ -163,7 +163,7 @@ function SmtpTab() {
   return (
     <Card bordered={false} style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-        <MailOutlined style={{ fontSize: 20, color: '#405189' }} />
+        <MailOutlined style={{ fontSize: 20, color: '#4F46E5' }} />
         <div>
           <Title level={5} style={{ margin: 0 }}>Configuration SMTP</Title>
           <Text type="secondary" style={{ fontSize: 13 }}>
@@ -301,7 +301,7 @@ function SmtpTab() {
             htmlType="submit"
             icon={<SaveOutlined />}
             loading={saving}
-            style={{ background: '#405189', borderColor: '#405189' }}
+            style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
           >
             Enregistrer
           </Button>
@@ -434,7 +434,7 @@ function AiTab() {
   return (
     <Card bordered={false} style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-        <RobotOutlined style={{ fontSize: 20, color: '#405189' }} />
+        <RobotOutlined style={{ fontSize: 20, color: '#4F46E5' }} />
         <div>
           <Title level={5} style={{ margin: 0 }}>Configuration Intelligence Artificielle</Title>
           <Text type="secondary" style={{ fontSize: 13 }}>
@@ -521,7 +521,7 @@ function AiTab() {
           onClick={onSave}
           loading={saving}
           disabled={!apiKey || apiKey === settings?.apiKey}
-          style={{ background: '#405189', borderColor: '#405189' }}
+          style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
         >
           Enregistrer
         </Button>
@@ -759,7 +759,7 @@ function ReferenceGrid({ category, title, items, onRefresh }: ReferenceGridProps
       size="small"
       title={
         <span>
-          <SettingOutlined style={{ marginRight: 8, color: '#405189' }} />
+          <SettingOutlined style={{ marginRight: 8, color: '#4F46E5' }} />
           {title}
         </span>
       }
@@ -774,7 +774,7 @@ function ReferenceGrid({ category, title, items, onRefresh }: ReferenceGridProps
               addForm.setFieldsValue({ sortOrder: (items.length + 1) });
               setAdding(true);
             }}
-            style={{ background: '#405189', borderColor: '#405189' }}
+            style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
           >
             Ajouter
           </Button>
@@ -810,7 +810,7 @@ function ReferenceGrid({ category, title, items, onRefresh }: ReferenceGridProps
           <Form.Item>
             <Space size={4}>
               <Button type="primary" size="small" icon={<CheckOutlined />} onClick={handleAdd} loading={saving}
-                style={{ background: '#405189', borderColor: '#405189' }}>
+                style={{ background: '#4F46E5', borderColor: '#4F46E5' }}>
                 OK
               </Button>
               <Button size="small" icon={<CloseOutlined />} onClick={() => { setAdding(false); addForm.resetFields(); }}>
@@ -1028,7 +1028,7 @@ function CustomFieldsGrid() {
       size="small"
       title={
         <span>
-          <SettingOutlined style={{ marginRight: 8, color: '#405189' }} />
+          <SettingOutlined style={{ marginRight: 8, color: '#4F46E5' }} />
           Informations libres (champs personnalisés)
         </span>
       }
@@ -1036,7 +1036,7 @@ function CustomFieldsGrid() {
         !adding && (
           <Button size="small" type="primary" icon={<PlusOutlined />}
             onClick={() => { addForm.resetFields(); addForm.setFieldsValue({ sortOrder: fields.length + 1, fieldType: 'TEXT' }); setAdding(true); }}
-            style={{ background: '#405189', borderColor: '#405189' }}>
+            style={{ background: '#4F46E5', borderColor: '#4F46E5' }}>
             Ajouter un champ
           </Button>
         )
@@ -1072,7 +1072,7 @@ function CustomFieldsGrid() {
           <Form.Item>
             <Space size={4}>
               <Button type="primary" size="small" icon={<CheckOutlined />} onClick={handleAdd} loading={saving}
-                style={{ background: '#405189', borderColor: '#405189' }}>OK</Button>
+                style={{ background: '#4F46E5', borderColor: '#4F46E5' }}>OK</Button>
               <Button size="small" icon={<CloseOutlined />} onClick={() => { setAdding(false); addForm.resetFields(); }}>Annuler</Button>
             </Space>
           </Form.Item>

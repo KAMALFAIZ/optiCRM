@@ -41,7 +41,7 @@ export default function ResetPasswordPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #405189 0%, #2e3b6e 50%, #1a2340 100%)',
+          background: 'linear-gradient(135deg, #4F46E5 0%, #2e3b6e 50%, #1a2340 100%)',
           padding: '24px',
         }}
       >
@@ -61,7 +61,7 @@ export default function ResetPasswordPage() {
             subTitle="Ce lien de réinitialisation est invalide ou a expiré."
             extra={
               <Link to="/forgot-password">
-                <Button type="primary" style={{ background: '#405189', borderColor: '#405189' }}>
+                <Button type="primary" style={{ background: '#4F46E5', borderColor: '#4F46E5' }}>
                   Nouvelle demande
                 </Button>
               </Link>
@@ -79,9 +79,9 @@ export default function ResetPasswordPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #405189 0%, #2e3b6e 50%, #1a2340 100%)',
+        background: 'linear-gradient(135deg, #4F46E5 0%, #2e3b6e 50%, #1a2340 100%)',
         padding: '24px',
-        fontFamily: 'Poppins, sans-serif',
+        fontFamily: 'Inter, sans-serif',
       }}
     >
       <div
@@ -101,7 +101,7 @@ export default function ResetPasswordPage() {
               width: 56,
               height: 56,
               borderRadius: 14,
-              background: '#405189',
+              background: '#4F46E5',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -118,11 +118,11 @@ export default function ResetPasswordPage() {
             <>
               <Title
                 level={4}
-                style={{ margin: 0, color: '#212529', fontFamily: 'Poppins', fontWeight: 600 }}
+                style={{ margin: 0, color: '#212529', fontFamily: 'Inter', fontWeight: 600 }}
               >
                 Nouveau mot de passe
               </Title>
-              <Text style={{ color: '#878a99', fontSize: 13, fontFamily: 'Poppins' }}>
+              <Text style={{ color: '#878a99', fontSize: 13, fontFamily: 'Inter' }}>
                 Choisissez un mot de passe sécurisé (min. 8 caractères)
               </Text>
             </>
@@ -134,13 +134,13 @@ export default function ResetPasswordPage() {
             status="success"
             title="Mot de passe modifié !"
             subTitle={
-              <span style={{ fontFamily: 'Poppins', fontSize: 13, color: '#495057' }}>
+              <span style={{ fontFamily: 'Inter', fontSize: 13, color: '#495057' }}>
                 Votre mot de passe a été réinitialisé avec succès. Redirection vers la connexion…
               </span>
             }
             extra={
               <Link to="/login">
-                <Button type="primary" style={{ background: '#405189', borderColor: '#405189' }}>
+                <Button type="primary" style={{ background: '#4F46E5', borderColor: '#4F46E5' }}>
                   Se connecter
                 </Button>
               </Link>
@@ -162,7 +162,7 @@ export default function ResetPasswordPage() {
             <Form name="reset-password" onFinish={onFinish} layout="vertical" size="large">
               <Form.Item
                 label={
-                  <span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500, color: '#495057' }}>
+                  <span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500, color: '#495057' }}>
                     Nouveau mot de passe
                   </span>
                 }
@@ -176,13 +176,13 @@ export default function ResetPasswordPage() {
                   prefix={<LockOutlined style={{ color: '#878a99' }} />}
                   placeholder="Nouveau mot de passe"
                   autoComplete="new-password"
-                  style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                  style={{ borderRadius: 8, fontFamily: 'Inter' }}
                 />
               </Form.Item>
 
               <Form.Item
                 label={
-                  <span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500, color: '#495057' }}>
+                  <span style={{ fontFamily: 'Inter', fontSize: 13, fontWeight: 500, color: '#495057' }}>
                     Confirmer le mot de passe
                   </span>
                 }
@@ -204,7 +204,7 @@ export default function ResetPasswordPage() {
                   prefix={<LockOutlined style={{ color: '#878a99' }} />}
                   placeholder="Confirmer le mot de passe"
                   autoComplete="new-password"
-                  style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                  style={{ borderRadius: 8, fontFamily: 'Inter' }}
                 />
               </Form.Item>
 
@@ -217,10 +217,10 @@ export default function ResetPasswordPage() {
                   style={{
                     height: 46,
                     borderRadius: 8,
-                    fontFamily: 'Poppins',
+                    fontFamily: 'Inter',
                     fontWeight: 600,
                     fontSize: 15,
-                    background: '#405189',
+                    background: '#4F46E5',
                     border: 'none',
                   }}
                 >
@@ -232,7 +232,7 @@ export default function ResetPasswordPage() {
             <div style={{ textAlign: 'center' }}>
               <Link
                 to="/forgot-password"
-                style={{ color: '#878a99', fontFamily: 'Poppins', fontSize: 13 }}
+                style={{ color: '#878a99', fontFamily: 'Inter', fontSize: 13 }}
               >
                 Renvoyer un nouveau lien
               </Link>

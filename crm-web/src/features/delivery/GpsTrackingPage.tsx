@@ -125,7 +125,7 @@ export default function GpsTrackingPage() {
       key: 'rep',
       render: (id: string) => (
         <Space>
-          <UserOutlined style={{ color: '#405189' }} />
+          <UserOutlined style={{ color: '#4F46E5' }} />
           <Text copyable={{ text: id }} style={{ fontSize: 12 }}>
             {id.slice(0, 8)}…
           </Text>
@@ -233,7 +233,7 @@ export default function GpsTrackingPage() {
   return (
     <div style={{ padding: 24 }}>
       <Title level={3} style={{ marginBottom: 4 }}>
-        <EnvironmentOutlined style={{ marginRight: 8, color: '#405189' }} />
+        <EnvironmentOutlined style={{ marginRight: 8, color: '#4F46E5' }} />
         Suivi GPS
       </Title>
       <Text type="secondary" style={{ display: 'block', marginBottom: 24 }}>
@@ -250,7 +250,7 @@ export default function GpsTrackingPage() {
               title="Reps actifs"
               value={livePositions.length}
               prefix={<UserOutlined />}
-              valueStyle={{ color: '#405189' }}
+              valueStyle={{ color: '#4F46E5' }}
             />
           </Card>
         </Col>

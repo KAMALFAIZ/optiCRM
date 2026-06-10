@@ -107,12 +107,12 @@ const safe = (record: unknown): CommercialKpi => {
 };
 
 const avatarColors = [
-  '#405189', '#0ab39c', '#f7b84b', '#f06548', '#299cdb',
+  '#4F46E5', '#10B981', '#f7b84b', '#f06548', '#299cdb',
   '#45cb85', '#e83e8c', '#6f42c1', '#fd7e14', '#20c997',
 ];
 
 const winRateColor = (v: number) =>
-  v >= 60 ? '#0ab39c' : v >= 40 ? '#f7b84b' : '#f06548';
+  v >= 60 ? '#10B981' : v >= 40 ? '#f7b84b' : '#f06548';
 
 const cardS = { borderRadius: 10, border: '1px solid #f1f5f9' };
 
@@ -158,7 +158,7 @@ class KpiErrorBoundary extends Component<{ children: ReactNode }, { error: strin
 // -- Component ----------------------------------------------------------------
 
 const scoreColor = (s: number) =>
-  s >= 70 ? '#0ab39c' : s >= 50 ? '#f7b84b' : s >= 30 ? '#fd7e14' : '#f06548';
+  s >= 70 ? '#10B981' : s >= 50 ? '#f7b84b' : s >= 30 ? '#fd7e14' : '#f06548';
 
 const scoreLabel = (s: number) =>
   s >= 70 ? 'Excellent' : s >= 50 ? 'Bon' : s >= 30 ? 'À améliorer' : 'Critique';
@@ -280,7 +280,7 @@ function SupervisionCommerciauxContent() {
       align: 'right' as const,
       sorter: (a: CommercialKpi, b: CommercialKpi) => num(a.revenue) - num(b.revenue),
       render: (v: unknown) => (
-        <span style={{ fontSize: 12, fontWeight: 600, color: '#0ab39c' }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#10B981' }}>
           {formatMAD(v)}
         </span>
       ),
@@ -347,7 +347,7 @@ function SupervisionCommerciauxContent() {
       align: 'right' as const,
       sorter: (a: CommercialKpi, b: CommercialKpi) => num(a.pipeline) - num(b.pipeline),
       render: (v: unknown) => (
-        <span style={{ fontSize: 12, color: '#405189', fontWeight: 500 }}>
+        <span style={{ fontSize: 12, color: '#4F46E5', fontWeight: 500 }}>
           {formatMAD(v)}
         </span>
       ),
@@ -389,7 +389,7 @@ function SupervisionCommerciauxContent() {
           gap: 8,
         }}
       >
-        <TeamOutlined style={{ color: '#405189' }} />
+        <TeamOutlined style={{ color: '#4F46E5' }} />
         Supervision des Commerciaux
       </div>
 
@@ -405,14 +405,14 @@ function SupervisionCommerciauxContent() {
             v: formatMAD(totalRevenue),
             icon: <DollarOutlined />,
             bg: 'rgba(10,179,156,0.12)',
-            color: '#0ab39c',
+            color: '#10B981',
           },
           {
             t: 'Pipeline Total',
             v: formatMAD(totalPipeline),
             icon: <FundProjectionScreenOutlined />,
             bg: 'rgba(64,81,137,0.12)',
-            color: '#405189',
+            color: '#4F46E5',
           },
           {
             t: 'Taux de gain moyen',
@@ -463,7 +463,7 @@ function SupervisionCommerciauxContent() {
                 size="small"
                 title={
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <DashboardOutlined style={{ color: '#405189' }} />
+                    <DashboardOutlined style={{ color: '#4F46E5' }} />
                     <span style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
                       Score Performance
                     </span>
@@ -571,7 +571,7 @@ function SupervisionCommerciauxContent() {
                 style={{ ...cardS, height: '100%' }}
               >
                 {supervision.alerts.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#0ab39c' }}>
+                  <div style={{ textAlign: 'center', color: '#10B981' }}>
                     <CheckCircleOutlined style={{ fontSize: 28, marginBottom: 8 }} />
                     <div style={{ fontSize: 12, fontWeight: 500 }}>Aucune alerte — équipe performante</div>
                   </div>
@@ -706,7 +706,7 @@ function SupervisionCommerciauxContent() {
             align: 'center' as const,
             children: [
               { title: 'Taux', dataIndex: 'visitCompletionRate', key: 'vc_val', align: 'center' as const, width: 70,
-                render: (v: number) => <span style={{ fontSize: 11, fontWeight: 600, color: v >= 70 ? '#0ab39c' : v >= 40 ? '#f7b84b' : '#f06548' }}>{v.toFixed(1)}%</span> },
+                render: (v: number) => <span style={{ fontSize: 11, fontWeight: 600, color: v >= 70 ? '#10B981' : v >= 40 ? '#f7b84b' : '#f06548' }}>{v.toFixed(1)}%</span> },
               { title: 'vs Moy.', dataIndex: 'visitCompletionDeviation', key: 'vc_dev', align: 'center' as const, width: 90,
                 sorter: (a: any, b: any) => a.visitCompletionDeviation - b.visitCompletionDeviation,
                 render: (v: number) => devPtsTag(v) },
@@ -719,7 +719,7 @@ function SupervisionCommerciauxContent() {
             size="small"
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <SwapOutlined style={{ color: '#405189' }} />
+                <SwapOutlined style={{ color: '#4F46E5' }} />
                 <span style={{ fontSize: 12, fontWeight: 600, color: '#475569' }}>
                   Comparaison & Analyse comparative
                 </span>
@@ -778,7 +778,7 @@ function SupervisionCommerciauxContent() {
             v: totalCompletedAll,
             icon: <CheckCircleOutlined />,
             bg: 'rgba(10,179,156,0.12)',
-            color: '#0ab39c',
+            color: '#10B981',
           },
           {
             t: 'Planifiées',
@@ -792,14 +792,14 @@ function SupervisionCommerciauxContent() {
             v: totalInProgressAll,
             icon: <FireOutlined />,
             bg: 'rgba(64,81,137,0.12)',
-            color: '#405189',
+            color: '#4F46E5',
           },
           {
             t: 'Taux complétion',
             v: pct(avgCompletionRate),
             icon: <RiseOutlined />,
             bg: 'rgba(10,179,156,0.08)',
-            color: '#0ab39c',
+            color: '#10B981',
           },
           {
             t: 'Km parcourus',
@@ -931,10 +931,10 @@ function SupervisionCommerciauxContent() {
                     <Progress
                       percent={parseFloat(n.toFixed(1))}
                       size="small"
-                      strokeColor={n >= 70 ? '#0ab39c' : n >= 40 ? '#f7b84b' : '#f06548'}
+                      strokeColor={n >= 70 ? '#10B981' : n >= 40 ? '#f7b84b' : '#f06548'}
                       trailColor="#f1f5f9"
                       format={(p) => (
-                        <span style={{ fontSize: 10, fontWeight: 600, color: n >= 70 ? '#0ab39c' : n >= 40 ? '#f7b84b' : '#f06548' }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: n >= 70 ? '#10B981' : n >= 40 ? '#f7b84b' : '#f06548' }}>
                           {p}%
                         </span>
                       )}
@@ -998,22 +998,22 @@ function SupervisionCommerciauxContent() {
             {
               label: 'CA Réalisé',
               data: trends.teamTrend.map((m) => num(m.revenue)),
-              borderColor: '#0ab39c',
+              borderColor: '#10B981',
               backgroundColor: 'rgba(10,179,156,0.1)',
               fill: true,
               tension: 0.3,
               pointRadius: 4,
-              pointBackgroundColor: '#0ab39c',
+              pointBackgroundColor: '#10B981',
             },
             {
               label: 'Pipeline',
               data: trends.teamTrend.map((m) => num(m.pipeline)),
-              borderColor: '#405189',
+              borderColor: '#4F46E5',
               backgroundColor: 'rgba(64,81,137,0.08)',
               fill: true,
               tension: 0.3,
               pointRadius: 4,
-              pointBackgroundColor: '#405189',
+              pointBackgroundColor: '#4F46E5',
             },
           ],
         };
@@ -1058,12 +1058,12 @@ function SupervisionCommerciauxContent() {
             {
               label: 'Visites complétées',
               data: trends.teamTrend.map((m) => num(m.completedVisits)),
-              borderColor: '#0ab39c',
+              borderColor: '#10B981',
               backgroundColor: 'rgba(10,179,156,0.08)',
               fill: true,
               tension: 0.3,
               pointRadius: 4,
-              pointBackgroundColor: '#0ab39c',
+              pointBackgroundColor: '#10B981',
             },
           ],
         };
@@ -1102,7 +1102,7 @@ function SupervisionCommerciauxContent() {
         return (
           <div style={{ marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-              <LineChartOutlined style={{ color: '#405189', fontSize: 14 }} />
+              <LineChartOutlined style={{ color: '#4F46E5', fontSize: 14 }} />
               <span style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>
                 Tendances — {trends.monthsIncluded} derniers mois
               </span>
@@ -1283,7 +1283,7 @@ function SupervisionCommerciauxContent() {
                   </Avatar>
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b' }}>{str(best.repName)}</div>
-                    <div style={{ fontSize: 12, color: '#0ab39c', fontWeight: 600 }}>
+                    <div style={{ fontSize: 12, color: '#10B981', fontWeight: 600 }}>
                       {formatMAD(best.revenue)} MAD
                     </div>
                     <div style={{ fontSize: 11, color: '#64748b' }}>
@@ -1370,11 +1370,11 @@ function SupervisionCommerciauxContent() {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: '#0ab39c' }}>{formatMAD(rep.revenue)}</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: '#10B981' }}>{formatMAD(rep.revenue)}</div>
                       <div style={{ fontSize: 10, color: '#94a3b8' }}>CA réalisé</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: '#405189' }}>{formatMAD(rep.pipeline)}</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: '#4F46E5' }}>{formatMAD(rep.pipeline)}</div>
                       <div style={{ fontSize: 10, color: '#94a3b8' }}>Pipeline</div>
                     </div>
                   </div>
@@ -1397,7 +1397,7 @@ function SupervisionCommerciauxContent() {
                       <div style={{ fontSize: 9, color: '#94a3b8' }}>Visites</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0ab39c' }}>{num(rep.completedVisits)}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#10B981' }}>{num(rep.completedVisits)}</div>
                       <div style={{ fontSize: 9, color: '#94a3b8' }}>Faites</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>

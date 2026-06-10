@@ -107,7 +107,7 @@ export default function SetupWizardPage() {
                 />
               ) : (
                 <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                  <DatabaseOutlined style={{ fontSize: 48, color: '#405189', marginBottom: 16 }} />
+                  <DatabaseOutlined style={{ fontSize: 48, color: '#4F46E5', marginBottom: 16 }} />
                   <div style={{ marginBottom: 16, color: '#595959' }}>
                     Cliquez sur le bouton ci-dessous pour créer automatiquement les bases de données nécessaires.
                   </div>
@@ -117,7 +117,7 @@ export default function SetupWizardPage() {
                     icon={dbInitLoading ? <Spin size="small" /> : <DatabaseOutlined />}
                     loading={dbInitLoading}
                     onClick={handleInitDatabases}
-                    style={{ background: '#405189', borderColor: '#405189' }}
+                    style={{ background: '#4F46E5', borderColor: '#4F46E5' }}
                   >
                     Créer opticrm_default
                   </Button>
@@ -178,7 +178,7 @@ export default function SetupWizardPage() {
                 type="primary"
                 disabled={!dbInitDone}
                 onClick={() => setCurrent(1)}
-                style={dbInitDone ? { background: '#405189', borderColor: '#405189' } : {}}
+                style={dbInitDone ? { background: '#4F46E5', borderColor: '#4F46E5' } : {}}
               >
                 Suivant
               </Button>

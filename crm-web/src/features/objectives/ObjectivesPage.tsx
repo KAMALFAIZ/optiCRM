@@ -177,7 +177,7 @@ export default function ObjectivesPage() {
       width: 150,
       align: 'right',
       sorter: (a, b) => a.targetAmount - b.targetAmount,
-      render: (v) => <Text strong style={{ color: '#405189' }}>{formatMAD(Number(v))}</Text>,
+      render: (v) => <Text strong style={{ color: '#4F46E5' }}>{formatMAD(Number(v))}</Text>,
     },
     {
       title: 'Notes',
@@ -215,7 +215,7 @@ export default function ObjectivesPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <AimOutlined style={{ fontSize: 22, color: '#405189' }} />
+          <AimOutlined style={{ fontSize: 22, color: '#4F46E5' }} />
           <div>
             <Title level={4} style={{ margin: 0 }}>Objectifs Commerciaux</Title>
             <Text type="secondary">Saisie des objectifs par commercial et par article</Text>
@@ -293,7 +293,7 @@ export default function ObjectivesPage() {
                   <Text strong>{totalQty.toLocaleString('fr-MA')}</Text>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={2} align="right">
-                  <Text strong style={{ color: '#405189' }}>{formatMAD(totalAmt)}</Text>
+                  <Text strong style={{ color: '#4F46E5' }}>{formatMAD(totalAmt)}</Text>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell index={3} colSpan={2} />
               </Table.Summary.Row>

@@ -53,8 +53,8 @@ const KIND_LABEL: Record<CommandKind, string> = {
 };
 
 const KIND_COLOR: Record<CommandKind, string> = {
-  action: '#0ab39c',
-  nav: '#405189',
+  action: '#10B981',
+  nav: '#4F46E5',
   entity: '#f7b84b',
 };
 
