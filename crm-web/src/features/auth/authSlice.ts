@@ -17,6 +17,7 @@ const initialState: AuthState = {
   // Only show loading if we have a token to verify — otherwise the login button would be stuck
   isLoading: !!storedAccessToken,
   error: null,
+  mustChangePassword: false,
 };
 
 export const login = createAsyncThunk<LoginResponse & { fullUser: User }, LoginRequest>(
@@ -117,11 +118,15 @@ const authSlice = createSlice({
       state.refreshToken = null;
       state.isAuthenticated = false;
       state.error = null;
+      state.mustChangePassword = false;
       localStorage.removeItem(ACCESS_TOKEN_KEY);
       localStorage.removeItem(REFRESH_TOKEN_KEY);
     },
     clearError: (state) => {
       state.error = null;
+    },
+    clearMustChangePassword: (state) => {
+      state.mustChangePassword = false;
     },
   },
   extraReducers: (builder) => {
@@ -136,6 +141,7 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.accessToken = action.payload.accessToken;
         state.refreshToken = action.payload.refreshToken;
+        state.mustChangePassword = action.payload.mustChangePassword ?? false;
         // Use the full user profile from /auth/me which includes role + permissions
         state.user = action.payload.fullUser;
       })
@@ -189,7 +195,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, clearMustChangePassword } = authSlice.actions;
 
 // Selectors
 export const selectAuth = (state: RootState) => state.auth;
@@ -197,5 +203,6 @@ export const selectUser = (state: RootState) => state.auth.user;
 export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;
 export const selectAuthLoading = (state: RootState) => state.auth.isLoading;
 export const selectAuthError = (state: RootState) => state.auth.error;
+export const selectMustChangePassword = (state: RootState) => state.auth.mustChangePassword;
 
 export default authSlice.reducer;

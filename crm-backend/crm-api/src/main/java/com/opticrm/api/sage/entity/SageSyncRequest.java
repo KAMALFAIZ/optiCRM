@@ -20,6 +20,9 @@ public class SageSyncRequest {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
+
     @Column(name = "entity_type", nullable = false, length = 30)
     private String entityType;   // ACCOUNTS | CONTACTS | CA | OBJECTIVES
 

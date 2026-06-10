@@ -52,9 +52,9 @@ import {
 
 import { useAppDispatch, useAppSelector } from '@/store';
 import { logoutAsync, selectUser } from '@/features/auth/authSlice';
-import { toggleTheme, selectThemeMode } from '@/features/settings/themeSlice';
+import { toggleTheme, selectThemeMode, selectDensity, setDensity, Density } from '@/features/settings/themeSlice';
 import { usePermissions } from '@/hooks/usePermissions';
-import GlobalSearchBar from '@/components/GlobalSearchBar';
+import CommandPalette from '@/components/CommandPalette';
 import AiAssistant from '@/components/ai/AiAssistant';
 import OfflineBanner from '@/components/OfflineBanner';
 
@@ -237,11 +237,13 @@ function filterMenuItems(
 export default function MainLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const themeMode = useAppSelector(selectThemeMode);
+  const density = useAppSelector(selectDensity);
   const tenantInfo = useAppSelector((state: any) => state.tenant?.publicInfo ?? state.tenant?.tenant ?? null);
   const tenantName = tenantInfo?.name ?? localStorage.getItem('opticrm_tenant_slug') ?? null;
   const isDark = themeMode === 'dark';
@@ -255,6 +257,18 @@ export default function MainLayout() {
   useEffect(() => {
     setDrawerOpen(false);
   }, [location.pathname]);
+
+  // Raccourci global Ctrl/Cmd+K pour ouvrir la Command Palette
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   // Is this the master/default tenant? Only it should see "Clients SaaS"
   const isMasterTenant = tenantInfo?.slug === 'default'
@@ -318,6 +332,25 @@ export default function MainLayout() {
       icon: <SettingOutlined />,
       label: 'Paramètres',
       onClick: () => navigate('/settings'),
+    },
+    {
+      key: 'density',
+      icon: <BoxPlotOutlined />,
+      label: 'Densité',
+      children: (['compact', 'default', 'comfortable'] as Density[]).map((d) => ({
+        key: `density-${d}`,
+        label: (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              width: 6, height: 6, borderRadius: '50%',
+              background: density === d ? '#0ab39c' : 'transparent',
+              border: density === d ? 'none' : '1px solid #ced4da',
+            }} />
+            {d === 'compact' ? 'Compacte' : d === 'default' ? 'Normale' : 'Confortable'}
+          </span>
+        ),
+        onClick: () => dispatch(setDensity(d)),
+      })),
     },
     { type: 'divider' as const },
     {
@@ -476,7 +509,49 @@ export default function MainLayout() {
             >
               {isMobile ? <MenuUnfoldOutlined /> : (collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />)}
             </button>
-            <GlobalSearchBar />
+            <button
+              onClick={() => setPaletteOpen(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                width: isMobile ? 180 : 320,
+                height: 36,
+                padding: '0 12px',
+                borderRadius: 20,
+                border: `1px solid ${isDark ? '#2a2f34' : '#e9ebec'}`,
+                background: isDark ? 'rgba(255,255,255,0.04)' : '#f8f9fa',
+                color: isDark ? '#878a99' : '#878a99',
+                fontSize: 13,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(255,255,255,0.08)' : '#ffffff';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = '#405189';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(255,255,255,0.04)' : '#f8f9fa';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = isDark ? '#2a2f34' : '#e9ebec';
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <span style={{ flex: 1, textAlign: 'left' }}>{isMobile ? 'Rechercher...' : 'Rechercher ou exécuter une action...'}</span>
+              <span style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                padding: '2px 6px',
+                borderRadius: 4,
+                background: isDark ? 'rgba(255,255,255,0.06)' : '#ffffff',
+                border: `1px solid ${isDark ? '#2a2f34' : '#e9ebec'}`,
+                fontSize: 11,
+                fontWeight: 600,
+                color: isDark ? '#adb5bd' : '#878a99',
+              }}>
+                <span style={{ fontSize: 10 }}>Ctrl</span><span>K</span>
+              </span>
+            </button>
           </div>
 
           {/* Right: actions */}
@@ -587,6 +662,7 @@ export default function MainLayout() {
       </Layout>
 
       <AiAssistant />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} isDark={isDark} />
     </Layout>
   );
 }

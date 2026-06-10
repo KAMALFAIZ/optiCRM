@@ -3,7 +3,7 @@ SET ANSI_NULLS ON;
 GO
 
 -- Add SUPERVISEUR system role
-INSERT INTO roles (id, name, description, permissions, is_system) VALUES
+INSERT INTO roles (id, name, description, permissions, is_system, tenant_id) VALUES
 (NEWID(), 'SUPERVISEUR', 'Superviseur - Supervision des commerciaux et suivi terrain', '{
     "users": {"read": true},
     "teams": {"read": true},
@@ -20,4 +20,4 @@ INSERT INTO roles (id, name, description, permissions, is_system) VALUES
     "activities": {"create": true, "read": true, "update": true, "delete": true},
     "objections": {"create": true, "read": true, "update": true, "approve": true},
     "reports": {"read": true, "export": true}
-}', 1);
+}', 1, '00000000-0000-0000-0000-000000000001');

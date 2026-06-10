@@ -66,7 +66,9 @@ public class SageIntegrationService {
     public SageSyncRequestDto createRequest(CreateSyncRequestRequest req) {
         User currentUser = currentUser();
 
+        UUID tenantId = TenantContext.get();
         SageSyncRequest syncReq = SageSyncRequest.builder()
+                .tenantId(tenantId)
                 .entityType(req.getEntityType().toUpperCase())
                 .label(req.getLabel())
                 .sourceFormat(req.getSourceFormat() != null ? req.getSourceFormat() : "CSV")
@@ -425,6 +427,7 @@ public class SageIntegrationService {
         }
 
         return SageSyncItem.builder()
+                .tenantId(req.getTenantId())
                 .request(req)
                 .rowIndex(idx)
                 .sageRef(sageRef)
@@ -483,6 +486,7 @@ public class SageIntegrationService {
      */
     private void applyAccount(SageSyncItem item, Map<String, Object> data) {
         String sageCode = getString(data, "sage_code", "ct_num", "code");
+        UUID tenantId = TenantContext.get();
 
         Account account;
         if ("UPDATE".equals(item.getAction()) && item.getCrmId() != null) {
@@ -492,6 +496,7 @@ public class SageIntegrationService {
             account = (sageCode != null ? accountRepository.findBySageCode(sageCode) : Optional.<Account>empty())
                     .orElseGet(() -> Account.builder().accountType("Client").build());
         }
+        if (account.getTenantId() == null) account.setTenantId(tenantId);
 
         // ── Nom : champ obligatoire en base — fallback sur le code Sage si absent ──
         String name = getString(data, "name", "ct_intitule", "nom");
@@ -619,8 +624,13 @@ public class SageIntegrationService {
         String arRef = getString(data, "ar_ref", "sage_code", "code", "ref");
         if (arRef == null) return;
 
-        Product product = productCache.computeIfAbsent(arRef, k ->
-                Product.builder().code(k).name(k).unitPrice(java.math.BigDecimal.ZERO).build());
+        UUID tenantId = TenantContext.get();
+        Product product = productCache.computeIfAbsent(arRef, k -> {
+            Product p = Product.builder().code(k).name(k).unitPrice(java.math.BigDecimal.ZERO).build();
+            p.setTenantId(tenantId);
+            return p;
+        });
+        if (product.getTenantId() == null) product.setTenantId(tenantId);
 
         product.setSageCode(arRef);
 
@@ -641,6 +651,7 @@ public class SageIntegrationService {
             String catKey = famCode.length() > 20 ? famCode.substring(0, 20).toUpperCase() : famCode.toUpperCase();
             ProductCategory cat = catCache.computeIfAbsent(catKey, k -> {
                 ProductCategory newCat = new ProductCategory();
+                newCat.setTenantId(tenantId);
                 newCat.setCode(k);
                 newCat.setName(famCode);
                 return productCategoryRepository.save(newCat);
@@ -736,6 +747,7 @@ public class SageIntegrationService {
         String deNo  = getString(data, "de_no",  "depot");
         if (arRef == null || deNo == null) return;
 
+        UUID tenantId = TenantContext.get();
         Product product = productCache.get(arRef);
         if (product == null) {
             log.warn("Inventaire (cached) : produit introuvable AR_Ref={}", arRef);
@@ -744,15 +756,22 @@ public class SageIntegrationService {
 
         // Dépôt : cache d'abord, création unique si absent (edge-case)
         Warehouse warehouse = warehouseCache.computeIfAbsent(deNo, code ->
-                warehouseRepository.findByCode(code).orElseGet(() -> warehouseRepository.save(
-                        Warehouse.builder()
-                                .code(code.length() > 20 ? code.substring(0, 20) : code)
-                                .name("Dépôt " + code)
-                                .build())));
+                warehouseRepository.findByCode(code).orElseGet(() -> {
+                    Warehouse w = Warehouse.builder()
+                            .code(code.length() > 20 ? code.substring(0, 20) : code)
+                            .name("Dépôt " + code)
+                            .build();
+                    w.setTenantId(tenantId);
+                    return warehouseRepository.save(w);
+                }));
 
         String slKey = product.getId() + "_" + warehouse.getId();
-        StockLevel stockLevel = stockLevelCache.computeIfAbsent(slKey, k ->
-                StockLevel.builder().product(product).warehouse(warehouse).build());
+        StockLevel stockLevel = stockLevelCache.computeIfAbsent(slKey, k -> {
+            StockLevel sl = StockLevel.builder().product(product).warehouse(warehouse).build();
+            sl.setTenantId(tenantId);
+            return sl;
+        });
+        if (stockLevel.getTenantId() == null) stockLevel.setTenantId(tenantId);
 
         java.math.BigDecimal qteSto = getBigDecimal(data, "as_qtesto", "quantity_on_hand", "qte_stock");
         java.math.BigDecimal qteRes = getBigDecimal(data, "as_qteres", "quantity_reserved", "qte_reserve");

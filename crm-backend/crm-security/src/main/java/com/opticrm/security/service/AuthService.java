@@ -204,12 +204,23 @@ public class AuthService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void setInitialPassword(UUID userId, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UnauthorizedException("Utilisateur introuvable"));
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setPasswordChangedAt(Instant.now());
+        userRepository.save(user);
+        log.info("Mot de passe initial défini pour : {}", user.getEmail());
+    }
+
     private LoginResponse buildLoginResponse(User user, String accessToken, String refreshToken) {
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(jwtService.getRefreshTokenExpirationMs() / 1000)
+                .mustChangePassword(user.getPasswordChangedAt() == null)
                 .user(LoginResponse.UserDto.builder()
                         .id(user.getId().toString())
                         .email(user.getEmail())

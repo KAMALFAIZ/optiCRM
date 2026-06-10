@@ -28,6 +28,9 @@ public class StockLevel {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

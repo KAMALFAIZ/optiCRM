@@ -71,8 +71,14 @@ export default function SageConfigTab() {
       await sageConfigApi.save(values);
       message.success('Configuration Sage sauvegardée');
       setPwdTouched(false);
-    } catch {
-      // validation antd ou erreur réseau
+    } catch (e: any) {
+      console.error('Erreur de sauvegarde:', e);
+      if (e?.errorFields) {
+        message.error('Veuillez remplir tous les champs obligatoires');
+      } else {
+        const errMsg = e?.response?.data?.message || e?.message || 'Erreur réseau';
+        message.error('Erreur lors de la sauvegarde : ' + errMsg);
+      }
     } finally {
       setSaving(false);
     }

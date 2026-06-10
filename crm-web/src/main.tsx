@@ -11,7 +11,7 @@ import { registerSW } from 'virtual:pwa-register';
 import App from './App';
 import { store } from './store';
 import { useAppSelector } from './store';
-import { selectThemeMode } from './features/settings/themeSlice';
+import { selectThemeMode, selectDensity } from './features/settings/themeSlice';
 import OfflineBanner from './components/OfflineBanner';
 import 'leaflet/dist/leaflet.css';
 import './styles/index.css';
@@ -40,7 +40,14 @@ dayjs.locale('fr');
 
 function ThemeWrapper({ children }: { children: React.ReactNode }) {
   const themeMode = useAppSelector(selectThemeMode);
+  const density = useAppSelector(selectDensity);
   const isDark = themeMode === 'dark';
+
+  const densityScale = density === 'compact' ? -1 : density === 'comfortable' ? 1 : 0;
+  const controlHeight = 34 + densityScale * 4;
+  const cellPaddingBlock = 7 + densityScale * 2;
+  const formItemMargin = 16 + densityScale * 4;
+  const cardPaddingLG = 20 + densityScale * 4;
 
   return (
     <ConfigProvider
@@ -87,27 +94,27 @@ function ThemeWrapper({ children }: { children: React.ReactNode }) {
           },
           Card: {
             borderRadius: 6,
-            paddingLG: 20,
+            paddingLG: cardPaddingLG,
           },
           Button: {
             borderRadius: 6,
             fontWeight: 500,
-            controlHeight: 34,
+            controlHeight,
             paddingContentHorizontal: 14,
           },
           Table: {
             borderRadius: 6,
-            cellPaddingBlock: 7,
+            cellPaddingBlock,
             cellPaddingInline: 10,
           },
           Form: {
-            itemMarginBottom: 16,
+            itemMarginBottom: formItemMargin,
           },
           Select: {
-            controlHeight: 34,
+            controlHeight,
           },
           Input: {
-            controlHeight: 34,
+            controlHeight,
           },
         },
       }}

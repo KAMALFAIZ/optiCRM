@@ -9,6 +9,6 @@ GO
 -- • Supprime les catégories produits (product_categories)
 -- =====================================================
 
-TRUNCATE TABLE product_prices;
-TRUNCATE TABLE products;
-TRUNCATE TABLE product_categories;
+DELETE FROM product_prices;
+DELETE FROM products;
+DELETE FROM product_categories;

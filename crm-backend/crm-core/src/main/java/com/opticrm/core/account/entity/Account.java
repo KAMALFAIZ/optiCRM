@@ -33,6 +33,9 @@ public class Account {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
+
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 

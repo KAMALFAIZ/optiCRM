@@ -44,6 +44,7 @@ export interface LoginResponse {
   refreshToken: string;
   tokenType: string;
   expiresIn: number;
+  mustChangePassword?: boolean;
   user: {
     id: string;
     email: string;
@@ -70,4 +71,5 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  mustChangePassword: boolean;
 }

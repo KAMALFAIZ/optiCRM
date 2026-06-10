@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: opticrm-sync-agent
+  main:
+    web-application-type: none
+    banner-mode: off
+    headless: false      # nécessaire pour Swing
+  config:
+    import: optional:file:./agent-config.yml
+
+logging:
+  level:
+    root: INFO
+    com.opticrm.agent: DEBUG
+  file:
+    name: ./logs/agent.log
+
+# ─── Valeurs par défaut (test local) ───────────────────────────────────────
+# Surchargées par agent-config.yml si présent à côté de l'EXE.
+agent:
+  opticrm:
+    server-url: http://localhost:8081
+    tenant-id: "00000000-0000-0000-0000-000000000001"
+    agent-key: "agent_sk_9f69062f32f4ecfcf308244c9db49099990008d1e952ba93"
+  sage:
+    host: 127.0.0.1
+    port: 1433
+    database: ORQUE_SANITAIRE_2022
+    username: sa
+    password: "SQL@2019"
+    dossier: ""
+  sync:
+    pull:
+      enabled: true
+      cron: "0 0 */2 * * *"
+      entities: [ACCOUNTS, CONTACTS, PRODUCTS, INVENTORY]
+    push:
+      enabled: true
+      poll-interval-ms: 30000
+      auto-apply: true
+    sage-defaults:
+      compte-client: "411000"
+      journal-vente: "VE"
+      journal-banque: "BQ"
+      devise: 0
+      depot-defaut: 1

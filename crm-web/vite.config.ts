@@ -58,10 +58,10 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     allowedHosts: ['kasoft.selfip.net'],
-    port: 3009,
+    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3009,
     proxy: {
       '/api': {
-        target: 'http://localhost:8081',
+        target: 'http://127.0.0.1:8081',
         changeOrigin: true,
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq) => {
@@ -70,7 +70,7 @@ export default defineConfig({
         },
       },
       '/uploads': {
-        target: 'http://localhost:8081',
+        target: 'http://127.0.0.1:8081',
         changeOrigin: true,
       },
     },

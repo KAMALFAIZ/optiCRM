@@ -15,6 +15,7 @@ public class LoginResponse {
     private String refreshToken;
     private String tokenType;
     private long expiresIn;
+    private boolean mustChangePassword;
     private UserDto user;
 
     @Data

@@ -90,6 +90,18 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
+    @PostMapping("/set-initial-password")
+    public ResponseEntity<ApiResponse<Void>> setInitialPassword(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @Valid @RequestBody SetInitialPasswordRequest request
+    ) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("UNAUTHORIZED", "Not authenticated"));
+        }
+        authService.setInitialPassword(principal.getId(), request.getNewPassword());
+        return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
     /**
      * Temporary diagnostic endpoint — remove after debugging login issue.
      * Tests BCrypt password matching directly, bypassing Spring Security chain.

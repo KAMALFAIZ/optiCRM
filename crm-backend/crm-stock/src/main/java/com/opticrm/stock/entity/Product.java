@@ -27,6 +27,9 @@ public class Product {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
+
     @Column(name = "code", nullable = false, unique = true, length = 50)
     private String code;
 

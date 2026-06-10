@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Form, Input, Button, Checkbox, Typography, Alert } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Checkbox, Typography, Alert, Modal } from 'antd';
+import { UserOutlined, LockOutlined, KeyOutlined } from '@ant-design/icons';
 
 import { useAppDispatch, useAppSelector } from '@/store';
-import { login, clearError, selectAuthError, selectAuthLoading, selectIsAuthenticated } from './authSlice';
+import { login, clearError, clearMustChangePassword, selectAuthError, selectAuthLoading, selectIsAuthenticated, selectMustChangePassword } from './authSlice';
+import { authApi } from '@/api/auth';
 import type { LoginRequest } from '@/types/auth';
 import type { RootState } from '@/store';
 
@@ -18,7 +19,12 @@ export default function LoginPage() {
   const isLoading = useAppSelector(selectAuthLoading);
   const error = useAppSelector(selectAuthError);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const mustChangePassword = useAppSelector(selectMustChangePassword);
   const publicInfo = useAppSelector((state: RootState) => state.tenant.publicInfo);
+
+  const [pwForm] = Form.useForm();
+  const [settingPassword, setSettingPassword] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
 
   const brandName = publicInfo?.name || 'OptiCRM';
   const brandColor = publicInfo?.primaryColor || '#405189';
@@ -34,10 +40,10 @@ export default function LoginPage() {
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !mustChangePassword) {
       navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, mustChangePassword, navigate, from]);
 
   useEffect(() => {
     return () => {
@@ -47,6 +53,25 @@ export default function LoginPage() {
 
   const onFinish = (values: LoginRequest) => {
     dispatch(login(values));
+  };
+
+  const handleSetPassword = async (values: { newPassword: string; confirmPassword: string }) => {
+    if (values.newPassword !== values.confirmPassword) {
+      setPwError('Les mots de passe ne correspondent pas');
+      return;
+    }
+    setSettingPassword(true);
+    setPwError(null);
+    try {
+      await authApi.setInitialPassword(values.newPassword);
+      dispatch(clearMustChangePassword());
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { error?: { message?: string } | string } } };
+      const msg = err.response?.data?.error;
+      setPwError(typeof msg === 'string' ? msg : (msg as { message?: string })?.message || 'Erreur lors de la définition du mot de passe');
+    } finally {
+      setSettingPassword(false);
+    }
   };
 
   return (
@@ -254,6 +279,87 @@ export default function LoginPage() {
               style={{ marginBottom: 24, borderRadius: 8 }}
             />
           )}
+
+          {/* First-login password setup modal */}
+          <Modal
+            open={mustChangePassword}
+            closable={false}
+            maskClosable={false}
+            footer={null}
+            centered
+            width={420}
+            title={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <KeyOutlined style={{ color: brandColor }} />
+                <span style={{ fontFamily: 'Poppins', fontWeight: 600 }}>Créer votre mot de passe</span>
+              </div>
+            }
+          >
+            <p style={{ color: '#878a99', fontFamily: 'Poppins', fontSize: 13, marginBottom: 20 }}>
+              Bienvenue ! Pour sécuriser votre compte, veuillez définir un mot de passe personnel avant de continuer.
+            </p>
+            {pwError && (
+              <Alert
+                message={pwError}
+                type="error"
+                showIcon
+                closable
+                onClose={() => setPwError(null)}
+                style={{ marginBottom: 16, borderRadius: 8 }}
+              />
+            )}
+            <Form
+              form={pwForm}
+              layout="vertical"
+              onFinish={handleSetPassword}
+              size="large"
+            >
+              <Form.Item
+                label={<span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500 }}>Nouveau mot de passe</span>}
+                name="newPassword"
+                rules={[
+                  { required: true, message: 'Requis' },
+                  { min: 8, message: 'Au moins 8 caractères' },
+                ]}
+              >
+                <Input.Password
+                  prefix={<LockOutlined style={{ color: '#878a99' }} />}
+                  placeholder="Minimum 8 caractères"
+                  style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                />
+              </Form.Item>
+              <Form.Item
+                label={<span style={{ fontFamily: 'Poppins', fontSize: 13, fontWeight: 500 }}>Confirmer le mot de passe</span>}
+                name="confirmPassword"
+                rules={[{ required: true, message: 'Requis' }]}
+              >
+                <Input.Password
+                  prefix={<LockOutlined style={{ color: '#878a99' }} />}
+                  placeholder="Répétez le mot de passe"
+                  style={{ borderRadius: 8, fontFamily: 'Poppins' }}
+                />
+              </Form.Item>
+              <Form.Item style={{ marginBottom: 0 }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={settingPassword}
+                  block
+                  style={{
+                    height: 46,
+                    borderRadius: 8,
+                    fontFamily: 'Poppins',
+                    fontWeight: 600,
+                    fontSize: 15,
+                    background: brandColor,
+                    border: 'none',
+                  }}
+                >
+                  Confirmer et accéder
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
 
           <Form
             name="login"

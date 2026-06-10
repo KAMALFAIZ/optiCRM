@@ -12,6 +12,7 @@ import {
   ShoppingCartOutlined,
   DollarOutlined,
   ThunderboltOutlined,
+  RobotOutlined,
 } from '@ant-design/icons';
 import AccountsSyncTab from './tabs/AccountsSyncTab';
 import ContactsSyncTab from './tabs/ContactsSyncTab';
@@ -23,6 +24,7 @@ import InventaireSyncTab from './tabs/InventaireSyncTab';
 import VentesSyncTab from './tabs/VentesSyncTab';
 import BalanceAgeeSyncTab from './tabs/BalanceAgeeSyncTab';
 import AutoSyncTab from './tabs/AutoSyncTab';
+import AgentTab from './tabs/AgentTab';
 
 const { Title, Text } = Typography;
 
@@ -129,6 +131,16 @@ export default function IntegrationSagePage() {
         </span>
       ),
       children: <SageConfigTab />,
+    },
+    {
+      key: 'agent',
+      label: (
+        <span className="flex items-center gap-2">
+          <RobotOutlined />
+          Agent local
+        </span>
+      ),
+      children: <AgentTab />,
     },
   ];
 

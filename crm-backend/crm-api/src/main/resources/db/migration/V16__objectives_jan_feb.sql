@@ -29,16 +29,16 @@ SELECT TOP 1 @v_youssef = id FROM users WHERE email LIKE '%youssef%';
 SELECT TOP 1 @v_amina   = id FROM users WHERE email LIKE '%amina%';
 
 IF @v_karim IS NULL
-    SELECT TOP 1 @v_karim = u.id FROM users u JOIN roles r ON r.id = u.role_id
+    SELECT @v_karim = u.id FROM users u JOIN roles r ON r.id = u.role_id
     WHERE u.is_active = 1 AND r.name != 'SUPER_ADMIN' ORDER BY u.created_at OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY;
 IF @v_fatima IS NULL
-    SELECT TOP 1 @v_fatima = u.id FROM users u JOIN roles r ON r.id = u.role_id
+    SELECT @v_fatima = u.id FROM users u JOIN roles r ON r.id = u.role_id
     WHERE u.is_active = 1 AND r.name != 'SUPER_ADMIN' ORDER BY u.created_at OFFSET 1 ROWS FETCH NEXT 1 ROWS ONLY;
 IF @v_youssef IS NULL
-    SELECT TOP 1 @v_youssef = u.id FROM users u JOIN roles r ON r.id = u.role_id
+    SELECT @v_youssef = u.id FROM users u JOIN roles r ON r.id = u.role_id
     WHERE u.is_active = 1 AND r.name != 'SUPER_ADMIN' ORDER BY u.created_at OFFSET 2 ROWS FETCH NEXT 1 ROWS ONLY;
 IF @v_amina IS NULL
-    SELECT TOP 1 @v_amina = u.id FROM users u JOIN roles r ON r.id = u.role_id
+    SELECT @v_amina = u.id FROM users u JOIN roles r ON r.id = u.role_id
     WHERE u.is_active = 1 AND r.name != 'SUPER_ADMIN' ORDER BY u.created_at OFFSET 3 ROWS FETCH NEXT 1 ROWS ONLY;
 
 -- ── Produits ──────────────────────────────────────────────────────────────

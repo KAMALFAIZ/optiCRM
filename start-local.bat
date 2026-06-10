@@ -53,6 +53,12 @@ set "FRONT_CMD=%TEMP%\opticrm_frontend.cmd"
     echo echo  OptiCRM Backend - port 8081
     echo echo  Swagger : http://localhost:8081/swagger-ui.html
     echo echo.
+    echo set DATABASE_URL=jdbc:sqlserver://127.0.0.1;databaseName=opticrm_system;encrypt=false;trustServerCertificate=true;sendStringParametersAsUnicode=true
+    echo set DATABASE_USERNAME=sa
+    echo set DATABASE_PASSWORD=SQL@2019
+    echo set FLYWAY_ENABLED=true
+    echo set DEFAULT_TENANT_ID=00000000-0000-0000-0000-000000000001
+    echo set DEPLOYMENT_MODE=onpremise
     echo "%JAVA%" -jar "%JAR%" --server.port=8081
     echo pause
 ) > "%BACK_CMD%"

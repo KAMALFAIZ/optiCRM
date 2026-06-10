@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   App, Badge, Button, Card, Col, ColorPicker, Divider, Form, Input, InputNumber, Modal, Popconfirm,
-  Row, Select, Space, Table, Tag, Typography, Tooltip,
+  Row, Select, Space, Table, Tag, Typography, Tooltip, Tabs,
 } from 'antd';
 import {
   DatabaseOutlined, CheckCircleOutlined, CloseCircleOutlined,
@@ -9,6 +9,7 @@ import {
   GlobalOutlined, MailOutlined, DeleteOutlined, EditOutlined,
   PhoneOutlined, HomeOutlined, BankOutlined, TeamOutlined,
   BgColorsOutlined, LinkOutlined, IdcardOutlined, EnvironmentOutlined,
+  KeyOutlined, CopyOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import apiClient from '@/api/client';
@@ -78,6 +79,8 @@ export default function TenantsAdminPage() {
   const [updating, setUpdating]         = useState(false);
   const [provisioning, setProvisioning] = useState<Set<string>>(new Set());
   const [deleting, setDeleting]         = useState<Set<string>>(new Set());
+  const [accessLink, setAccessLink]     = useState<{ url: string; adminEmail: string } | null>(null);
+  const [generatingLink, setGeneratingLink] = useState<Set<string>>(new Set());
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
 
@@ -189,6 +192,21 @@ export default function TenantsAdminPage() {
       setTenants(prev => prev.map(t => t.id === id ? { ...t, status: status as TenantDto['status'] } : t));
     } catch {
       message.error('Impossible de changer le statut');
+    }
+  };
+
+  const handleGenerateLink = async (id: string) => {
+    setGeneratingLink(prev => new Set(prev).add(id));
+    try {
+      const { data } = await apiClient.post<{ data: { url: string; adminEmail: string; expiresIn: string } }>(
+        `/superadmin/tenants/${id}/generate-access-link`
+      );
+      setAccessLink({ url: data.data.url, adminEmail: data.data.adminEmail });
+    } catch (e: any) {
+      const err = e?.response?.data?.error;
+      message.error(typeof err === 'string' ? err : err?.message || 'Erreur lors de la génération du lien');
+    } finally {
+      setGeneratingLink(prev => { const s = new Set(prev); s.delete(id); return s; });
     }
   };
 
@@ -334,6 +352,18 @@ export default function TenantsAdminPage() {
               onClick={() => openEditModal(r)}
             />
           </Tooltip>
+
+          {/* Bouton Lien d'accès */}
+          {r.dbProvisioned && (
+            <Tooltip title="Générer lien de 1ère connexion">
+              <Button
+                size="small"
+                icon={generatingLink.has(r.id) ? <SyncOutlined spin /> : <KeyOutlined />}
+                loading={generatingLink.has(r.id)}
+                onClick={() => handleGenerateLink(r.id)}
+              />
+            </Tooltip>
+          )}
 
           <Popconfirm
             title={r.dbProvisioned ? `Re-migrer '${r.dbName}' ?` : `Créer 'opticrm_${r.slug}' ?`}
@@ -481,129 +511,135 @@ export default function TenantsAdminPage() {
           form={editForm}
           layout="vertical"
           onFinish={handleUpdate}
-          style={{ marginTop: 16 }}
+          style={{ marginTop: 8 }}
         >
-          {/* ─ Informations générales ─ */}
-          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
-            <BankOutlined /> Informations générales
-          </Divider>
+          <Tabs
+            defaultActiveKey="info"
+            size="small"
+            items={[
+              {
+                key: 'info',
+                label: <span><BankOutlined /> Informations</span>,
+                children: (
+                  <>
+                    <Form.Item
+                      label="Slug (sous-domaine)"
+                      name="slug"
+                      rules={[
+                        { required: true, message: 'Requis' },
+                        { pattern: /^[a-z0-9-]{3,50}$/, message: 'Minuscules, chiffres et tirets (3-50 car.)' },
+                      ]}
+                      extra="Identifiant unique : slug.opticrm.ma"
+                    >
+                      <Input prefix={<GlobalOutlined style={ICON_STYLE} />} placeholder="ex: acme" />
+                    </Form.Item>
 
-          <Form.Item
-            label="Slug (sous-domaine)"
-            name="slug"
-            rules={[
-              { required: true, message: 'Requis' },
-              { pattern: /^[a-z0-9-]{3,50}$/, message: 'Minuscules, chiffres et tirets (3-50 car.)' },
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item
+                          label="Nom de l'entreprise"
+                          name="name"
+                          rules={[{ required: true, message: 'Requis' }, { min: 2 }]}
+                        >
+                          <Input prefix={<UserOutlined style={ICON_STYLE} />} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item
+                          label="Email administrateur"
+                          name="adminEmail"
+                          rules={[{ required: true, message: 'Requis' }, { type: 'email', message: 'Email invalide' }]}
+                        >
+                          <Input prefix={<MailOutlined style={ICON_STYLE} />} />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item label="Téléphone" name="phone">
+                          <Input prefix={<PhoneOutlined style={ICON_STYLE} />} placeholder="+212 6XX-XXXXXX" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label="ICE" name="ice">
+                          <Input prefix={<IdcardOutlined style={ICON_STYLE} />} placeholder="000000000000000" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                      <Col span={16}>
+                        <Form.Item label="Adresse" name="address">
+                          <Input prefix={<HomeOutlined style={ICON_STYLE} />} placeholder="123 Rue Mohammed V" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={8}>
+                        <Form.Item label="Ville" name="city">
+                          <Input prefix={<EnvironmentOutlined style={ICON_STYLE} />} placeholder="Casablanca" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  </>
+                ),
+              },
+              {
+                key: 'subscription',
+                label: <span><DatabaseOutlined /> Abonnement</span>,
+                children: (
+                  <>
+                    <Form.Item label="Plan d'abonnement" name="planId">
+                      <Select
+                        placeholder="Choisir un plan (optionnel)"
+                        allowClear
+                        options={planOptions}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      label="Max utilisateurs"
+                      name="maxUsers"
+                      tooltip="Laisser vide = illimité"
+                    >
+                      <InputNumber
+                        min={1}
+                        max={10000}
+                        style={{ width: '100%' }}
+                        placeholder="Illimité"
+                        prefix={<TeamOutlined style={ICON_STYLE} />}
+                      />
+                    </Form.Item>
+                  </>
+                ),
+              },
+              {
+                key: 'branding',
+                label: <span><BgColorsOutlined /> Personnalisation</span>,
+                children: (
+                  <>
+                    <Row gutter={16}>
+                      <Col span={16}>
+                        <Form.Item label="URL du logo" name="logoUrl">
+                          <Input prefix={<LinkOutlined style={ICON_STYLE} />} placeholder="https://acme.ma/logo.png" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={8}>
+                        <Form.Item label="Couleur principale" name="primaryColor">
+                          <ColorPicker showText format="hex" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Form.Item label="Domaine personnalisé" name="customDomain">
+                      <Input
+                        prefix={<GlobalOutlined style={ICON_STYLE} />}
+                        placeholder="crm.acme.ma"
+                        addonBefore="https://"
+                      />
+                    </Form.Item>
+                  </>
+                ),
+              },
             ]}
-            extra="Identifiant unique : slug.opticrm.ma"
-          >
-            <Input prefix={<GlobalOutlined style={ICON_STYLE} />} placeholder="ex: acme" />
-          </Form.Item>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                label="Nom de l'entreprise"
-                name="name"
-                rules={[{ required: true, message: 'Requis' }, { min: 2 }]}
-              >
-                <Input prefix={<UserOutlined style={ICON_STYLE} />} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                label="Email administrateur"
-                name="adminEmail"
-                rules={[{ required: true, message: 'Requis' }, { type: 'email', message: 'Email invalide' }]}
-              >
-                <Input prefix={<MailOutlined style={ICON_STYLE} />} />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item label="Téléphone" name="phone">
-                <Input prefix={<PhoneOutlined style={ICON_STYLE} />} placeholder="+212 6XX-XXXXXX" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item label="ICE (Identifiant Commun de l'Entreprise)" name="ice">
-                <Input prefix={<IdcardOutlined style={ICON_STYLE} />} placeholder="000000000000000" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={16}>
-              <Form.Item label="Adresse" name="address">
-                <Input prefix={<HomeOutlined style={ICON_STYLE} />} placeholder="123 Rue Mohammed V" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item label="Ville" name="city">
-                <Input prefix={<EnvironmentOutlined style={ICON_STYLE} />} placeholder="Casablanca" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          {/* ─ Abonnement ─ */}
-          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
-            <DatabaseOutlined /> Abonnement & limites
-          </Divider>
-
-          <Row gutter={16}>
-            <Col span={16}>
-              <Form.Item label="Plan d'abonnement" name="planId">
-                <Select
-                  placeholder="Choisir un plan (optionnel)"
-                  allowClear
-                  options={planOptions}
-                />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item
-                label="Max utilisateurs"
-                name="maxUsers"
-                tooltip="Laisser vide = illimité"
-              >
-                <InputNumber
-                  min={1}
-                  max={10000}
-                  style={{ width: '100%' }}
-                  placeholder="Illimité"
-                  prefix={<TeamOutlined style={ICON_STYLE} />}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          {/* ─ Personnalisation ─ */}
-          <Divider orientation="left" orientationMargin={0} style={{ fontSize: 13, color: '#405189' }}>
-            <BgColorsOutlined /> Personnalisation
-          </Divider>
-
-          <Row gutter={16}>
-            <Col span={16}>
-              <Form.Item label="URL du logo" name="logoUrl">
-                <Input prefix={<LinkOutlined style={ICON_STYLE} />} placeholder="https://acme.ma/logo.png" />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item label="Couleur principale" name="primaryColor">
-                <ColorPicker showText format="hex" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Form.Item label="Domaine personnalisé" name="customDomain">
-            <Input
-              prefix={<GlobalOutlined style={ICON_STYLE} />}
-              placeholder="crm.acme.ma"
-              addonBefore="https://"
-            />
-          </Form.Item>
+          />
         </Form>
       </Modal>
 
@@ -770,6 +806,70 @@ export default function TenantsAdminPage() {
             />
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* ── Modal Lien d'accès ──────────────────────────────────────────── */}
+      <Modal
+        title={
+          <Space>
+            <KeyOutlined style={{ color: '#405189' }} />
+            <span>Lien de première connexion</span>
+          </Space>
+        }
+        open={!!accessLink}
+        onCancel={() => setAccessLink(null)}
+        footer={
+          <Button type="primary" onClick={() => setAccessLink(null)}
+            style={{ background: '#405189', borderColor: '#405189' }}>
+            Fermer
+          </Button>
+        }
+        width={560}
+      >
+        {accessLink && (
+          <div style={{ marginTop: 8 }}>
+            <p style={{ color: '#595959', marginBottom: 16 }}>
+              Envoyez ce lien à l'administrateur. Il est valable <strong>24 heures</strong> et permet de définir un mot de passe sans connaître l'ancien.
+            </p>
+            <div style={{ marginBottom: 12 }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>Email de connexion</Text>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                <Text code style={{ flex: 1, padding: '6px 10px', background: '#f5f5f5', borderRadius: 6 }}>
+                  {accessLink.adminEmail}
+                </Text>
+              </div>
+            </div>
+            <div>
+              <Text type="secondary" style={{ fontSize: 12 }}>Lien de setup (valable 24h)</Text>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                <Text
+                  code
+                  style={{
+                    flex: 1, padding: '6px 10px', background: '#f0f5ff',
+                    borderRadius: 6, wordBreak: 'break-all', fontSize: 12,
+                  }}
+                >
+                  {accessLink.url}
+                </Text>
+                <Tooltip title="Copier">
+                  <Button
+                    icon={<CopyOutlined />}
+                    onClick={() => {
+                      navigator.clipboard.writeText(accessLink.url);
+                      message.success('Lien copié !');
+                    }}
+                  />
+                </Tooltip>
+              </div>
+            </div>
+            <div style={{
+              marginTop: 16, padding: '10px 14px', background: '#fffbe6',
+              borderRadius: 8, border: '1px solid #ffe58f', fontSize: 12, color: '#ad6800',
+            }}>
+              Après avoir défini son mot de passe, l'admin se connectera normalement avec <strong>{accessLink.adminEmail}</strong>.
+            </div>
+          </div>
+        )}
       </Modal>
 
       <style>{`

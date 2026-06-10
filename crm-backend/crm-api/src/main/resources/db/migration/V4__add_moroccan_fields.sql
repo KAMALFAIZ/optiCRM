@@ -20,4 +20,14 @@ ALTER TABLE quotes ADD updated_by_id UNIQUEIDENTIFIER REFERENCES users(id);
 
 -- Fix version column type to match JPA Long type
 -- Note: ALTER COLUMN type change - SQL Server syntax
+-- Drop auto-generated DEFAULT constraint on 'version' first (auto-named DF__quotes__version__XXXX)
+DECLARE @cn NVARCHAR(255);
+SELECT @cn = dc.name
+FROM sys.default_constraints dc
+JOIN sys.columns c ON c.default_object_id = dc.object_id
+WHERE dc.parent_object_id = OBJECT_ID('quotes') AND c.name = 'version';
+IF @cn IS NOT NULL EXEC('ALTER TABLE quotes DROP CONSTRAINT ' + @cn);
+GO
+
 ALTER TABLE quotes ALTER COLUMN version BIGINT;
+GO

@@ -1,0 +1,26 @@
+# Configuration de l'agent OptiCRM Sync
+# Renommer ce fichier en agent-config.yml et le placer à côté de l'EXE
+# (ou de opticrm-sync-agent.jar) pour surcharger les valeurs par défaut.
+
+agent:
+  opticrm:
+    server-url: http://localhost:8081      # backend OptiCRM (https://… en prod)
+    tenant-id: "00000000-0000-0000-0000-000000000001"
+    agent-key: "agent_sk_9f69062f32f4ecfcf308244c9db49099990008d1e952ba93"
+
+  sage:
+    host: 127.0.0.1
+    port: 1433
+    database: ORQUE_SANITAIRE_2022
+    username: sa
+    password: "SQL@2019"
+    dossier: ""
+
+  sync:
+    pull:
+      enabled: true
+      cron: "0 0 */2 * * *"
+      entities: [ACCOUNTS, CONTACTS, PRODUCTS, INVENTORY]
+    push:
+      enabled: true
+      poll-interval-ms: 30000

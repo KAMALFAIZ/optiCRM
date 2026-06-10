@@ -63,6 +63,8 @@ spring:
 
 # Upload & App Configuration
 app:
+  frontend:
+    url: https://votre-domaine.com
   upload:
     dir: ./uploads/avatars
 
