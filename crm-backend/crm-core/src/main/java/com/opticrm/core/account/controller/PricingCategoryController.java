@@ -22,19 +22,19 @@ public class PricingCategoryController {
     private final PricingCategoryService pricingCategoryService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<PricingCategoryDto>>> list() {
         return ResponseEntity.ok(ApiResponse.success(pricingCategoryService.getAll()));
     }
 
     @GetMapping("/active")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<PricingCategoryDto>>> listActive() {
         return ResponseEntity.ok(ApiResponse.success(pricingCategoryService.getActive()));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<PricingCategoryDto>> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(pricingCategoryService.getById(id)));
     }

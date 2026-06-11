@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  Card, Typography, Tag, Button, Rate, Input, message, Spin, Timeline, Space, Divider,
+  Card, Typography, Tag, Button, Rate, message, Spin, Timeline, Space,
 } from 'antd';
 import {
   CheckCircleOutlined, CloseCircleOutlined, UserOutlined, RobotOutlined, TeamOutlined,
@@ -10,7 +10,6 @@ import {
 import { savPortalApi } from '@/api/sav';
 
 const { Title, Text, Paragraph } = Typography;
-const { TextArea } = Input;
 
 const STATUT_COLORS: Record<string, string> = {
   OUVERT: 'blue', EN_ANALYSE: 'processing', EN_COURS: 'processing',

@@ -18,7 +18,7 @@ import {
   Alert,
 } from 'antd';
 import dayjs from 'dayjs';
-import { CameraOutlined, BankOutlined, EnvironmentOutlined, ScanOutlined, CheckCircleOutlined, PhoneOutlined, WhatsAppOutlined } from '@ant-design/icons';
+import { CameraOutlined, BankOutlined, EnvironmentOutlined, ScanOutlined, PhoneOutlined, WhatsAppOutlined } from '@ant-design/icons';
 import { scanRcDocument, type RcExtractedData } from '@/services/scanRc';
 import type { UploadRequestOption } from 'rc-upload/lib/interface';
 import { GpsLocationPicker } from '@/components/maps';

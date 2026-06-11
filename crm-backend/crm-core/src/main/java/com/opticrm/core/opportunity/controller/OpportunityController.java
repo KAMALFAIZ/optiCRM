@@ -24,14 +24,14 @@ public class OpportunityController {
     private final OpportunityService opportunityService;
 
     @GetMapping("/stages")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<OpportunityStageDto>>> getAllStages() {
         List<OpportunityStageDto> stages = opportunityService.getAllStages();
         return ResponseEntity.ok(ApiResponse.success(stages));
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<OpportunityListDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -59,14 +59,14 @@ public class OpportunityController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<OpportunityDto>> getById(@PathVariable UUID id) {
         OpportunityDto opportunity = opportunityService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(opportunity));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<OpportunityDto>> create(
             @Valid @RequestBody CreateOpportunityRequest request
     ) {
@@ -75,7 +75,7 @@ public class OpportunityController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<OpportunityDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateOpportunityRequest request
@@ -85,14 +85,14 @@ public class OpportunityController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         opportunityService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/by-account/{accountId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<OpportunityListDto>>> getByAccount(@PathVariable UUID accountId) {
         List<OpportunityListDto> opportunities = opportunityService.getByAccount(accountId);
         return ResponseEntity.ok(ApiResponse.success(opportunities));
@@ -105,7 +105,7 @@ public class OpportunityController {
      * GET /api/v1/opportunities/pipeline?assignedToId=...
      */
     @GetMapping("/pipeline")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<PipelineSummaryDto>> getPipeline(
             @RequestParam(required = false) String assignedToId) {
         PipelineSummaryDto pipeline = opportunityService.getPipeline(assignedToId);
@@ -117,7 +117,7 @@ public class OpportunityController {
      * PATCH /api/v1/opportunities/{id}/stage
      */
     @PatchMapping("/{id}/stage")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<OpportunityListDto>> moveToStage(
             @PathVariable UUID id,
             @Valid @RequestBody MoveStageRequest request) {

@@ -31,7 +31,7 @@ public class ProductController {
     private final FileStorageService fileStorageService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ProductListDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -59,14 +59,14 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ProductDto>> getById(@PathVariable UUID id) {
         ProductDto product = productService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(product));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ProductDto>> create(
             @Valid @RequestBody CreateProductRequest request
     ) {
@@ -75,7 +75,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ProductDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateProductRequest request
@@ -85,14 +85,14 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         productService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ProductDto>> uploadImage(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file) throws java.io.IOException {
@@ -102,7 +102,7 @@ public class ProductController {
     }
 
     @PostMapping(value = "/{id}/datasheet", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ProductDto>> uploadDatasheet(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file) throws java.io.IOException {
@@ -115,14 +115,14 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}/datasheet")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ProductDto>> deleteDatasheet(@PathVariable UUID id) {
         ProductDto product = productService.deleteDatasheet(id);
         return ResponseEntity.ok(ApiResponse.success(product));
     }
 
     @GetMapping("/{id}/stock")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<StockLevelDto>>> getStock(@PathVariable UUID id) {
         List<StockLevelDto> stockLevels = stockLevelService.getByProduct(id);
         return ResponseEntity.ok(ApiResponse.success(stockLevels));
@@ -131,14 +131,14 @@ public class ProductController {
     // ---- Prix par catégorie tarifaire ----
 
     @GetMapping("/{id}/prices")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ProductPriceDto>>> getPrices(@PathVariable UUID id) {
         List<ProductPriceDto> prices = productService.getPrices(id);
         return ResponseEntity.ok(ApiResponse.success(prices));
     }
 
     @PutMapping("/{id}/prices")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ProductPriceDto>> setPrice(
             @PathVariable UUID id,
             @Valid @RequestBody SetProductPriceRequest request) {
@@ -147,7 +147,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}/prices/{categoryId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> deletePrice(
             @PathVariable UUID id,
             @PathVariable UUID categoryId) {
@@ -156,14 +156,14 @@ public class ProductController {
     }
 
     @GetMapping("/stats/by-category")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Map<String, Long>>> getStatsByCategory() {
         Map<String, Long> stats = productService.getCategoryStats();
         return ResponseEntity.ok(ApiResponse.success(stats));
     }
 
     @GetMapping("/stats/counts")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Map<String, Long>>> getCounts() {
         Map<String, Long> counts = Map.of(
                 "active", productService.countActive(),

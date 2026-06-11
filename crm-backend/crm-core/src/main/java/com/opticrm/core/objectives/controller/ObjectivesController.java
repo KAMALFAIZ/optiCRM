@@ -22,7 +22,7 @@ public class ObjectivesController {
     // ── Objectifs ────────────────────────────────────────────────────────────
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ObjectiveDto>>> listObjectives(
             @RequestParam int year,
             @RequestParam(required = false) Integer month,
@@ -31,14 +31,14 @@ public class ObjectivesController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ObjectiveDto>> upsertObjective(
             @Valid @RequestBody CreateObjectiveRequest req) {
         return ResponseEntity.ok(ApiResponse.success(service.upsertObjective(req)));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> deleteObjective(@PathVariable UUID id) {
         service.deleteObjective(id);
         return ResponseEntity.ok(ApiResponse.success(null));
@@ -47,7 +47,7 @@ public class ObjectivesController {
     // ── Ventes ───────────────────────────────────────────────────────────────
 
     @GetMapping("/sales")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<SaleEntryDto>>> listSales(
             @RequestParam int year,
             @RequestParam(required = false) Integer month,
@@ -57,14 +57,14 @@ public class ObjectivesController {
     }
 
     @PostMapping("/sales")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SaleEntryDto>> createSale(
             @Valid @RequestBody CreateSaleEntryRequest req) {
         return ResponseEntity.ok(ApiResponse.success(service.createSale(req)));
     }
 
     @PutMapping("/sales/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SaleEntryDto>> updateSale(
             @PathVariable UUID id,
             @Valid @RequestBody CreateSaleEntryRequest req) {
@@ -72,7 +72,7 @@ public class ObjectivesController {
     }
 
     @DeleteMapping("/sales/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> deleteSale(@PathVariable UUID id) {
         service.deleteSale(id);
         return ResponseEntity.ok(ApiResponse.success(null));
@@ -81,7 +81,7 @@ public class ObjectivesController {
     // ── Tracking KPI ─────────────────────────────────────────────────────────
 
     @GetMapping("/tracking")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ObjectiveTrackingDto>>> getTracking(
             @RequestParam int year,
             @RequestParam(required = false) Integer month,

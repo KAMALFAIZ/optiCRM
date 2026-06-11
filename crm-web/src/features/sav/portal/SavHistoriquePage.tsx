@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Table, Tag, Button, Typography, Space, message } from 'antd';
+import { Card, Table, Tag, Button, Typography, message } from 'antd';
 import { PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { savPortalApi } from '@/api/sav';
 

@@ -21,7 +21,7 @@ public class AccountStatsController {
     private final AccountStatsService accountStatsService;
 
     @GetMapping("/{id}/stats")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     @Operation(summary = "Get account statistics", description = "Returns aggregated statistics for an account (contacts, opportunities, revenue, invoices)")
     public ResponseEntity<ApiResponse<AccountStatsDto>> getAccountStats(@PathVariable UUID id) {
         AccountStatsDto stats = accountStatsService.getAccountStats(id);

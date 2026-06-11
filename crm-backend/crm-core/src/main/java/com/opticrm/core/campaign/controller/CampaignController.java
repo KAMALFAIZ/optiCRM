@@ -25,7 +25,7 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     @Operation(summary = "List campaigns")
     public ResponseEntity<ApiResponse<PageResponse<CampaignListDto>>> list(
             @RequestParam(defaultValue = "0") int page,
@@ -39,7 +39,7 @@ public class CampaignController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     @Operation(summary = "Get campaign by ID")
     public ResponseEntity<ApiResponse<CampaignDto>> getById(@PathVariable UUID id) {
         CampaignDto campaign = campaignService.getById(id);
@@ -47,7 +47,7 @@ public class CampaignController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     @Operation(summary = "Create campaign")
     public ResponseEntity<ApiResponse<CampaignDto>> create(@Valid @RequestBody CreateCampaignRequest request) {
         CampaignDto campaign = campaignService.create(request);
@@ -55,7 +55,7 @@ public class CampaignController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     @Operation(summary = "Update campaign")
     public ResponseEntity<ApiResponse<CampaignDto>> update(
             @PathVariable UUID id,
@@ -66,7 +66,7 @@ public class CampaignController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     @Operation(summary = "Delete campaign")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         campaignService.delete(id);

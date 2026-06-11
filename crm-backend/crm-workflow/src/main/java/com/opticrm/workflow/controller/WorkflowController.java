@@ -36,7 +36,7 @@ public class WorkflowController {
     // ── Workflow CRUD ─────────────────────────────────────────────────────────
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<WorkflowListDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -53,7 +53,7 @@ public class WorkflowController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<WorkflowDto>> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(workflowService.getById(id)));
     }
@@ -90,7 +90,7 @@ public class WorkflowController {
     // ── Manual trigger ───────────────────────────────────────────────────────
 
     @PostMapping("/{id}/execute")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<WorkflowExecutionDto>> execute(
             @PathVariable UUID id,
             @RequestParam String entityId
@@ -105,7 +105,7 @@ public class WorkflowController {
     // ── Executions ───────────────────────────────────────────────────────────
 
     @GetMapping("/executions")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<WorkflowExecutionDto>>> listExecutions(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -120,7 +120,7 @@ public class WorkflowController {
     }
 
     @GetMapping("/executions/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<WorkflowExecutionDto>> getExecution(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(workflowService.getExecutionById(id)));
     }
@@ -132,7 +132,7 @@ public class WorkflowController {
     }
 
     @PostMapping("/executions/{id}/approve")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> approveExecution(
             @PathVariable UUID id,
             @RequestParam boolean approved
@@ -144,7 +144,7 @@ public class WorkflowController {
     // ── Stats ────────────────────────────────────────────────────────────────
 
     @GetMapping("/stats")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<WorkflowStatsDto>> getStats() {
         return ResponseEntity.ok(ApiResponse.success(workflowService.getStats()));
     }
@@ -156,7 +156,7 @@ public class WorkflowController {
      * Liste paginée des templates avec filtres optionnels.
      */
     @GetMapping("/templates")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<WorkflowTemplateListDto>>> listTemplates(
             @RequestParam(defaultValue = "1")  int    page,
             @RequestParam(defaultValue = "50") int    perPage,
@@ -176,7 +176,7 @@ public class WorkflowController {
      * Détail d'un template (avec aperçu des étapes).
      */
     @GetMapping("/templates/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<WorkflowTemplateDto>> getTemplate(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(workflowTemplateService.getById(id)));
     }

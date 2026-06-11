@@ -16,26 +16,26 @@ public class SageAutoSyncController {
     private final SageAutoSyncService sageAutoSyncService;
 
     @GetMapping("/config")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SageAutoSyncConfigDto>> getConfig() {
         return ResponseEntity.ok(ApiResponse.success(sageAutoSyncService.getConfig()));
     }
 
     @PutMapping("/config")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SageAutoSyncConfigDto>> saveConfig(
             @RequestBody SageAutoSyncConfigDto dto) {
         return ResponseEntity.ok(ApiResponse.success(sageAutoSyncService.saveConfig(dto)));
     }
 
     @PostMapping("/trigger")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<String>> triggerAll() {
         return ResponseEntity.ok(ApiResponse.success(sageAutoSyncService.triggerAll()));
     }
 
     @PostMapping("/trigger/{entityType}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SageSyncRequestDto>> triggerOne(
             @PathVariable String entityType) {
         return ResponseEntity.ok(ApiResponse.success(sageAutoSyncService.triggerOne(entityType)));

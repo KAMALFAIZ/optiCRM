@@ -35,7 +35,7 @@ public class ExpenseReportController {
     private final FileStorageService fileStorageService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     @Operation(summary = "Liste des notes de frais")
     public ResponseEntity<ApiResponse<PageResponse<ExpenseReportListDto>>> getAll(
             @RequestParam(required = false) UUID tourId,
@@ -54,7 +54,7 @@ public class ExpenseReportController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     @Operation(summary = "Détail d'une note de frais")
     public ResponseEntity<ApiResponse<ExpenseReportDto>> getById(@PathVariable UUID id) {
         ExpenseReportDto report = expenseReportService.findById(id);
@@ -62,7 +62,7 @@ public class ExpenseReportController {
     }
 
     @GetMapping("/tour/{tourId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     @Operation(summary = "Notes de frais d'une tournée")
     public ResponseEntity<ApiResponse<List<ExpenseReportListDto>>> getByTour(@PathVariable UUID tourId) {
         List<ExpenseReportListDto> reports = expenseReportService.findByTourId(tourId);
@@ -70,7 +70,7 @@ public class ExpenseReportController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     @Operation(summary = "Créer une note de frais")
     public ResponseEntity<ApiResponse<ExpenseReportDto>> create(
             @Valid @RequestBody CreateExpenseReportRequest request) {
@@ -79,7 +79,7 @@ public class ExpenseReportController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     @Operation(summary = "Modifier une note de frais (brouillon uniquement)")
     public ResponseEntity<ApiResponse<ExpenseReportDto>> update(
             @PathVariable UUID id,
@@ -89,7 +89,7 @@ public class ExpenseReportController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     @Operation(summary = "Supprimer une note de frais (brouillon uniquement)")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         expenseReportService.delete(id);
@@ -97,7 +97,7 @@ public class ExpenseReportController {
     }
 
     @PatchMapping("/{id}/submit")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     @Operation(summary = "Soumettre une note de frais pour approbation")
     public ResponseEntity<ApiResponse<ExpenseReportDto>> submit(@PathVariable UUID id) {
         ExpenseReportDto report = expenseReportService.submit(id);
@@ -105,7 +105,7 @@ public class ExpenseReportController {
     }
 
     @PatchMapping("/{id}/approve")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     @Operation(summary = "Approuver une note de frais")
     public ResponseEntity<ApiResponse<ExpenseReportDto>> approve(@PathVariable UUID id) {
         ExpenseReportDto report = expenseReportService.approve(id);
@@ -113,7 +113,7 @@ public class ExpenseReportController {
     }
 
     @PatchMapping("/{id}/reject")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     @Operation(summary = "Rejeter une note de frais")
     public ResponseEntity<ApiResponse<ExpenseReportDto>> reject(
             @PathVariable UUID id,
@@ -132,7 +132,7 @@ public class ExpenseReportController {
     }
 
     @PostMapping("/upload-receipt")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     @Operation(summary = "Uploader un justificatif")
     public ResponseEntity<ApiResponse<String>> uploadReceipt(@RequestParam("file") MultipartFile file) throws IOException {
         String url = fileStorageService.storeReceipt(file);

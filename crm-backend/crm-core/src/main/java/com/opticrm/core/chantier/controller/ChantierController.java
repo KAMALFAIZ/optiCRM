@@ -30,7 +30,7 @@ public class ChantierController {
     private final ChantierPhotoService photoService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ChantierListDto>>> list(
             PageRequest pageRequest,
             @RequestParam(required = false) String search,
@@ -50,20 +50,20 @@ public class ChantierController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierDto>> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(chantierService.getById(id)));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierDto>> create(@Valid @RequestBody CreateChantierRequest request) {
         ChantierDto dto = chantierService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(dto));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateChantierRequest request) {
@@ -71,7 +71,7 @@ public class ChantierController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         chantierService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
@@ -79,7 +79,7 @@ public class ChantierController {
 
     // Acteurs liés
     @PostMapping("/{id}/acteurs")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierActeurDto>> addActeur(
             @PathVariable UUID id,
             @Valid @RequestBody CreateChantierRequest.ActeurRequest request) {
@@ -88,7 +88,7 @@ public class ChantierController {
     }
 
     @DeleteMapping("/{id}/acteurs/{acteurId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> removeActeur(
             @PathVariable UUID id,
             @PathVariable UUID acteurId) {
@@ -98,7 +98,7 @@ public class ChantierController {
 
     // Demandes d'échantillons
     @PostMapping("/{id}/echantillons")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierEchantillonDto>> createEchantillon(
             @PathVariable UUID id,
             @Valid @RequestBody CreateEchantillonRequest request) {
@@ -107,14 +107,14 @@ public class ChantierController {
     }
 
     @GetMapping("/{id}/echantillons")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ChantierEchantillonDto>>> getEchantillons(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(echantillonService.findByChantier(id)));
     }
 
     // Photos du chantier
     @PostMapping("/{id}/photos")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierPhotoDto>> uploadPhoto(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file) throws IOException {
@@ -123,13 +123,13 @@ public class ChantierController {
     }
 
     @GetMapping("/{id}/photos")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ChantierPhotoDto>>> getPhotos(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(photoService.findByChantier(id)));
     }
 
     @DeleteMapping("/{id}/photos/{photoId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> deletePhoto(
             @PathVariable UUID id,
             @PathVariable UUID photoId) throws IOException {
@@ -139,14 +139,14 @@ public class ChantierController {
 
     // Carte interactive : chantiers géolocalisés
     @GetMapping("/map")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ChantierListDto>>> getMapData() {
         return ResponseEntity.ok(ApiResponse.success(chantierService.findAllWithGps()));
     }
 
     // Chantiers liés à un compte
     @GetMapping("/by-account/{accountId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ChantierListDto>>> getByAccount(@PathVariable UUID accountId) {
         return ResponseEntity.ok(ApiResponse.success(chantierService.findByAccount(accountId)));
     }

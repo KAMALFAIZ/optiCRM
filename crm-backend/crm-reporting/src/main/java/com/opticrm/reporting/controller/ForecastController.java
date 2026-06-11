@@ -23,7 +23,7 @@ public class ForecastController {
     private final ForecastService forecastService;
 
     @GetMapping("/monthly")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ForecastDto.ForecastByMonth>>> getMonthlyForecast(
             @RequestParam(defaultValue = "6") int months
     ) {
@@ -33,7 +33,7 @@ public class ForecastController {
     }
 
     @GetMapping("/by-rep")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ForecastDto.ForecastByRep>>> getByRep() {
         log.debug("GET /api/v1/forecast/by-rep");
         List<ForecastDto.ForecastByRep> forecast = forecastService.getByRep();

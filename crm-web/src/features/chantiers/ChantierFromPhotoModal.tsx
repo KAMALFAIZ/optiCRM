@@ -69,7 +69,6 @@ interface IntervenantRow extends ChantierIntervenant {
   key: string;
 }
 
-const RETRY_DELAYS: number[] = []; // pas de délai — échec IA → saisie manuelle immédiate
 
 export default function ChantierFromPhotoModal({ open, onClose, onCreateChantier }: Props) {
   const [step, setStep] = useState(0);
@@ -78,8 +77,8 @@ export default function ChantierFromPhotoModal({ open, onClose, onCreateChantier
   const [loading, setLoading] = useState(false);
   const [extracted, setExtracted] = useState<Record<string, any> | null>(null);
   const [intervenants, setIntervenants] = useState<IntervenantRow[]>([]);
-  const [analyzeError, setAnalyzeError] = useState<'overloaded' | 'generic' | null>(null);
-  const [analyzeErrorMsg, setAnalyzeErrorMsg] = useState<string>('');
+  const [_analyzeError, setAnalyzeError] = useState<'overloaded' | 'generic' | null>(null);
+  const [_analyzeErrorMsg, setAnalyzeErrorMsg] = useState<string>('');
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [retryMax]    = useState(1);  // 1 tentative → fallback manuel immédiat
   const [countdown, setCountdown] = useState(0);

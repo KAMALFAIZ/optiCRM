@@ -25,7 +25,7 @@ public class ActivityController {
     private final ActivityService activityService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ActivityListDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -52,7 +52,7 @@ public class ActivityController {
     }
 
     @GetMapping("/calendar")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ActivityListDto>>> calendarEvents(
             @RequestParam Instant from,
             @RequestParam Instant to,
@@ -63,14 +63,14 @@ public class ActivityController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ActivityDto>> getById(@PathVariable UUID id) {
         ActivityDto activity = activityService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(activity));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ActivityDto>> create(
             @Valid @RequestBody CreateActivityRequest request
     ) {
@@ -79,7 +79,7 @@ public class ActivityController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ActivityDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateActivityRequest request
@@ -89,14 +89,14 @@ public class ActivityController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         activityService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PatchMapping("/{id}/complete")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ActivityDto>> complete(@PathVariable UUID id) {
         ActivityDto activity = activityService.complete(id);
         return ResponseEntity.ok(ApiResponse.success(activity));

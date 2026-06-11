@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Card, Typography, message, Space } from 'antd';
-import { PhoneOutlined, ShopOutlined, ToolOutlined } from '@ant-design/icons';
+import { PhoneOutlined, ToolOutlined } from '@ant-design/icons';
 import { savAuthApi } from '@/api/sav';
 
 const { Title, Text } = Typography;

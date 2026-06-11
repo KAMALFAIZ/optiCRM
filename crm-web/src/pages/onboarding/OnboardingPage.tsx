@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Card, Form, Input, Select, Steps, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { tenantApi } from '@/api/tenant';

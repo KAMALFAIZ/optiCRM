@@ -23,7 +23,7 @@ public class SageIntegrationController {
 
     /** Créer une requête de synchronisation (avec preview auto) */
     @PostMapping("/requests")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SageSyncRequestDto>> createRequest(
             @Valid @RequestBody CreateSyncRequestRequest req) {
         return ResponseEntity.ok(ApiResponse.success(sageIntegrationService.createRequest(req)));
@@ -31,14 +31,14 @@ public class SageIntegrationController {
 
     /** Appliquer une requête (écriture en base CRM) */
     @PostMapping("/requests/{id}/apply")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SageSyncRequestDto>> applyRequest(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(sageIntegrationService.applyRequest(id)));
     }
 
     /** Annuler une requête PENDING */
     @PostMapping("/requests/{id}/cancel")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> cancelRequest(@PathVariable UUID id) {
         sageIntegrationService.cancelRequest(id);
         return ResponseEntity.ok(ApiResponse.success(null));
@@ -46,7 +46,7 @@ public class SageIntegrationController {
 
     /** Lister les requêtes */
     @GetMapping("/requests")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Page<SageSyncRequestDto>>> listRequests(
             @RequestParam(required = false) String entityType,
             @RequestParam(defaultValue = "0") int page,
@@ -57,7 +57,7 @@ public class SageIntegrationController {
 
     /** Détail d'une requête avec ses items */
     @GetMapping("/requests/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SageSyncRequestDto>> getRequest(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(sageIntegrationService.getRequest(id)));
     }

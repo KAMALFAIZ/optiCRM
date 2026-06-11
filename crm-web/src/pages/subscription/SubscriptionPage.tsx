@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Badge, Button, Card, Col, Progress, Row, Space, Tag, Typography } from 'antd';
+import { useEffect } from 'react';
+import { Button, Card, Col, Progress, Row, Space, Tag, Typography } from 'antd';
 import { CheckCircleOutlined, CrownOutlined } from '@ant-design/icons';
 import { useAppDispatch, useAppSelector } from '@/store';
 import { fetchCurrentTenant, fetchPlans } from '@/features/tenant/tenantSlice';

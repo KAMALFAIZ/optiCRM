@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Card, Table, Button, Space, Empty, Spin, Tag, Modal, Form, Select,
   Popconfirm, Row, Col, Statistic, DatePicker, Typography, InputNumber,
-  Alert, Divider, Badge, Descriptions,
+  Alert, Divider, Badge,
 } from 'antd';
 import { useMessage } from '@/hooks/useMessage';
 import {
@@ -105,8 +105,6 @@ export default function VehicleLoadsListPage() {
   useEffect(() => { loadData(); }, [loadData]);
 
   // ── Helpers ────────────────────────────────────────────────────────────────
-  const getProductName   = (id?: string) => { const p = products.find(p => p.id === id); return p ? p.name : id ? id.substring(0, 8) + '…' : '—'; };
-  const getProductCode   = (id?: string) => products.find(p => p.id === id)?.code;
   const getWarehouseName = (id?: string) => { const w = warehouses.find(w => w.id === id); return w ? `${w.name}${w.code ? ` (${w.code})` : ''}` : null; };
   const getTourRep       = (tourId?: string | null) => { const t = tours.find(t => t.id === tourId); return t?.assignedTo?.fullName || '—'; };
 

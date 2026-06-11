@@ -24,7 +24,7 @@ public class QuoteController {
     private final QuoteService quoteService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<QuoteListDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -51,14 +51,14 @@ public class QuoteController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<QuoteDto>> getById(@PathVariable UUID id) {
         QuoteDto quote = quoteService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(quote));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<QuoteDto>> create(
             @Valid @RequestBody CreateQuoteRequest request
     ) {
@@ -67,7 +67,7 @@ public class QuoteController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<QuoteDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateQuoteRequest request
@@ -77,35 +77,35 @@ public class QuoteController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         quoteService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/by-account/{accountId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<QuoteListDto>>> getByAccount(@PathVariable UUID accountId) {
         List<QuoteListDto> quotes = quoteService.getByAccount(accountId);
         return ResponseEntity.ok(ApiResponse.success(quotes));
     }
 
     @GetMapping("/by-opportunity/{opportunityId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<QuoteListDto>>> getByOpportunity(@PathVariable UUID opportunityId) {
         List<QuoteListDto> quotes = quoteService.getByOpportunity(opportunityId);
         return ResponseEntity.ok(ApiResponse.success(quotes));
     }
 
     @GetMapping("/by-chantier/{chantierId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<QuoteListDto>>> getByChantier(@PathVariable UUID chantierId) {
         List<QuoteListDto> quotes = quoteService.getByChantier(chantierId);
         return ResponseEntity.ok(ApiResponse.success(quotes));
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<QuoteDto>> updateStatus(
             @PathVariable UUID id,
             @RequestParam String status
@@ -115,7 +115,7 @@ public class QuoteController {
     }
 
     @PostMapping("/{id}/duplicate")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<QuoteDto>> duplicate(@PathVariable UUID id) {
         QuoteDto quote = quoteService.duplicate(id);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(quote));

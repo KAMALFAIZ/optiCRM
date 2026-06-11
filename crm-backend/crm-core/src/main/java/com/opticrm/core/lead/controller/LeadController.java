@@ -26,7 +26,7 @@ public class LeadController {
     private final LeadScoreService leadScoreService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<LeadListDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -53,14 +53,14 @@ public class LeadController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<LeadDto>> getById(@PathVariable UUID id) {
         LeadDto lead = leadService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(lead));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<LeadDto>> create(
             @Valid @RequestBody CreateLeadRequest request
     ) {
@@ -69,7 +69,7 @@ public class LeadController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<LeadDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateLeadRequest request
@@ -79,14 +79,14 @@ public class LeadController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         leadService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PostMapping("/{id}/convert")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ConvertLeadResponse>> convert(
             @PathVariable UUID id,
             @RequestBody ConvertLeadRequest request
@@ -98,19 +98,19 @@ public class LeadController {
     // ── Score de qualification ────────────────────────────────────────────────
 
     @GetMapping("/{id}/score")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<LeadScoreDto>> getScore(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(leadScoreService.compute(id)));
     }
 
     @PostMapping("/{id}/score/refresh")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<LeadScoreDto>> refreshScore(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(leadScoreService.computeAndPersist(id)));
     }
 
     @GetMapping("/duplicates")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<LeadDto>>> findDuplicates(
             @RequestParam(required = false) String firstName,
             @RequestParam String lastName,

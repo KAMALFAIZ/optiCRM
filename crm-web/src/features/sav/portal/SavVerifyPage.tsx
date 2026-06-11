@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Card, Typography, message, Input } from 'antd';
+import { Button, Card, Typography, message } from 'antd';
 import { savAuthApi } from '@/api/sav';
 
 const { Title, Text } = Typography;

@@ -22,7 +22,7 @@ public class AccountTimelineController {
     private final AccountTimelineService accountTimelineService;
 
     @GetMapping("/api/v1/accounts/{id}/timeline")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<AccountTimelineDto>> getTimeline(
             @PathVariable UUID id,
             @RequestParam(defaultValue = "50") int limit,

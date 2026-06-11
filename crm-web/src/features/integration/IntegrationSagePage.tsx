@@ -26,7 +26,7 @@ import BalanceAgeeSyncTab from './tabs/BalanceAgeeSyncTab';
 import AutoSyncTab from './tabs/AutoSyncTab';
 import AgentTab from './tabs/AgentTab';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export default function IntegrationSagePage() {
   const [activeTab, setActiveTab] = useState('accounts');

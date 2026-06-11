@@ -26,7 +26,7 @@ public class VisitController {
     private final VisitService visitService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<VisitListDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -53,7 +53,7 @@ public class VisitController {
     }
 
     @GetMapping("/calendar")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<VisitListDto>>> calendarEvents(
             @RequestParam Instant from,
             @RequestParam Instant to,
@@ -64,14 +64,14 @@ public class VisitController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<VisitDto>> getById(@PathVariable UUID id) {
         VisitDto visit = visitService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(visit));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<VisitDto>> create(
             @Valid @RequestBody CreateVisitRequest request
     ) {
@@ -80,7 +80,7 @@ public class VisitController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<VisitDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateVisitRequest request
@@ -90,14 +90,14 @@ public class VisitController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         visitService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @PatchMapping("/{id}/check-in")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<VisitDto>> checkIn(
             @PathVariable UUID id,
             @RequestParam(required = false) BigDecimal latitude,
@@ -108,7 +108,7 @@ public class VisitController {
     }
 
     @PatchMapping("/{id}/check-out")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<VisitDto>> checkOut(
             @PathVariable UUID id,
             @RequestParam(required = false) String notes,

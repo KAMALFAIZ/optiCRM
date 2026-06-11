@@ -20,7 +20,7 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping("/stats")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<DashboardStatsDto>> getStats() {
         log.debug("GET /api/v1/dashboard/stats");
         DashboardStatsDto stats = dashboardService.getStats();

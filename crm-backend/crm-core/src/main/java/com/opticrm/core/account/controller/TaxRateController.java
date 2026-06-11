@@ -20,14 +20,14 @@ public class TaxRateController {
     private final TaxRateRepository taxRateRepository;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<TaxRate>>> list() {
         List<TaxRate> taxRates = taxRateRepository.findAllOrdered();
         return ResponseEntity.ok(ApiResponse.success(taxRates));
     }
 
     @GetMapping("/active")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<TaxRate>>> listActive() {
         List<TaxRate> taxRates = taxRateRepository.findByIsActiveTrue();
         return ResponseEntity.ok(ApiResponse.success(taxRates));

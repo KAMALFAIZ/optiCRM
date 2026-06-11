@@ -22,7 +22,7 @@ public class ChantierAiController {
 
     /** Score de santé du chantier (rule-based, rapide) */
     @PostMapping("/{id}/health")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierHealthResponse>> computeHealth(@PathVariable UUID id) {
         ChantierHealthResponse result = chantierAiService.computeHealthScore(id);
         return ResponseEntity.ok(ApiResponse.success(result));
@@ -30,7 +30,7 @@ public class ChantierAiController {
 
     /** Analyse IA complète du chantier */
     @PostMapping("/{id}/analyze")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<String>> analyzeChantier(@PathVariable UUID id) {
         String result = chantierAiService.analyzeChantier(id);
         return ResponseEntity.ok(ApiResponse.success(result));
@@ -38,14 +38,14 @@ public class ChantierAiController {
 
     /** Chat contextuel SSE sur un chantier */
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public SseEmitter streamChat(@Valid @RequestBody ChantierChatRequest request) {
         return chantierAiService.streamChantierChat(request);
     }
 
     /** Extraction d'informations depuis un document */
     @PostMapping("/extract-document")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierExtractResponse>> extractDocument(
             @Valid @RequestBody ChantierDocumentExtractRequest request) {
         ChantierExtractResponse result = chantierAiService.extractFromDocument(request);
@@ -54,7 +54,7 @@ public class ChantierAiController {
 
     /** Insights géographiques sur tous les chantiers */
     @GetMapping("/geo-insights")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<String>> getGeoInsights() {
         String result = chantierAiService.generateGeoInsights();
         return ResponseEntity.ok(ApiResponse.success(result));
@@ -62,7 +62,7 @@ public class ChantierAiController {
 
     /** Extraction d'informations depuis une photo de chantier (vision IA) */
     @PostMapping(value = "/extract-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<ChantierExtractResponse>> extractFromImage(
             @RequestParam("file") MultipartFile file) {
         ChantierExtractResponse result = chantierAiService.extractFromImage(file);

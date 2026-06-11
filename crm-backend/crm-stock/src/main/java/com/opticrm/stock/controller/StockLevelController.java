@@ -23,7 +23,7 @@ public class StockLevelController {
     private final StockLevelService stockLevelService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<StockLevelDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -47,21 +47,21 @@ public class StockLevelController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<StockLevelDto>> getById(@PathVariable UUID id) {
         StockLevelDto stockLevel = stockLevelService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(stockLevel));
     }
 
     @GetMapping("/product/{productId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<StockLevelDto>>> getByProduct(@PathVariable UUID productId) {
         List<StockLevelDto> stockLevels = stockLevelService.getByProduct(productId);
         return ResponseEntity.ok(ApiResponse.success(stockLevels));
     }
 
     @GetMapping("/product/{productId}/warehouse/{warehouseId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<StockLevelDto>> getByProductAndWarehouse(
             @PathVariable UUID productId,
             @PathVariable UUID warehouseId
@@ -71,28 +71,28 @@ public class StockLevelController {
     }
 
     @GetMapping("/low-stock")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<StockLevelDto>>> getLowStock() {
         List<StockLevelDto> lowStock = stockLevelService.getLowStock();
         return ResponseEntity.ok(ApiResponse.success(lowStock));
     }
 
     @GetMapping("/needs-reorder")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<StockLevelDto>>> getNeedsReorder() {
         List<StockLevelDto> needsReorder = stockLevelService.getNeedingReorder();
         return ResponseEntity.ok(ApiResponse.success(needsReorder));
     }
 
     @GetMapping("/product/{productId}/total")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<BigDecimal>> getTotalAvailable(@PathVariable UUID productId) {
         BigDecimal total = stockLevelService.getTotalAvailable(productId);
         return ResponseEntity.ok(ApiResponse.success(total));
     }
 
     @GetMapping("/check-availability")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Boolean>> checkAvailability(
             @RequestParam String productId,
             @RequestParam String warehouseId,

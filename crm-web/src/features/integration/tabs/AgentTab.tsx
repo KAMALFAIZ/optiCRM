@@ -22,7 +22,7 @@ import {
 } from '@ant-design/icons';
 import { type AgentKey, type AgentKeyCreated, agentApi } from '@/api/agent';
 
-const { Text, Paragraph, Title } = Typography;
+const { Text, Paragraph } = Typography;
 
 function heartbeatStatus(lastHeartbeat: string | null): { color: string; label: string } {
   if (!lastHeartbeat) return { color: 'default', label: 'Jamais connecté' };

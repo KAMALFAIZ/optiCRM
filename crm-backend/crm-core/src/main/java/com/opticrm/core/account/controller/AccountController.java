@@ -33,7 +33,7 @@ public class AccountController {
     private final HealthScoreService healthScoreService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<AccountListDto>>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int perPage,
@@ -63,26 +63,26 @@ public class AccountController {
     }
 
     @GetMapping("/representants")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<String>>> getRepresentants() {
         return ResponseEntity.ok(ApiResponse.success(accountService.listRepresentants()));
     }
 
     @GetMapping("/geolocated")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<AccountListDto>>> getGeolocated() {
         return ResponseEntity.ok(ApiResponse.success(accountService.getAllGeolocated()));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<AccountDto>> getById(@PathVariable UUID id) {
         AccountDto account = accountService.getById(id);
         return ResponseEntity.ok(ApiResponse.success(account));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<AccountDto>> create(
             @Valid @RequestBody CreateAccountRequest request
     ) {
@@ -91,7 +91,7 @@ public class AccountController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<AccountDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateAccountRequest request
@@ -101,28 +101,28 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         accountService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     @GetMapping("/{id}/contacts")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<ContactListDto>>> getContacts(@PathVariable UUID id) {
         List<ContactListDto> contacts = contactService.getByAccountId(id);
         return ResponseEntity.ok(ApiResponse.success(contacts));
     }
 
     @GetMapping("/{id}/children")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<AccountListDto>>> getChildAccounts(@PathVariable UUID id) {
         List<AccountListDto> children = accountService.getChildAccounts(id);
         return ResponseEntity.ok(ApiResponse.success(children));
     }
 
     @GetMapping("/stats/by-type")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Map<String, Long>>> getStatsByType() {
         Map<String, Long> stats = accountService.getAccountTypeStats();
         return ResponseEntity.ok(ApiResponse.success(stats));
@@ -135,7 +135,7 @@ public class AccountController {
      * GET /api/v1/accounts/{id}/health-score
      */
     @GetMapping("/{id}/health-score")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<HealthScoreDto>> getHealthScore(@PathVariable UUID id) {
         HealthScoreDto score = healthScoreService.compute(id);
         return ResponseEntity.ok(ApiResponse.success(score));
@@ -146,7 +146,7 @@ public class AccountController {
      * POST /api/v1/accounts/{id}/health-score/refresh
      */
     @PostMapping("/{id}/health-score/refresh")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<HealthScoreDto>> refreshHealthScore(@PathVariable UUID id) {
         HealthScoreDto score = healthScoreService.computeAndPersist(id);
         return ResponseEntity.ok(ApiResponse.success(score));
@@ -157,7 +157,7 @@ public class AccountController {
     // -----------------------------------------------------------------------
 
     @PostMapping(value = "/{id}/logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<AccountDto>> uploadLogo(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file
@@ -167,7 +167,7 @@ public class AccountController {
     }
 
     @PostMapping(value = "/{id}/photos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<AccountPhotoDto>> uploadPhoto(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file,
@@ -178,7 +178,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/{id}/photos/{photoId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> deletePhoto(
             @PathVariable UUID id,
             @PathVariable UUID photoId

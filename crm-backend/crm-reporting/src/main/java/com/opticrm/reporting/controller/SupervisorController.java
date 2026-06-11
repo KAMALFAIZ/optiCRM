@@ -67,7 +67,7 @@ public class SupervisorController {
     // --- Admin endpoints: manage assignments for any supervisor ---
 
     @GetMapping("/admin/{supervisorId}/collaborators")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<SupervisorAssignmentDto>>> getCollaboratorsForSupervisor(
             @PathVariable UUID supervisorId) {
         log.debug("GET /supervisor/admin/{}/collaborators", supervisorId);
@@ -76,7 +76,7 @@ public class SupervisorController {
     }
 
     @PostMapping("/admin/{supervisorId}/collaborators")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<SupervisorAssignmentDto>> assignCollaboratorForSupervisor(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID supervisorId,
@@ -88,7 +88,7 @@ public class SupervisorController {
     }
 
     @DeleteMapping("/admin/{supervisorId}/collaborators/{collaboratorId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> unassignCollaboratorForSupervisor(
             @PathVariable UUID supervisorId,
             @PathVariable UUID collaboratorId) {

@@ -19,7 +19,7 @@ public class SearchController {
     private final GlobalSearchService globalSearchService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'READ_ONLY', 'SUPERVISEUR')")
     @Operation(summary = "Global search", description = "Search across accounts, contacts, leads, and opportunities")
     public ResponseEntity<ApiResponse<GlobalSearchResult>> search(
             @RequestParam String q,

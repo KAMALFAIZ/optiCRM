@@ -30,7 +30,7 @@ public class VenteSaisieController {
     private final VenteSaisieService venteSaisieService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<PageResponse<VenteSaisieDto>>> findAll(
             @RequestParam(required = false) UUID accountId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
@@ -45,19 +45,19 @@ public class VenteSaisieController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<VenteSaisieDto>> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(ApiResponse.success(venteSaisieService.findById(id)));
     }
 
     @GetMapping("/account/{accountId}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<List<VenteSaisieDto>>> findByAccount(@PathVariable UUID accountId) {
         return ResponseEntity.ok(ApiResponse.success(venteSaisieService.findByAccount(accountId)));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<VenteSaisieDto>> create(
             @Valid @RequestBody CreateVenteSaisieRequest request) {
         VenteSaisieDto dto = venteSaisieService.create(request);
@@ -65,7 +65,7 @@ public class VenteSaisieController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<VenteSaisieDto>> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateVenteSaisieRequest request) {
@@ -73,7 +73,7 @@ public class VenteSaisieController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER')")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER', 'SUPERVISEUR')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         venteSaisieService.delete(id);
         return ResponseEntity.ok(ApiResponse.success(null));
