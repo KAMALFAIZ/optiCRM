@@ -31,6 +31,9 @@ public class Visit {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contact_id")
     private Contact contact;

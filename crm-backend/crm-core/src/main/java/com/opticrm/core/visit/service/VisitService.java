@@ -4,6 +4,7 @@ import com.opticrm.common.dto.PageRequest;
 import com.opticrm.common.exception.ResourceNotFoundException;
 import com.opticrm.core.account.entity.Account;
 import com.opticrm.security.config.ContextUtils;
+import com.opticrm.common.exception.BusinessException;
 import com.opticrm.core.account.repository.AccountRepository;
 import com.opticrm.core.contact.entity.Contact;
 import com.opticrm.core.contact.repository.ContactRepository;
@@ -101,7 +102,11 @@ public class VisitService {
 
     @Transactional
     public VisitDto create(CreateVisitRequest request) {
+        UUID tenantId = ContextUtils.getCurrentTenantId()
+                .orElseThrow(() -> new BusinessException("TENANT_MISSING", "Tenant non résolu"));
+
         Visit visit = Visit.builder()
+                .tenantId(tenantId)
                 .visitType(request.getVisitType())
                 .subject(request.getSubject())
                 .description(request.getDescription())
