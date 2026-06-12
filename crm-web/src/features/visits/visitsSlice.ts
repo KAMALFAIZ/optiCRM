@@ -150,12 +150,28 @@ const visitsSlice = createSlice({
         state.loading = false;
         state.selectedVisit = action.payload;
       })
+      .addCase(createVisit.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(createVisit.fulfilled, (state) => {
         state.loading = false;
+      })
+      .addCase(createVisit.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateVisit.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(updateVisit.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedVisit = action.payload;
+      })
+      .addCase(updateVisit.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       })
       .addCase(deleteVisit.fulfilled, (state, action) => {
         state.loading = false;

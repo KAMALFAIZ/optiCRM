@@ -1,11 +1,22 @@
 /// <reference lib="webworker" />
-import { precacheAndRoute } from 'workbox-precaching';
+import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
+import { clientsClaim } from 'workbox-core';
 import { registerRoute } from 'workbox-routing';
 import { NetworkFirst, StaleWhileRevalidate, CacheFirst } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 
 declare const self: ServiceWorkerGlobalScope;
+
+// ── Activation immédiate du nouveau service worker ───────────────────────────
+// Sans skipWaiting/clientsClaim, un nouveau build reste « en attente » tant que
+// tous les onglets ne sont pas fermés → les postes gardent l'ancien bundle en
+// cache (assets 404, login cassé). On force l'activation et le contrôle direct.
+self.skipWaiting();
+clientsClaim();
+
+// Purge les anciennes entrées de précache (évite les 404 bad-precaching-response)
+cleanupOutdatedCaches();
 
 // ── Workbox precaching (injecté par vite-plugin-pwa) ─────────────────────────
 precacheAndRoute(self.__WB_MANIFEST);

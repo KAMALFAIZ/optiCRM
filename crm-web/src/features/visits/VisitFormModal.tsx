@@ -448,25 +448,38 @@ export default function VisitFormModal({ open, editingId, onClose, onSuccess }: 
   };
 
   const handleSubmit = async () => {
+    // 1) Validation des champs — surface les erreurs même sur un onglet non actif
+    let values: any;
     try {
-      const values = await form.validateFields();
-      const data = {
-        ...values,
-        visitDate: values.visitDate?.toISOString(),
-        visitEndDate: values.visitEndDate?.toISOString(),
-        followUpDate: values.followUpDate?.toISOString(),
-      };
+      values = await form.validateFields();
+    } catch (err: any) {
+      const missing = err?.errorFields?.[0]?.errors?.[0];
+      message.error(missing || 'Veuillez remplir les champs obligatoires (Type, Sujet, Date de visite).');
+      return;
+    }
 
+    // 2) Enregistrement — affiche toujours l'erreur serveur (chaîne renvoyée par rejectWithValue)
+    const data = {
+      ...values,
+      visitDate: values.visitDate?.toISOString(),
+      visitEndDate: values.visitEndDate?.toISOString(),
+      followUpDate: values.followUpDate?.toISOString(),
+    };
+    try {
       if (editingId) {
         await dispatch(updateVisit({ id: editingId, data })).unwrap();
+        message.success('Visite mise à jour');
       } else {
         await dispatch(createVisit(data)).unwrap();
+        message.success('Visite créée');
       }
       onSuccess();
     } catch (error: any) {
-      if (error?.message) {
-        message.error(error.message);
-      }
+      message.error(
+        typeof error === 'string'
+          ? error
+          : error?.message || "Erreur lors de l'enregistrement de la visite",
+      );
     }
   };
 
