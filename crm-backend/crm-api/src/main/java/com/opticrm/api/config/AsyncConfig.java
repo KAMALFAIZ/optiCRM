@@ -14,10 +14,16 @@ public class AsyncConfig {
     @Bean(name = "sageTaskExecutor")
     public Executor sageTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(1);
-        executor.setQueueCapacity(20);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(200);
         executor.setThreadNamePrefix("sage-import-");
+        // Ne jamais perdre silencieusement un import : si saturé, exécuter sur le thread
+        // appelant plutôt que de rejeter (AbortPolicy par défaut).
+        executor.setRejectedExecutionHandler(
+                new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
         executor.initialize();
         return executor;
     }

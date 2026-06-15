@@ -53,6 +53,9 @@ coverage/
 
 # Credentials / test files
 login.json
+# Agent Sage — config locale avec secrets (SQL Server password, clé agent)
+opticrm-sync-agent/agent-config.yml
+$null
 
 # Claude Code local config
 .claude/

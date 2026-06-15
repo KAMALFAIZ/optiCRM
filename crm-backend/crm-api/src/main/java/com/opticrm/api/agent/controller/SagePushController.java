@@ -47,7 +47,12 @@ public class SagePushController {
         SageSyncRequestDto created = sageIntegrationService.createRequest(req);
 
         if (autoApply && created.getId() != null) {
-            SageSyncRequestDto applied = sageIntegrationService.applyRequest(created.getId());
+            // Application SYNCHRONE : la réponse ne revient qu'une fois les lignes
+            // réellement écrites, avec les vrais compteurs + la première erreur.
+            SageSyncRequestDto applied = sageIntegrationService.applyRequestSync(created.getId());
+            log.info("[Agent push] entityType={} succes={} erreurs={} ignores={} firstError={}",
+                    req.getEntityType(), applied.getSuccessItems(), applied.getErrorItems(),
+                    applied.getSkipItems(), applied.getFirstError());
             return ResponseEntity.ok(ApiResponse.success(applied));
         }
         return ResponseEntity.ok(ApiResponse.success(created));

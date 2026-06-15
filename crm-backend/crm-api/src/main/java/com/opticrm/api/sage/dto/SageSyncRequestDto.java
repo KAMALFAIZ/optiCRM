@@ -26,6 +26,9 @@ public class SageSyncRequestDto {
     private LocalDateTime processedAt;
     private LocalDateTime createdAt;
 
+    // Premier message d'erreur (renseigné par l'apply synchrone de l'agent)
+    private String firstError;
+
     // Items (only when fetching detail)
     private List<SageSyncItemDto> items;
 

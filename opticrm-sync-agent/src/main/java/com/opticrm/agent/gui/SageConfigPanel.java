@@ -46,9 +46,13 @@ public class SageConfigPanel {
         JLabel jdbcLabel = new JLabel();
         jdbcLabel.setForeground(Color.GRAY);
         jdbcLabel.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
-        Runnable refreshJdbc = () -> jdbcLabel.setText(
-                "<html><b>JDBC :</b> jdbc:sqlserver://" + hostField.getText() + ":" + portField.getValue()
-                        + ";databaseName=" + dbField.getText() + ";encrypt=false</html>");
+        Runnable refreshJdbc = () -> {
+            int port = (Integer) portField.getValue();
+            String hostPort = port == 1433 ? hostField.getText() : hostField.getText() + ":" + port;
+            jdbcLabel.setText(
+                    "<html><b>JDBC :</b> jdbc:sqlserver://" + hostPort
+                            + ";databaseName=" + dbField.getText() + ";encrypt=false</html>");
+        };
         refreshJdbc.run();
         hostField.addActionListener(e -> refreshJdbc.run());
 
@@ -87,11 +91,11 @@ public class SageConfigPanel {
             new SwingWorker<String, Void>() {
                 @Override protected String doInBackground() {
                     long t = System.currentTimeMillis();
-                    boolean ok = sageConnection.ping();
+                    SageConnection.TestResult res = sageConnection.test();
                     long ms = System.currentTimeMillis() - t;
-                    return ok
+                    return res.ok()
                             ? "✓ Connexion SQL Server établie (" + ms + " ms)"
-                            : "✗ Connexion impossible — vérifiez host, port et identifiants";
+                            : "✗ Connexion impossible (" + ms + " ms) :\n" + res.message();
                 }
                 @Override protected void done() {
                     try { status.setText(get()); } catch (Exception ex) { status.setText(ex.getMessage()); }

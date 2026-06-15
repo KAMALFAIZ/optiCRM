@@ -147,6 +147,37 @@ public class SageIntegrationService {
         return mapToDto(syncReq, null);
     }
 
+    /**
+     * Application SYNCHRONE pour le push de l'agent : écrit tout AVANT de répondre,
+     * et retourne les VRAIS compteurs + le premier message d'erreur. Garantit aussi
+     * l'ordre (l'agent envoie ACCOUNTS → PRODUCTS → INVENTORY en bloquant, donc les
+     * produits existent avant l'inventaire). Ne touche pas au flux UI async (applyRequest).
+     */
+    public SageSyncRequestDto applyRequestSync(UUID requestId) {
+        SageSyncRequest syncReq = markProcessing(requestId);
+        String entityType = syncReq.getEntityType();
+        List<UUID> itemIds = itemRepository.findIdsByRequestIdOrderByRowIndex(requestId);
+
+        int success = 0, errors = 0, skips = 0;
+        String firstError = null;
+        int batchSize = 100;
+        for (int i = 0; i < itemIds.size(); i += batchSize) {
+            List<UUID> batchIds = itemIds.subList(i, Math.min(i + batchSize, itemIds.size()));
+            int[] counts = applyBatch(batchIds, entityType);
+            success += counts[0];
+            errors  += counts[1];
+            skips   += counts[2];
+            if (firstError == null && counts[1] > 0) {
+                firstError = firstErrorOfBatch(batchIds);
+            }
+        }
+        SageSyncRequestDto dto = self.finalizeRequest(requestId, success, errors, skips);
+        dto.setFirstError(firstError);
+        log.info("[Agent push] apply sync requestId={} succes={} erreurs={} ignores={} firstError={}",
+                requestId, success, errors, skips, firstError);
+        return dto;
+    }
+
     @Async("sageTaskExecutor")
     public void applyAsync(UUID requestId, String entityType, UUID tenantId) {
         TenantContext.set(tenantId); // propager le contexte tenant dans le thread async
@@ -196,120 +227,83 @@ public class SageIntegrationService {
         return requestRepository.save(syncReq);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    /**
+     * Applique un lot d'items. CHAQUE item est traité dans SA PROPRE transaction
+     * (REQUIRES_NEW) : une ligne en erreur ne corrompt plus le contexte de
+     * persistance des autres. Les bonnes lignes sont committées, les mauvaises
+     * isolées avec leur vraie erreur. Corrige le symptôme « écrit mais CHAQUE
+     * ligne en ERROR » dû au flush différé du batch Hibernate.
+     */
     public int[] applyBatch(List<UUID> itemIds, String entityType) {
-        List<SageSyncItem> items = itemRepository.findAllById(itemIds);
-
-        // ── PRODUCTS : pré-chargement produits + catégories ─────────────────
-        Map<String, Product> productCache = Collections.emptyMap();
-        Map<String, ProductCategory> catCache = new HashMap<>();
-        if ("PRODUCTS".equalsIgnoreCase(entityType)) {
-            List<String> sageCodes = items.stream()
-                    .map(i -> getString(i.getRawData(), "ar_ref", "sage_code", "code", "ref"))
-                    .filter(s -> s != null && !s.isBlank()).distinct().collect(Collectors.toList());
-            if (!sageCodes.isEmpty()) {
-                productCache = productRepository.findBySageCodeIn(sageCodes).stream()
-                        .collect(Collectors.toMap(Product::getSageCode, p -> p));
-            }
-            List<String> famCodes = items.stream()
-                    .map(i -> getString(i.getRawData(), "fa_codefamille", "ar_famille", "famille", "category"))
-                    .filter(s -> s != null && !s.isBlank())
-                    .map(s -> s.length() > 20 ? s.substring(0, 20).toUpperCase() : s.toUpperCase())
-                    .distinct().collect(Collectors.toList());
-            if (!famCodes.isEmpty()) {
-                productCategoryRepository.findByCodeIn(famCodes).forEach(c -> catCache.put(c.getCode(), c));
-            }
-        }
-        final Map<String, Product> productCacheF = productCache;
-        final Map<String, ProductCategory> catCacheF = catCache;
-
-        // ── INVENTORY : pré-chargement produits, dépôts, niveaux de stock ──
-        Map<String, Product>    invProductCache    = Collections.emptyMap();
-        Map<String, Warehouse>  invWarehouseCache  = new HashMap<>();
-        Map<String, StockLevel> invStockLevelCache = new HashMap<>();
-        if ("INVENTORY".equalsIgnoreCase(entityType)) {
-            List<String> arRefs = items.stream()
-                    .map(i -> getString(i.getRawData(), "ar_ref", "sage_code"))
-                    .filter(s -> s != null && !s.isBlank()).distinct().collect(Collectors.toList());
-            List<String> deCodes = items.stream()
-                    .map(i -> getString(i.getRawData(), "de_no", "depot"))
-                    .filter(s -> s != null && !s.isBlank()).distinct().collect(Collectors.toList());
-            if (!arRefs.isEmpty()) {
-                invProductCache = loadInBatches(arRefs, 1000,
-                        batch -> productRepository.findBySageCodeIn(batch), Product::getSageCode);
-            }
-            if (!deCodes.isEmpty()) {
-                warehouseRepository.findByCodeIn(deCodes)
-                        .forEach(w -> invWarehouseCache.put(w.getCode(), w));
-            }
-            if (!invProductCache.isEmpty()) {
-                List<UUID> productIds = invProductCache.values().stream()
-                        .map(Product::getId).collect(Collectors.toList());
-                for (int i = 0; i < productIds.size(); i += 1000) {
-                    List<UUID> batch = productIds.subList(i, Math.min(i + 1000, productIds.size()));
-                    stockLevelRepository.findByProductIdIn(batch).forEach(sl ->
-                            invStockLevelCache.put(
-                                    sl.getProduct().getId() + "_" + sl.getWarehouse().getId(), sl));
-                }
-            }
-        }
-        final Map<String, Product>    invProductCacheF    = invProductCache;
-        final Map<String, Warehouse>  invWarehouseCacheF  = invWarehouseCache;
-        final Map<String, StockLevel> invStockLevelCacheF = invStockLevelCache;
-
         int success = 0, errors = 0, skips = 0;
-        for (SageSyncItem item : items) {
-            if ("SKIP".equals(item.getAction())) {
-                item.setStatus("SKIPPED");
-                skips++;
-                continue;
-            }
+        for (UUID itemId : itemIds) {
             try {
-                if ("PRODUCTS".equalsIgnoreCase(entityType)) {
-                    applyProductCached(item, item.getRawData(), productCacheF, catCacheF);
-                } else if ("INVENTORY".equalsIgnoreCase(entityType)) {
-                    applyInventoryCached(item, item.getRawData(),
-                            invProductCacheF, invWarehouseCacheF, invStockLevelCacheF);
-                } else {
-                    applyItem(item, entityType);
-                }
-                item.setStatus("DONE");
-                item.setProcessedAt(LocalDateTime.now());
-                success++;
+                String result = self.applyItemTx(itemId, entityType);
+                if ("SKIPPED".equals(result)) skips++;
+                else success++;
             } catch (Exception e) {
-                item.setStatus("ERROR");
-                item.setErrorMessage(e.getMessage());
-                item.setProcessedAt(LocalDateTime.now());
+                String msg = describeError(e);
+                self.markItemError(itemId, msg);
                 errors++;
-                log.warn("Erreur sync item {}: {}", item.getSageRef(), e.getMessage());
+                log.warn("Erreur sync item {} : {}", itemId, msg);
             }
         }
-        // Sauvegarder tous les produits modifiés en une seule opération batch
-        if ("PRODUCTS".equalsIgnoreCase(entityType) && !productCacheF.isEmpty()) {
-            productRepository.saveAll(productCacheF.values());
-        }
-        // Sauvegarder tous les niveaux de stock modifiés en une seule opération batch
-        if ("INVENTORY".equalsIgnoreCase(entityType) && !invStockLevelCacheF.isEmpty()) {
-            List<StockLevel> saved = stockLevelRepository.saveAll(invStockLevelCacheF.values());
-            // Renseigner crmId pour les nouvelles entrées (id généré après saveAll)
-            Map<String, UUID> keyToId = saved.stream()
-                    .collect(Collectors.toMap(
-                            sl -> sl.getProduct().getId() + "_" + sl.getWarehouse().getId(),
-                            StockLevel::getId, (a, b) -> a));
-            for (SageSyncItem item : items) {
-                if (item.getCrmId() == null && "DONE".equals(item.getStatus())) {
-                    String arRef = getString(item.getRawData(), "ar_ref", "sage_code");
-                    String deNo  = getString(item.getRawData(), "de_no", "depot");
-                    Product p = invProductCacheF.get(arRef);
-                    Warehouse w = invWarehouseCacheF.get(deNo);
-                    if (p != null && w != null) {
-                        item.setCrmId(keyToId.get(p.getId() + "_" + w.getId()));
-                    }
-                }
-            }
-        }
-        itemRepository.saveAll(items);
         return new int[]{success, errors, skips};
+    }
+
+    /**
+     * Applique UN item dans sa propre transaction. Si l'écriture échoue, seule
+     * cette transaction est annulée (les autres items du lot restent committés).
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public String applyItemTx(UUID itemId, String entityType) {
+        SageSyncItem item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException("SyncItem", itemId.toString()));
+        if ("SKIP".equals(item.getAction())) {
+            item.setStatus("SKIPPED");
+            item.setProcessedAt(LocalDateTime.now());
+            return "SKIPPED";
+        }
+        applyItem(item, entityType);   // upsert l'entité — peut lever (rollback de CETTE tx)
+        item.setStatus("DONE");
+        item.setProcessedAt(LocalDateTime.now());
+        return "DONE";
+    }
+
+    /** Marque un item en erreur dans une transaction séparée (la tx d'origine a rollback). */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markItemError(UUID itemId, String message) {
+        itemRepository.findById(itemId).ifPresent(it -> {
+            it.setStatus("ERROR");
+            it.setErrorMessage(message != null && message.length() > 1000
+                    ? message.substring(0, 1000) : message);
+            it.setProcessedAt(LocalDateTime.now());
+        });
+    }
+
+    /** Premier message d'erreur d'un lot (lecture seule) — remonté à l'agent. */
+    @Transactional(readOnly = true)
+    public String firstErrorOfBatch(List<UUID> itemIds) {
+        return itemRepository.findAllById(itemIds).stream()
+                .filter(it -> "ERROR".equals(it.getStatus()) && it.getErrorMessage() != null)
+                .map(SageSyncItem::getErrorMessage)
+                .findFirst().orElse(null);
+    }
+
+    /** Message complet avec causes racines (SQLServerException.getMessage() est souvent vide). */
+    private String describeError(Throwable e) {
+        StringBuilder sb = new StringBuilder();
+        Throwable t = e;
+        int depth = 0;
+        while (t != null && depth < 6) {
+            if (depth > 0) sb.append(" | ");
+            sb.append(t.getClass().getSimpleName());
+            String m = t.getMessage();
+            if (m != null && !m.isBlank()) sb.append(": ").append(m.trim());
+            t = t.getCause();
+            depth++;
+        }
+        return sb.toString();
     }
 
     @Transactional
@@ -677,7 +671,10 @@ public class SageIntegrationService {
         if ("UPDATE".equals(item.getAction()) && item.getCrmId() != null) {
             product = productRepository.findById(item.getCrmId()).orElseThrow();
         } else {
+            // Upsert par sage_code OU par code : évite une violation d'unicité sur
+            // products.code si un produit du même code existe déjà (seed / import partiel).
             product = productRepository.findBySageCode(arRef)
+                    .or(() -> productRepository.findByCode(arRef))
                     .orElseGet(() -> Product.builder()
                             .code(arRef)
                             .name(arRef)

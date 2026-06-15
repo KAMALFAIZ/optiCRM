@@ -45,6 +45,8 @@ public class AgentProperties {
         private boolean enabled = true;
         private String cron = "0 0 */2 * * *";  // toutes les 2 heures
         private List<String> entities = List.of("ACCOUNTS", "CONTACTS", "PRODUCTS", "INVENTORY");
+        /** Nombre de lignes par envoi HTTP (évite les erreurs 413 Payload Too Large). */
+        private int batchSize = 200;
     }
 
     @Getter @Setter

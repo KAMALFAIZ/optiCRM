@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.Http11SslContextSpec;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 
@@ -20,6 +21,14 @@ public class OptiCrmClient {
 
     private final AgentProperties props;
 
+    /**
+     * OptiCRM force TLS 1.2/1.3 (le serveur les supporte). On épingle les protocoles
+     * AU NIVEAU DU SSLEngine (handlerConfigurator) : indispensable car la JVM
+     * réautorise globalement TLS 1.0 pour le SQL Server Sage hérité — sans cet
+     * épinglage, le serveur négocierait à tort TLS 1.0 (warnings + downgrade).
+     */
+    private static final String[] TLS_PROTOCOLS = {"TLSv1.3", "TLSv1.2"};
+
     /** WebClient construit à chaque appel pour utiliser la config courante (modifiable via la GUI). */
     private WebClient client() {
         String baseUrl = props.getOpticrm().getServerUrl();
@@ -31,8 +40,13 @@ public class OptiCrmClient {
             throw new IllegalStateException("Clé d'agent non configurée");
         }
 
+        Http11SslContextSpec sslSpec = Http11SslContextSpec.forClient()
+                .configure(b -> b.protocols(TLS_PROTOCOLS));
         HttpClient http = HttpClient.create(ConnectionProvider.newConnection())
-                .responseTimeout(Duration.ofSeconds(30));
+                // apply synchrone côté serveur : laisser le temps à un lot de s'écrire
+                .responseTimeout(Duration.ofSeconds(120))
+                .secure(spec -> spec.sslContext(sslSpec)
+                        .handlerConfigurator(h -> h.engine().setEnabledProtocols(TLS_PROTOCOLS)));
 
         return WebClient.builder()
                 .baseUrl(baseUrl.trim())
