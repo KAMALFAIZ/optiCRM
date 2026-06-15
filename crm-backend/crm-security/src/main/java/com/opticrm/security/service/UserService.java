@@ -1,8 +1,10 @@
 package com.opticrm.security.service;
 
 import com.opticrm.common.dto.PageRequest;
+import com.opticrm.common.exception.BusinessException;
 import com.opticrm.common.exception.DuplicateEntryException;
 import com.opticrm.common.exception.ResourceNotFoundException;
+import com.opticrm.security.config.ContextUtils;
 import com.opticrm.security.dto.*;
 import com.opticrm.security.entity.Role;
 import com.opticrm.security.entity.Team;
@@ -123,8 +125,13 @@ public class UserService {
                 ? request.getPassword()
                 : generateRandomPassword();
 
+        // Resolve tenant
+        UUID tenantId = ContextUtils.getCurrentTenantId()
+                .orElseThrow(() -> new BusinessException("TENANT_MISSING", "Tenant non résolu"));
+
         // Build user
         User user = User.builder()
+                .tenantId(tenantId)
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(plainPassword))
                 .firstName(request.getFirstName())

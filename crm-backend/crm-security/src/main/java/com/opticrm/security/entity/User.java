@@ -31,7 +31,7 @@ public class User {
      * Tenant discriminator. User.email is unique per tenant (not globally).
      * The DB unique constraint is on (tenant_id, email) — see V72b migration.
      */
-    @Column(name = "tenant_id", insertable = false, updatable = false)
+    @Column(name = "tenant_id", nullable = false, updatable = false)
     private UUID tenantId;
 
     @Column(name = "email", nullable = false, length = 255)

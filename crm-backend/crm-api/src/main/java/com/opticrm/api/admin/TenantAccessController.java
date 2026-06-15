@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -64,9 +65,19 @@ public class TenantAccessController {
         try {
             TenantContext.set(tenant.getId());
 
-            // 3. Trouver l'utilisateur admin (créé par la migration V2)
-            User adminUser = userRepository.findByEmail("admin@opticrm.com")
-                    .orElseThrow(() -> new RuntimeException("Utilisateur admin@opticrm.com introuvable dans la base du tenant"));
+            // 3. Trouver l'utilisateur admin : email du tenant, puis repli historique,
+            //    puis premier administrateur actif trouvé dans la base du tenant.
+            String tenantAdminEmail = tenant.getAdminEmail();
+            User adminUser = (tenantAdminEmail != null && !tenantAdminEmail.isBlank()
+                        ? userRepository.findByEmail(tenantAdminEmail)
+                        : Optional.<User>empty())
+                    .or(() -> userRepository.findByEmail("admin@opticrm.com"))
+                    .or(() -> userRepository.findAllActive().stream()
+                            .filter(u -> u.getRole() != null
+                                    && ("ADMIN".equalsIgnoreCase(u.getRole().getName())
+                                        || "SUPER_ADMIN".equalsIgnoreCase(u.getRole().getName())))
+                            .findFirst())
+                    .orElseThrow(() -> new RuntimeException("Aucun utilisateur administrateur trouvé dans la base du tenant"));
 
             // 4. Invalider les anciens tokens
             passwordResetTokenRepository.invalidateAllForUser(adminUser.getId(), Instant.now());
@@ -84,7 +95,7 @@ public class TenantAccessController {
 
             return ResponseEntity.ok(ApiResponse.success(Map.of(
                     "url", setupUrl,
-                    "adminEmail", "admin@opticrm.com",
+                    "adminEmail", adminUser.getEmail(),
                     "expiresIn", "24h"
             )));
 
