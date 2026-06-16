@@ -4,6 +4,7 @@ import com.opticrm.agent.config.AgentProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import io.netty.resolver.DefaultAddressResolverGroup;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.Http11SslContextSpec;
@@ -43,6 +44,11 @@ public class OptiCrmClient {
         Http11SslContextSpec sslSpec = Http11SslContextSpec.forClient()
                 .configure(b -> b.protocols(TLS_PROTOCOLS));
         HttpClient http = HttpClient.create(ConnectionProvider.newConnection())
+                // Résolveur DNS du système (java.net.InetAddress) au lieu du résolveur
+                // natif asynchrone de Netty : sous Windows ce dernier échoue souvent à
+                // lire les serveurs DNS configurés ("Failed to resolve host after N
+                // queries"), alors que localhost passait sans requête DNS.
+                .resolver(DefaultAddressResolverGroup.INSTANCE)
                 // apply synchrone côté serveur : laisser le temps à un lot de s'écrire
                 .responseTimeout(Duration.ofSeconds(120))
                 .secure(spec -> spec.sslContext(sslSpec)
