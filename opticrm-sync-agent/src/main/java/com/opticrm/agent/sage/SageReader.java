@@ -24,20 +24,23 @@ public class SageReader {
 
     private final SageConnection connection;
 
+    // Pas de TOP : on synchronise l'intégralité des tables Sage. Les anciens plafonds
+    // (TOP 5000/10000/20000) tronquaient silencieusement les gros dossiers — ex. 10000
+    // articles importés au lieu de 18000. Le push est déjà découpé en lots côté agent.
     public List<Map<String, Object>> fetchAccounts() throws Exception {
-        return query("SELECT TOP 5000 * FROM dbo.F_COMPTET WHERE CT_Type = 1");
+        return query("SELECT * FROM dbo.F_COMPTET WHERE CT_Type = 1");
     }
 
     public List<Map<String, Object>> fetchContacts() throws Exception {
-        return query("SELECT TOP 5000 * FROM dbo.F_CONTACTT");
+        return query("SELECT * FROM dbo.F_CONTACTT");
     }
 
     public List<Map<String, Object>> fetchProducts() throws Exception {
-        return query("SELECT TOP 10000 * FROM dbo.F_ARTICLE WHERE AR_Sommeil = 0");
+        return query("SELECT * FROM dbo.F_ARTICLE WHERE AR_Sommeil = 0");
     }
 
     public List<Map<String, Object>> fetchInventory() throws Exception {
-        return query("SELECT TOP 20000 * FROM dbo.F_ARTSTOCK");
+        return query("SELECT * FROM dbo.F_ARTSTOCK");
     }
 
     private List<Map<String, Object>> query(String sql) throws Exception {
