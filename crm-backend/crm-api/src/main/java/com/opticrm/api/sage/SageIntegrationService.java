@@ -794,19 +794,22 @@ public class SageIntegrationService {
         String deNo  = getString(data, "de_no", "depot");
         if (arRef == null || deNo == null) return;
 
+        UUID tenantId = TenantContext.get();
+
         Product product = productRepository.findBySageCode(arRef).orElse(null);
         if (product == null) {
             log.warn("Inventaire Sage : produit introuvable pour AR_Ref={}", arRef);
             return;
         }
 
-        // Dépôt : find or create par code
+        // Dépôt : find or create par code (tenant_id NOT NULL — injection obligatoire)
         Warehouse warehouse = warehouseRepository.findByCode(deNo)
                 .orElseGet(() -> {
                     Warehouse wh = Warehouse.builder()
                             .code(deNo.length() > 20 ? deNo.substring(0, 20) : deNo)
                             .name("Dépôt " + deNo)
                             .build();
+                    wh.setTenantId(tenantId);
                     return warehouseRepository.save(wh);
                 });
 
@@ -816,6 +819,7 @@ public class SageIntegrationService {
                         .product(product)
                         .warehouse(warehouse)
                         .build());
+        if (stockLevel.getTenantId() == null) stockLevel.setTenantId(tenantId);
 
         java.math.BigDecimal qteSto = getBigDecimal(data, "as_qtesto", "quantity_on_hand", "qte_stock");
         java.math.BigDecimal qteRes = getBigDecimal(data, "as_qteres", "quantity_reserved", "qte_reserve");
