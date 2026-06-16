@@ -667,6 +667,8 @@ public class SageIntegrationService {
         String arRef = getString(data, "ar_ref", "sage_code", "code", "ref");
         if (arRef == null) return;
 
+        UUID tenantId = TenantContext.get();
+
         Product product;
         if ("UPDATE".equals(item.getAction()) && item.getCrmId() != null) {
             product = productRepository.findById(item.getCrmId()).orElseThrow();
@@ -681,6 +683,10 @@ public class SageIntegrationService {
                             .unitPrice(java.math.BigDecimal.ZERO)
                             .build());
         }
+
+        // tenant_id est NOT NULL : sans cette injection, chaque création de produit
+        // échoue (toutes les lignes en erreur). Le tenant provient de la clé d'agent.
+        if (product.getTenantId() == null) product.setTenantId(tenantId);
 
         product.setSageCode(arRef);
 
@@ -703,6 +709,7 @@ public class SageIntegrationService {
                         ProductCategory newCat = new ProductCategory();
                         newCat.setCode(famCode.length() > 20 ? famCode.substring(0, 20).toUpperCase() : famCode.toUpperCase());
                         newCat.setName(famCode);
+                        newCat.setTenantId(tenantId); // tenant_id NOT NULL : sinon la création de catégorie échoue
                         return productCategoryRepository.save(newCat);
                     });
             product.setCategory(cat);
