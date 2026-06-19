@@ -16,8 +16,8 @@ public class DeploymentModeProperties {
     /** Deployment mode. Defaults to ONPREMISE for safety. */
     private Mode mode = Mode.ONPREMISE;
 
-    /** Root domain for SaaS subdomain extraction (e.g. "opticrm.ma") */
-    private String rootDomain = "opticrm.ma";
+    /** Root domain for SaaS subdomain extraction (e.g. "kasoft.ma") */
+    private String rootDomain = "kasoft.ma";
 
     /**
      * On-premise default tenant ID (UUID).

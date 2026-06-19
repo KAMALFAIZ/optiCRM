@@ -23,9 +23,8 @@ import java.util.UUID;
  *
  * Resolution strategy (first match wins):
  *   1. Header X-Tenant-ID (highest priority, used by frontend SPA)
- *   2. Query parameter ?client=slug (URL-based, for shareable links / bookmarks)
- *   3. Subdomain (SaaS mode only): Host: acme.opticrm.ma → slug=acme
- *   4. Default tenant (on-premise mode)
+ *   2. Subdomain (SaaS mode only): Host: acme.kasoft.ma → slug=acme
+ *   3. Default tenant (on-premise mode)
  *
  * Always clears TenantContext in a finally block to prevent ThreadLocal leaks.
  */
@@ -69,20 +68,13 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
             }
         }
 
-        // 2. Query parameter ?client=slug (shareable URLs, bookmarks)
-        String clientSlug = request.getParameter("client");
-        if (clientSlug != null && !clientSlug.isBlank()) {
-            UUID fromSlug = resolveFromSlug(clientSlug);
-            if (fromSlug != null) return fromSlug;
-        }
-
-        // 3. SaaS mode: extract subdomain from Host header
+        // 2. SaaS mode: extract subdomain from Host header (routing par {client}.kasoft.ma)
         if (deploymentProps.isSaas()) {
             UUID fromSubdomain = resolveFromSubdomain(request);
             if (fromSubdomain != null) return fromSubdomain;
         }
 
-        // 4. On-premise: always use the default (single) tenant
+        // 3. On-premise: always use the default (single) tenant
         if (deploymentProps.isOnPremise()) {
             try {
                 return UUID.fromString(deploymentProps.getDefaultTenantId());
@@ -92,13 +84,6 @@ public class TenantResolutionFilter extends OncePerRequestFilter {
         }
 
         return null;
-    }
-
-    private UUID resolveFromSlug(String slug) {
-        return tenantRepository.findBySlug(slug.toLowerCase().trim())
-                .filter(t -> t.getStatus() != com.opticrm.tenant.entity.Tenant.TenantStatus.CANCELLED)
-                .map(com.opticrm.tenant.entity.Tenant::getId)
-                .orElse(null);
     }
 
     private UUID resolveFromSubdomain(HttpServletRequest request) {

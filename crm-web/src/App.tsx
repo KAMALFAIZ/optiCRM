@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useRoutes, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useRoutes, useNavigate, useLocation } from 'react-router-dom';
 import { Result, Spin, Button } from 'antd';
 
 import { useAppDispatch, useAppSelector } from '@/store';
@@ -14,31 +14,29 @@ function App() {
   const isLoading = useAppSelector(selectAuthLoading);
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
   const [setupChecked, setSetupChecked] = useState(false);
   const [tenantResolved, setTenantResolved] = useState(false);
   const [tenantError, setTenantError] = useState<string | null>(null);
   const [authTimedOut, setAuthTimedOut] = useState(false);
 
-  // Step 1: Resolve tenant from ?client= param, localStorage, or subdomain
+  // Step 1: Resolve tenant from the subdomain ({client}.kasoft.ma), then localStorage
   useEffect(() => {
-    const clientSlug = searchParams.get('client');
     const savedSlug = localStorage.getItem(TENANT_SLUG_KEY);
 
-    // Detect slug from subdomain: odyssee.opticrm.ma → "odyssee"
+    // Detect slug from subdomain: odyssee.kasoft.ma → "odyssee"
     let subdomainSlug: string | null = null;
-    const hostname = window.location.hostname; // e.g. "odyssee.opticrm.ma"
+    const hostname = window.location.hostname; // e.g. "odyssee.kasoft.ma"
     const parts = hostname.split('.');
     if (parts.length >= 3) {
       const candidate = parts[0];
       // Ignore generic subdomains
-      if (!['www', 'app', 'localhost', 'opticrm'].includes(candidate)) {
+      if (!['www', 'app', 'localhost', 'kasoft'].includes(candidate)) {
         subdomainSlug = candidate;
       }
     }
 
-    // Priority: ?client= > localStorage > subdomain > "default" (base maître)
-    const slug = clientSlug || savedSlug || subdomainSlug || 'default';
+    // Priority: subdomain ({client}.kasoft.ma) > localStorage > "default" (base maître)
+    const slug = subdomainSlug || savedSlug || 'default';
 
     dispatch(resolveSlug(slug))
       .unwrap()

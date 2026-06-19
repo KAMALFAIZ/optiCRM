@@ -71,7 +71,7 @@ app:
   # Deployment mode: saas | onpremise (default)
   deployment:
     mode: ${DEPLOYMENT_MODE:onpremise}
-    root-domain: ${ROOT_DOMAIN:opticrm.ma}
+    root-domain: ${ROOT_DOMAIN:kasoft.ma}
     default-tenant-id: ${DEFAULT_TENANT_ID:00000000-0000-0000-0000-000000000001}
     cors-allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,https://localhost:3443,https://opticrm.kasoft.ma}
 

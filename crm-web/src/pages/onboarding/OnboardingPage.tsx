@@ -34,7 +34,7 @@ export default function OnboardingPage() {
       if (res.data.success) {
         message.success('Compte créé avec succès !');
         // Redirect to the new tenant's login page
-        window.location.href = `https://${res.data.data!.slug}.opticrm.ma/login`;
+        window.location.href = `https://${res.data.data!.slug}.kasoft.ma/login`;
       }
     } catch (err: any) {
       message.error(err.response?.data?.error || 'Erreur lors de la création du compte');
@@ -74,9 +74,9 @@ export default function OnboardingPage() {
                   { required: true },
                   { pattern: /^[a-z0-9-]{3,50}$/, message: 'Lettres minuscules, chiffres et tirets uniquement (3-50 car.)' },
                 ]}
-                extra="Votre CRM sera accessible sur : monentreprise.opticrm.ma"
+                extra="Votre CRM sera accessible sur : monentreprise.kasoft.ma"
               >
-                <Input addonAfter=".opticrm.ma" placeholder="monentreprise" />
+                <Input addonAfter=".kasoft.ma" placeholder="monentreprise" />
               </Form.Item>
             </>
           )}
