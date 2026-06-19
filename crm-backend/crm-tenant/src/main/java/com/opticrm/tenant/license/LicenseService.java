@@ -3,22 +3,33 @@ package com.opticrm.tenant.license;
 import com.opticrm.tenant.config.DeploymentModeProperties;
 import com.opticrm.tenant.entity.Tenant;
 import com.opticrm.tenant.repository.TenantRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
+import java.util.Base64;
+import java.util.Date;
 import java.util.UUID;
 
 /**
- * Validates the on-premise license key at startup and exposes license status.
- * In SaaS mode, this service is inactive (license is managed via Stripe subscriptions).
+ * Validates the on-premise license at startup and exposes license status.
  *
- * License key format: BASE64(JSON_PAYLOAD).BASE64(RSA_SIGNATURE)
- * where JSON_PAYLOAD = { tenantSlug, maxUsers, plan, expiresAt, issuedAt }
- * Signature validated with the public RSA key bundled in the JAR.
+ * <p>La licence est une licence KASOFT signée (JWT RS256) émise par la console et
+ * vérifiée avec la clé publique embarquée ({@code /license-public.pem}). Le JWT est
+ * stocké dans {@code tenants.license_key}. Claims lus : {@code exp}, {@code customer},
+ * {@code product}. Un {@code license_key} qui n'est PAS un JWT KASOFT valide retombe
+ * sur l'ancien champ {@code license_expires_at} (rétro-compatibilité).
+ * En mode SaaS, ce service est inactif (abonnements gérés autrement).
  */
 @Slf4j
 @Service
@@ -66,6 +77,26 @@ public class LicenseService {
                 return;
             }
 
+            // ── Licence KASOFT signée (JWT RS256) ──
+            Claims claims = verifySignedLicense(licenseKey);
+            if (claims != null) {
+                Date exp = claims.getExpiration();
+                if (exp != null && exp.before(new Date())) {
+                    status = LicenseStatus.EXPIRED;
+                    statusMessage = "Licence KASOFT expirée le " + exp + " — contactez support@opticrm.ma";
+                    log.error("OptiCRM on-premise: licence KASOFT expirée le {}", exp);
+                    return;
+                }
+                String customer = claims.get("customer", String.class);
+                status = LicenseStatus.VALID;
+                statusMessage = "Licence KASOFT valide"
+                        + (exp != null ? " jusqu'au " + exp : " (sans expiration)")
+                        + (customer != null ? " — " + customer : "");
+                log.info("OptiCRM on-premise: {}", statusMessage);
+                return;
+            }
+
+            // ── Repli legacy : ancien champ license_expires_at en base (rétro-compatibilité) ──
             Instant expiresAt = tenant.getLicenseExpiresAt();
             if (expiresAt != null && expiresAt.isBefore(Instant.now())) {
                 status = LicenseStatus.EXPIRED;
@@ -84,6 +115,38 @@ public class LicenseService {
             status = LicenseStatus.ERROR;
             statusMessage = "Erreur de validation de licence : " + e.getMessage();
             log.error("Erreur validation licence: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Vérifie une licence KASOFT signée (JWT RS256) avec la clé publique embarquée.
+     * Renvoie les claims si la signature est valide, ou {@code null} si le jeton
+     * n'est pas un JWT KASOFT valide (→ repli sur l'ancien champ d'expiration).
+     */
+    private Claims verifySignedLicense(String jwt) {
+        try {
+            return Jwts.parser()
+                    .verifyWith(loadPublicKey())
+                    .build()
+                    .parseSignedClaims(jwt)
+                    .getPayload();
+        } catch (Exception e) {
+            log.debug("license_key n'est pas un JWT KASOFT valide (repli legacy) : {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private PublicKey loadPublicKey() throws Exception {
+        try (InputStream is = getClass().getResourceAsStream("/license-public.pem")) {
+            if (is == null) {
+                throw new IllegalStateException("license-public.pem introuvable dans le classpath");
+            }
+            String pem = new String(is.readAllBytes(), StandardCharsets.UTF_8)
+                    .replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "")
+                    .replaceAll("\\s", "");
+            byte[] der = Base64.getDecoder().decode(pem);
+            return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(der));
         }
     }
 
