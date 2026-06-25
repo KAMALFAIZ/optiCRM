@@ -1,0 +1,27 @@
+name: Deploy OptiCRM
+
+# Auto-deploiement : tout push sur main reconstruit frontend + backend
+# et redeploie sur opticrm.kasoft.ma via le self-hosted runner du serveur.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # permet aussi un declenchement manuel depuis GitHub
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-opticrm-prod
+  cancel-in-progress: false   # ne jamais interrompre un deploiement en cours
+
+jobs:
+  deploy:
+    name: Build & deploy (serveur Windows)
+    runs-on: [self-hosted, opticrm-prod]
+    steps:
+      - name: Checkout (commit pousse)
+        uses: actions/checkout@v4
+
+      - name: Deploiement (sync -> build front+back -> restart -> health)
+        shell: powershell
+        run: .\deploy\win\deploy.ps1 -Root "B:\OptiCRM" -Sha "${{ github.sha }}"
