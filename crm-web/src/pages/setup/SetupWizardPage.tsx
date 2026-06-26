@@ -131,7 +131,7 @@ export default function SetupWizardPage() {
             <>
               <Alert
                 message="Clé de licence optionnelle"
-                description="Sans clé de licence, OptiCRM fonctionne en mode communautaire avec les fonctionnalités de base. Contactez support@opticrm.ma pour obtenir une licence."
+                description="Sans clé de licence, OptiCRM fonctionne en mode communautaire avec les fonctionnalités de base. Contactez support@kasoft.ma pour obtenir une licence."
                 type="info"
                 showIcon
                 style={{ marginBottom: 16 }}

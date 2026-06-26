@@ -10,7 +10,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Chaîne de sécurité dédiée aux endpoints de la console KASOFT (monitoring du parc).
- * Précède la chaîne principale grâce à @Order(2) et laisse passer /api/v1/console/**
+ * Précède la chaîne principale grâce à @Order(2) et laisse passer /api/console/**
  * sans JWT ; l'authentification se fait par le header X-Console-Token vérifié dans
  * le contrôleur (token de service configuré côté instance).
  */
@@ -21,7 +21,7 @@ public class ConsoleSecurityConfig {
     @Order(2)
     public SecurityFilterChain consoleSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/api/v1/console/**")
+                .securityMatcher("/api/console/**")
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(c -> {})
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

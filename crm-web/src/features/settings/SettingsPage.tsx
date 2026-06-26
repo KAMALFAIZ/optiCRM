@@ -258,7 +258,7 @@ function SmtpTab() {
                 ]}
               >
                 <Input prefix={<MailOutlined style={{ color: '#878a99' }} />}
-                  placeholder="noreply@opticrm.ma" />
+                  placeholder="noreply@kasoft.ma" />
               </Form.Item>
               <Form.Item name="fromName" label="Nom expéditeur">
                 <Input placeholder="OptiCRM" />

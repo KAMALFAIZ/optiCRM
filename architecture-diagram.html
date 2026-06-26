@@ -96,7 +96,7 @@ graph TB
         P1["1️⃣ INSERT INTO<br/><b>tenants</b><br/>slug · db_name"] --> P2["2️⃣ CREATE DATABASE<br/><code>opticrm_{slug}</code>"] --> P3["3️⃣ Flyway migrate<br/><code>db/tenant-migration/</code><br/>V1__complete_schema.sql"] --> P4["4️⃣ DataSourceManager<br/><b>.register(id, db)</b><br/>Pool HikariCP créé"]
     end
 
-    WEB -->|"?client=odyssee<br/>→ resolveSlug()<br/>→ X-Tenant-ID"| TRF
+    WEB -->|"odyssee.kasoft.ma<br/>→ resolveSlug()<br/>→ X-Tenant-ID"| TRF
     MOB -->|"X-Tenant-ID<br/>header"| TRF
 
     TDM -->|"tenant<br/>...0002"| ENFANT1

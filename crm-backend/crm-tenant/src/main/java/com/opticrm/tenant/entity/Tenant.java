@@ -26,7 +26,7 @@ public class Tenant {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    /** Subdomain identifier: "acme" → acme.opticrm.ma */
+    /** Subdomain identifier: "acme" → acme.kasoft.ma */
     @Column(name = "slug", nullable = false, length = 100)
     private String slug;
 

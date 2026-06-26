@@ -55,7 +55,7 @@ public class SettingService {
                 .port(parsePort(get("smtp.port", "587")))
                 .username(get("smtp.username", ""))
                 .password(passwordSet ? MASKED : "")
-                .from(get("smtp.from", "noreply@opticrm.ma"))
+                .from(get("smtp.from", "noreply@kasoft.ma"))
                 .fromName(get("smtp.from_name", "OptiCRM"))
                 .starttls(Boolean.parseBoolean(get("smtp.starttls", "true")))
                 .auth(Boolean.parseBoolean(get("smtp.auth", "true")))
@@ -305,7 +305,7 @@ public class SettingService {
 
     private String formatFrom() {
         String name = get("smtp.from_name", "OptiCRM");
-        String addr = get("smtp.from", "noreply@opticrm.ma");
+        String addr = get("smtp.from", "noreply@kasoft.ma");
         return name.isBlank() ? addr : name + " <" + addr + ">";
     }
 

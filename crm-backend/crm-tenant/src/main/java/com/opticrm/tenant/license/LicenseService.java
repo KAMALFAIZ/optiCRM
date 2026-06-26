@@ -83,7 +83,7 @@ public class LicenseService {
                 Date exp = claims.getExpiration();
                 if (exp != null && exp.before(new Date())) {
                     status = LicenseStatus.EXPIRED;
-                    statusMessage = "Licence KASOFT expirée le " + exp + " — contactez support@opticrm.ma";
+                    statusMessage = "Licence KASOFT expirée le " + exp + " — contactez support@kasoft.ma";
                     log.error("OptiCRM on-premise: licence KASOFT expirée le {}", exp);
                     return;
                 }
@@ -100,7 +100,7 @@ public class LicenseService {
             Instant expiresAt = tenant.getLicenseExpiresAt();
             if (expiresAt != null && expiresAt.isBefore(Instant.now())) {
                 status = LicenseStatus.EXPIRED;
-                statusMessage = "Licence expirée le " + expiresAt + " — contactez support@opticrm.ma";
+                statusMessage = "Licence expirée le " + expiresAt + " — contactez support@kasoft.ma";
                 log.error("OptiCRM on-premise: licence expirée le {}", expiresAt);
                 return;
             }

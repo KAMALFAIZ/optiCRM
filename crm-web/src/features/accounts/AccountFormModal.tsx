@@ -138,7 +138,7 @@ const AccountFormModal: React.FC<AccountFormModalProps> = ({ open, accountId, on
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=fr`,
-        { headers: { 'User-Agent': 'OptiCRM/1.0 (contact@opticrm.ma)' } }
+        { headers: { 'User-Agent': 'OptiCRM/1.0 (contact@kasoft.ma)' } }
       );
       if (!res.ok) throw new Error('Erreur réseau');
       const data = await res.json();

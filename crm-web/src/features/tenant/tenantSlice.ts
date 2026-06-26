@@ -14,7 +14,7 @@ const initialState: TenantState = {
 };
 
 /**
- * Resolves a tenant slug (from ?client= or localStorage) into public tenant info.
+ * Resolves a tenant slug (extracted from the subdomain, e.g. acme.kasoft.ma) into public tenant info.
  * This runs BEFORE auth — uses a raw axios call (no X-Tenant-ID header needed).
  */
 export const resolveSlug = createAsyncThunk(

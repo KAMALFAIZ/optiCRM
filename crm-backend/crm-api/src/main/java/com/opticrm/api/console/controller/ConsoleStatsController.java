@@ -19,15 +19,15 @@ import java.util.UUID;
 
 /**
  * Endpoint de monitoring lu par la console KASOFT (parc multi-produits).
- * Contrat aligné sur ERP-Vision (/api/admin/instance-stats) :
- *   - GET /api/v1/console/instance-stats avec header X-Console-Token
+ * Contrat commun du parc KASOFT (chemin unifié /api/console/instance-stats) :
+ *   - GET /api/console/instance-stats avec header X-Console-Token
  *   - 404 si le token n'est pas configuré (endpoint désactivé, défaut)
  *   - 401 si le token est absent ou erroné
  *   - 200 + snapshot JSON sinon
  * Token de service : propriété console.token (env CONSOLE_TOKEN).
  */
 @RestController
-@RequestMapping("/api/v1/console")
+@RequestMapping("/api/console")
 @RequiredArgsConstructor
 public class ConsoleStatsController {
 

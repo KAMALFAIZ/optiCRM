@@ -280,7 +280,7 @@ export default function TenantsAdminPage() {
       render: (_, r) => (
         <div>
           <div style={{ fontWeight: 600 }}>{r.name}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>{r.slug}.opticrm.ma</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>{r.slug}.kasoft.ma</Text>
           {r.city && <div><Text type="secondary" style={{ fontSize: 11 }}><EnvironmentOutlined /> {r.city}</Text></div>}
         </div>
       ),
@@ -529,7 +529,7 @@ export default function TenantsAdminPage() {
                         { required: true, message: 'Requis' },
                         { pattern: /^[a-z0-9-]{3,50}$/, message: 'Minuscules, chiffres et tirets (3-50 car.)' },
                       ]}
-                      extra="Identifiant unique : slug.opticrm.ma"
+                      extra="Identifiant unique : slug.kasoft.ma"
                     >
                       <Input prefix={<GlobalOutlined style={ICON_STYLE} />} placeholder="ex: acme" />
                     </Form.Item>
@@ -698,14 +698,14 @@ export default function TenantsAdminPage() {
                 ]}
                 extra={
                   <Text type="secondary" style={{ fontSize: 11 }}>
-                    URL : <strong>slug.opticrm.ma</strong> — base : <strong>opticrm_slug</strong>
+                    URL : <strong>slug.kasoft.ma</strong> — base : <strong>opticrm_slug</strong>
                   </Text>
                 }
               >
                 <Input
                   prefix={<GlobalOutlined style={ICON_STYLE} />}
                   placeholder="acme"
-                  addonAfter=".opticrm.ma"
+                  addonAfter=".kasoft.ma"
                 />
               </Form.Item>
             </Col>
