@@ -29,14 +29,17 @@ function App() {
     const parts = hostname.split('.');
     if (parts.length >= 3) {
       const candidate = parts[0];
-      // Ignore generic subdomains
-      if (!['www', 'app', 'localhost', 'kasoft'].includes(candidate)) {
+      // Ignore generic subdomains + 'opticrm' (host maître, PAS un slug client)
+      if (!['www', 'app', 'localhost', 'kasoft', 'opticrm'].includes(candidate)) {
         subdomainSlug = candidate;
       }
     }
 
-    // Priority: subdomain ({client}.kasoft.ma) > localStorage > "default" (base maître)
-    const slug = subdomainSlug || savedSlug || 'default';
+    // Rétrocompat : ?client=odyssee sur le host maître (opticrm.kasoft.ma?client=odyssee)
+    const queryClient = new URLSearchParams(window.location.search).get('client');
+
+    // Priority: sous-domaine réel > ?client= > localStorage > "default" (base maître)
+    const slug = subdomainSlug || queryClient || savedSlug || 'default';
 
     dispatch(resolveSlug(slug))
       .unwrap()
