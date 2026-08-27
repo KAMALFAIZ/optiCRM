@@ -46,7 +46,14 @@ public class TenantDataSourceManager {
 
     @PostConstruct
     public void loadProvisionedTenants() {
-        String sql = "SELECT id, db_name FROM tenants WHERE db_provisioned = 1 AND db_name IS NOT NULL";
+        // Un tenant suspendu ou resilie ne doit pas ouvrir de pool : updateStatus() le
+        // deregistre a chaud, la requete de demarrage applique la meme regle a froid.
+        String sql = """
+                SELECT id, db_name FROM tenants
+                WHERE db_provisioned = 1
+                  AND db_name IS NOT NULL
+                  AND status NOT IN ('SUSPENDED', 'CANCELLED')
+                """;
         try (Connection conn = systemDataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
