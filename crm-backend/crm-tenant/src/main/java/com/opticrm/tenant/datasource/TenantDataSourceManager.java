@@ -51,25 +51,13 @@ public class TenantDataSourceManager {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             int count = 0;
-            int failed = 0;
             while (rs.next()) {
                 UUID id = UUID.fromString(rs.getString("id"));
                 String dbName = rs.getString("db_name");
-                // Hikari ouvre une connexion des la construction (minimumIdle >= 1) et leve une
-                // PoolInitializationException — une RuntimeException — si la base est absente ou
-                // inaccessible. Sans ce catch, un seul tenant casse empeche TOUTE l'application
-                // de demarrer. On isole donc chaque tenant : les autres restent servis.
-                try {
-                    pool.put(id, buildDataSource(dbName, dbName));
-                    count++;
-                } catch (RuntimeException e) {
-                    failed++;
-                    log.error("Tenant {} ignore au demarrage : base '{}' inaccessible ({}). "
-                                    + "Les requetes de ce tenant echoueront tant que la base n'est pas retablie.",
-                            id, dbName, e.getMessage());
-                }
+                pool.put(id, buildDataSource(dbName, dbName));
+                count++;
             }
-            log.info("TenantDataSourceManager: {} tenant datasource(s) loaded at startup, {} en echec", count, failed);
+            log.info("TenantDataSourceManager: {} tenant datasource(s) loaded at startup", count);
         } catch (SQLException e) {
             log.warn("Could not pre-load tenant datasources: {}", e.getMessage());
         }
