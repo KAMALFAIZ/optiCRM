@@ -6,11 +6,14 @@ import com.opticrm.common.dto.PageRequest;
 import com.opticrm.core.chantier.dto.*;
 import com.opticrm.core.chantier.service.ChantierService;
 import com.opticrm.core.chantier.service.ChantierEchantillonService;
+import com.opticrm.core.chantier.service.ChantierExportService;
 import com.opticrm.core.chantier.service.ChantierPhotoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,7 @@ public class ChantierController {
     private final ChantierService chantierService;
     private final ChantierEchantillonService echantillonService;
     private final ChantierPhotoService photoService;
+    private final ChantierExportService exportService;
 
     @GetMapping
     @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
@@ -47,6 +51,49 @@ public class ChantierController {
         return ResponseEntity.ok(ApiResponse.success(
                 page.getContent(),
                 PageMeta.from(page)));
+    }
+
+    // ---- Export (memes filtres que la liste) ----
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
+    public ResponseEntity<byte[]> exportExcel(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String stadeChantier,
+            @RequestParam(required = false) String statutChantier,
+            @RequestParam(required = false) String typeProjet,
+            @RequestParam(required = false) String assignedToId,
+            @RequestParam(required = false) String accountId,
+            @RequestParam(required = false) Boolean temoin) throws IOException {
+
+        byte[] data = exportService.exportToExcel(search, stadeChantier, statutChantier,
+                typeProjet, assignedToId, accountId, temoin);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        headers.setContentDispositionFormData("attachment", "chantiers.xlsx");
+        return new ResponseEntity<>(data, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/export/pdf")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMIN','MANAGER','COMMERCIAL','READ_ONLY', 'SUPERVISEUR')")
+    public ResponseEntity<byte[]> exportPdf(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String stadeChantier,
+            @RequestParam(required = false) String statutChantier,
+            @RequestParam(required = false) String typeProjet,
+            @RequestParam(required = false) String assignedToId,
+            @RequestParam(required = false) String accountId,
+            @RequestParam(required = false) Boolean temoin) throws IOException {
+
+        byte[] data = exportService.exportToPdf(search, stadeChantier, statutChantier,
+                typeProjet, assignedToId, accountId, temoin);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "chantiers.pdf");
+        return new ResponseEntity<>(data, headers, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
