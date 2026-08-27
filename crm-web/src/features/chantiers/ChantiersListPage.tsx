@@ -8,9 +8,12 @@ import {
   PlusOutlined, SearchOutlined, DeleteOutlined,
   EyeOutlined, EditOutlined, MoreOutlined, EnvironmentOutlined,
   StarOutlined, ReloadOutlined, GlobalOutlined, CameraOutlined,
+  DownloadOutlined, FileExcelOutlined, FilePdfOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { chantiersApi, ChantierListItem, CreateChantierRequest } from '@/api/chantiers';
+import {
+  chantiersApi, ChantierListItem, CreateChantierRequest, ChantiersExportFilters,
+} from '@/api/chantiers';
 import ChantierFormModal from './ChantierFormModal';
 import ChantierGeoInsightsModal from './ChantierGeoInsightsModal';
 import ChantierFromPhotoModal from './ChantierFromPhotoModal';
@@ -63,6 +66,7 @@ export default function ChantiersListPage() {
   const [geoInsightsOpen, setGeoInsightsOpen] = useState(false);
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [prefilledData, setPrefilledData] = useState<Partial<CreateChantierRequest> | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -98,6 +102,27 @@ export default function ChantiersListPage() {
         load();
       },
     });
+  };
+
+  // L'export reprend les filtres affichés, pas seulement la page courante.
+  const currentFilters = (): ChantiersExportFilters => ({
+    search: search || undefined,
+    stadeChantier: stadeFilter,
+    statutChantier: activeTab === 'all' ? undefined : activeTab,
+    temoin: temoinFilter,
+  });
+
+  const handleExport = async (format: 'excel' | 'pdf') => {
+    setExporting(true);
+    try {
+      if (format === 'excel') await chantiersApi.exportExcel(currentFilters());
+      else await chantiersApi.exportPdf(currentFilters());
+      message.success('Export téléchargé');
+    } catch {
+      message.error("Erreur lors de l'export");
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handlePhotoCreate = (prefilled: Partial<CreateChantierRequest>) => {
@@ -263,6 +288,27 @@ export default function ChantiersListPage() {
           </Typography.Text>
         </Space>
         <Space>
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: [
+                {
+                  key: 'excel',
+                  icon: <FileExcelOutlined style={{ color: '#217346' }} />,
+                  label: 'Exporter en Excel (.xlsx)',
+                  onClick: () => handleExport('excel'),
+                },
+                {
+                  key: 'pdf',
+                  icon: <FilePdfOutlined style={{ color: '#d32f2f' }} />,
+                  label: 'Exporter en PDF',
+                  onClick: () => handleExport('pdf'),
+                },
+              ],
+            }}
+          >
+            <Button icon={<DownloadOutlined />} loading={exporting}>Exporter</Button>
+          </Dropdown>
           <Button icon={<GlobalOutlined />} onClick={() => setGeoInsightsOpen(true)}>Insights Géo</Button>
           <Button
             icon={<CameraOutlined />}
