@@ -134,23 +134,6 @@ export interface ChantiersQueryParams {
   temoin?: boolean;
 }
 
-/** Filtres de l'export : on reprend ceux de la liste, sans la pagination. */
-export type ChantiersExportFilters = Omit<ChantiersQueryParams, 'page' | 'size'>;
-
-/** Déclenche le téléchargement d'un blob reçu de l'API. */
-const downloadBlob = (blob: Blob, filename: string) => {
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
-};
-
-const today = () => new Date().toISOString().split('T')[0];
-
 export const chantiersApi = {
   getAll: async (params: ChantiersQueryParams = {}): Promise<PagedResponse<ChantierListItem>> => {
     const response = await apiClient.get<ApiResponse<ChantierListItem[]>>('/chantiers', {
@@ -231,23 +214,6 @@ export const chantiersApi = {
 
   deletePhoto: async (chantierId: string, photoId: string): Promise<void> => {
     await apiClient.delete(`/chantiers/${chantierId}/photos/${photoId}`);
-  },
-
-  // Export de la liste (mêmes filtres que l'affichage), coordonnées GPS incluses
-  exportExcel: async (filters: ChantiersExportFilters = {}): Promise<void> => {
-    const response = await apiClient.get('/chantiers/export/excel', {
-      params: filters,
-      responseType: 'blob',
-    });
-    downloadBlob(response.data, `chantiers_${today()}.xlsx`);
-  },
-
-  exportPdf: async (filters: ChantiersExportFilters = {}): Promise<void> => {
-    const response = await apiClient.get('/chantiers/export/pdf', {
-      params: filters,
-      responseType: 'blob',
-    });
-    downloadBlob(response.data, `chantiers_${today()}.pdf`);
   },
 
   // Pour la carte interactive

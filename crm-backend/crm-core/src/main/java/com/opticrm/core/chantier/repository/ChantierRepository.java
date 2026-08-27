@@ -42,20 +42,6 @@ public interface ChantierRepository extends JpaRepository<Chantier, UUID> {
     @Query("SELECT c FROM Chantier c WHERE c.latitude IS NOT NULL AND c.longitude IS NOT NULL")
     List<Chantier> findAllWithGps();
 
-    /**
-     * Charge tous les chantiers avec leurs relations pour l'export (evite le N+1 sur
-     * account / assignedTo / acteurs). Le filtrage est fait en Java par ChantierExportService :
-     * le volume tient largement en memoire et cela evite les parametres nuls typees en JPQL.
-     */
-    @Query("""
-        SELECT DISTINCT c FROM Chantier c
-        LEFT JOIN FETCH c.account
-        LEFT JOIN FETCH c.assignedTo
-        LEFT JOIN FETCH c.acteurs
-        ORDER BY c.nom ASC
-    """)
-    List<Chantier> findAllForExport();
-
     @Query("SELECT COUNT(c) FROM Chantier c GROUP BY c.stadeChantier")
     List<Object[]> countByStadeGrouped();
 }
