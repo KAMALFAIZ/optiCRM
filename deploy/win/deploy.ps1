@@ -26,21 +26,6 @@ $HealthUrl  = "http://localhost:8082/actuator/health"
 function Step($msg) { Write-Host "`n==> $msg" -ForegroundColor Cyan }
 
 Step "Sync $Root sur origin/main ($Sha)"
-
-# $Root est AUSSI le repertoire de developpement : le 'reset --hard' ci-dessous
-# ecraserait tout travail non commite. On le met d'abord de cote dans un stash
-# (recuperable via 'git stash list' / 'git stash apply') plutot que de le perdre.
-$dirty = git -C $Root status --porcelain --untracked-files=no
-if ($LASTEXITCODE -ne 0) { throw "git status a echoue" }
-if ($dirty) {
-  $stashMsg = "auto-deploy-backup $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') avant $Sha"
-  Write-Host "ATTENTION : modifications non commitees detectees dans $Root :" -ForegroundColor Yellow
-  $dirty | ForEach-Object { Write-Host "    $_" -ForegroundColor Yellow }
-  git -C $Root stash push -m $stashMsg
-  if ($LASTEXITCODE -ne 0) { throw "git stash a echoue - deploiement interrompu pour ne pas perdre le travail local" }
-  Write-Host "Sauvegarde dans le stash : `"$stashMsg`" (restaurer avec : git -C $Root stash apply)" -ForegroundColor Yellow
-}
-
 git -C $Root fetch --all --prune
 if ($LASTEXITCODE -ne 0) { throw "git fetch a echoue" }
 git -C $Root reset --hard origin/main
